@@ -1,0 +1,84 @@
+<!-- === Panneau latéral Bibliothèque === -->
+<aside id="library-sidebar" class="library-collapsed" aria-hidden="true">
+  <!-- En-tête -->
+  <div class="library-topbar">
+    <h3><i class="bi bi-collection"></i> Bibliothèque</h3>
+    <div class="library-controls">
+      <div class="expand-btn" id="library-expand" title="Agrandir">
+        <i class="bi bi-arrows-angle-expand"></i>
+      </div>
+      <div class="close-btn" id="library-close" title="Fermer">
+        <i class="bi bi-x-lg"></i>
+      </div>
+    </div>
+  </div>
+  <!-- Onglets -->
+  <div class="library-tabs">
+    <div class="tab-btn active" data-tab="playlists">Playlists</div>
+    <div class="tab-btn" data-tab="artists">Artistes</div>
+    <div class="tab-btn" data-tab="albums">Albums</div>
+  </div>
+
+  <!-- Contenu -->
+  <div class="library-content">
+    <!-- Playlists -->
+    <div id="tab-playlists" class="tab-content active">
+      <ul>
+        {% if playlists %} {% for playlist in playlists %}
+        <li>
+          <a href="#">{{ playlist.name }}</a>
+        </li>
+        {% endfor %} {% else %}
+        <li><em>Aucune playlist trouvée.</em></li>
+        {% endif %}
+      </ul>
+    </div>
+
+    <!-- Artistes -->
+    <div id="tab-artists" class="tab-content">
+      <ul>
+        {% if artists %} {% for artist in artists %}
+        <li>
+          <a href="{% url 'artist_detail' artist.id %}">
+            {% if artist.image %}
+            <img
+              src="{{ artist.image.url }}"
+              alt="{{ artist.name }}"
+              width="40"
+              height="40"
+              style="border-radius: 50%"
+            />
+            {% endif %} {{ artist.name }}
+          </a>
+        </li>
+        {% endfor %} {% else %}
+        <li><em>Aucun artiste trouvé.</em></li>
+        {% endif %}
+      </ul>
+    </div>
+
+    <!-- Albums -->
+    <div id="tab-albums" class="tab-content">
+      <ul>
+        {% if albums %} {% for album in albums %}
+        <li>
+          <a href="{% url 'album_detail' album.id %}">
+            {% if album.cover_image %}
+            <img
+              src="{{ album.cover_image.url }}"
+              alt="{{ album.title }}"
+              width="40"
+              height="40"
+              style="border-radius: 6px"
+            />
+            {% endif %} {{ album.title }} –
+            <small>{{ album.artist.name }}</small>
+          </a>
+        </li>
+        {% endfor %} {% else %}
+        <li><em>Aucun album trouvé.</em></li>
+        {% endif %}
+      </ul>
+    </div>
+  </div>
+</aside>

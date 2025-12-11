@@ -1,0 +1,791 @@
+{% extends 'store/base.html' %} {% block title %}Liste des videos{% endblock %}
+{% block playtrack %}
+
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Segoe UI", Arial, sans-serif;
+        background: linear-gradient(135deg, #6efbc3ff, #2accedff);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        padding: 20px;
+      }
+
+      #playlist-player {
+        width: 100%;
+        max-width: 800px;
+        background-color: rgba(255, 255, 255, 0.95);
+        border-radius: 20px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        overflow: hidden;
+      }
+
+      .player-header {
+        padding: 25px 25px 15px;
+        text-align: center;
+        border-bottom: 1px solid #f0f0f0;
+      }
+
+      .player-header h2 {
+        color: #333;
+        font-size: 22px;
+        margin-bottom: 5px;
+      }
+
+      .player-header p {
+        color: #888;
+        font-size: 14px;
+      }
+
+      .track-info {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 20px;
+      }
+
+      .track-info img {
+        width: 220px;
+        height: 220px;
+        border-radius: 10px;
+        object-fit: cover;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
+      }
+
+      .track-text {
+        text-align: center;
+        margin-bottom: 25px;
+        width: 100%;
+      }
+
+      .track-text .title {
+        font-size: 20px;
+        font-weight: bold;
+        color: #333;
+        margin-bottom: 5px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .track-text .artist {
+        font-size: 16px;
+        color: #777;
+      }
+
+      .progress-container {
+        width: 100%;
+        margin-bottom: 10px;
+      }
+
+      .time-display {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 8px;
+        font-size: 12px;
+        color: #888;
+      }
+
+      .progress-bar {
+        width: 100%;
+        height: 6px;
+        background-color: #e0e0e0;
+        border-radius: 3px;
+        overflow: hidden;
+        margin-bottom: 20px;
+      }
+
+      .progress {
+        height: 100%;
+        background: linear-gradient(to right, #6e8efb, #a777e3);
+        border-radius: 3px;
+        width: 35%;
+      }
+
+      .controls {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 0 20px 25px;
+      }
+
+      .controls button {
+        background: none;
+        border: none;
+        cursor: pointer;
+        outline: none;
+        margin: 0 12px;
+        color: #555;
+        transition: all 0.2s ease;
+      }
+
+      .controls button:hover {
+        color: #6e8efb;
+        transform: scale(1.1);
+      }
+
+      .controls button:active {
+        transform: scale(0.95);
+      }
+
+      #play-pause-btn {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #6e8efb, #a777e3);
+        color: white;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 20px;
+        box-shadow: 0 4px 10px rgba(110, 142, 251, 0.4);
+      }
+
+      #play-pause-btn:hover {
+        box-shadow: 0 6px 12px rgba(110, 142, 251, 0.5);
+        color: white;
+      }
+
+      .volume-container {
+        padding: 0 25px 25px;
+        display: flex;
+        align-items: center;
+      }
+
+      .volume-container i {
+        color: #777;
+        margin-right: 12px;
+        font-size: 18px;
+      }
+
+      .volume-bar {
+        flex: 1;
+        height: 5px;
+        background-color: #e0e0e0;
+        border-radius: 3px;
+        position: relative;
+      }
+
+      .volume-level {
+        height: 100%;
+        width: 70%;
+        background: linear-gradient(to right, #6e8efb, #a777e3);
+        border-radius: 3px;
+      }
+
+      .playlist-container {
+        background-color: #f8f8f8;
+        border-top: 1px solid #eee;
+        padding: 15px 0;
+      }
+
+      .playlist-header {
+        padding: 0 25px 15px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .playlist-header h3 {
+        font-size: 16px;
+        color: #333;
+      }
+
+      #playlist {
+        list-style-type: none;
+        max-height: 200px;
+        overflow-y: auto;
+      }
+
+      #playlist li {
+        padding: 12px 25px;
+        border-bottom: 1px solid #eee;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        transition: background-color 0.2s;
+      }
+
+      #playlist li:hover {
+        background-color: #f0f0f0;
+      }
+
+      #playlist li.active {
+        background-color: rgba(110, 142, 251, 0.1);
+        color: #6e8efb;
+      }
+
+      #playlist li i {
+        margin-right: 12px;
+        color: #777;
+      }
+
+      #playlist li.active i {
+        color: #6e8efb;
+      }
+
+      .track-details {
+        flex: 1;
+      }
+
+      .track-details .title {
+        font-size: 14px;
+        font-weight: 500;
+        margin-bottom: 3px;
+      }
+
+      .track-details .artist {
+        font-size: 12px;
+        color: #888;
+      }
+
+      .track-duration {
+        font-size: 12px;
+        color: #888;
+        margin-left: 10px;
+      }
+
+      /* Style pour la barre de défilement */
+      #playlist::-webkit-scrollbar {
+        width: 6px;
+      }
+
+      #playlist::-webkit-scrollbar-track {
+        background: #f1f1f1;
+      }
+
+      #playlist::-webkit-scrollbar-thumb {
+        background: #c1c1c1;
+        border-radius: 3px;
+      }
+
+      #playlist::-webkit-scrollbar-thumb:hover {
+        background: #a1a1a1;
+      }
+
+      .fade-out {
+        opacity: 0;
+        transition: opacity 0.3s ease;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="playlist-player">
+      <div class="player-header">
+        <h2>Mon Lecteur</h2>
+        <p>Profitez de votre musique</p>
+      </div>
+
+      <div class="track-info">
+        <img
+          id="track-img"
+          src="{{ track.cover_image.url }}"
+          alt="Image du track"
+        />
+        <div class="track-text">
+          <span id="track-title">{{ track.title }}</span>
+          <span id="track-artist">{{ track.artist.name }}</span>
+        </div>
+
+        <div class="progress-container">
+          <div class="time-display">
+            <span id="current-time">2:15</span>
+            <span id="total-time">4:35</span>
+          </div>
+          <div class="progress-bar">
+            <div class="progress"></div>
+          </div>
+        </div>
+      </div>
+
+      <audio id="audio-element">
+        <source src="{{ track.file.url }}" type="audio/mpeg" />
+        Votre navigateur ne supporte pas la lecture audio.
+      </audio>
+
+      <div class="controls">
+        <button id="shuffle-btn"><i class="fas fa-random"></i></button>
+        <button id="prev-btn"><i class="fas fa-step-backward"></i></button>
+        <button id="play-pause-btn"><i class="fas fa-play"></i></button>
+        <button id="next-btn"><i class="fas fa-step-forward"></i></button>
+        <button id="repeat-btn"><i class="fas fa-redo"></i></button>
+      </div>
+
+      <div class="volume-container">
+        <i class="fas fa-volume-up"></i>
+        <div class="volume-bar">
+          <div class="volume-level"></div>
+        </div>
+      </div>
+
+      
+
+    <script>
+      const audio = document.getElementById("audio-element");
+      const playPauseBtn = document.getElementById("play-pause-btn");
+      const prevBtn = document.getElementById("prev-btn");
+      const nextBtn = document.getElementById("next-btn");
+      const shuffleBtn = document.getElementById("shuffle-btn");
+      const repeatBtn = document.getElementById("repeat-btn");
+      const progressBar = document.querySelector(".progress");
+      const currentTimeEl = document.getElementById("current-time");
+      const totalTimeEl = document.getElementById("total-time");
+      const volumeLevel = document.querySelector(".volume-level");
+      const playlistItems = document.querySelectorAll("#playlist li");
+      const expandBtn = document.getElementById("expand-player");
+      const playerContainer = document.getElementById("player-container");
+
+      // --- Données des pistes ---
+      const tracks = [
+        {
+          id: 1,
+          title: "Fais moi confiance",
+          artist: "Sidiki Diabaté",
+          duration: "4:35",
+          file: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview125/v4/7d/94/7c/7d947cd5-095a-35e9-4e2f-5e95aa007113/mzaf_1702833948110558951.plus.aac.p.m4a",
+          image:
+            "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?auto=format&fit=crop&w=600&q=80",
+        },
+        {
+          id: 2,
+          title: "African Blues",
+          artist: "Ali Farka Touré",
+          duration: "5:20",
+          file: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview115/v4/8f/af/02/8faf02c6-97c0-6770-3f5a-5db3e57b9e5e/mzaf_17264234643338515301.plus.aac.p.m4a",
+          image:
+            "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?auto=format&fit=crop&w=600&q=80",
+        },
+        {
+          id: 3,
+          title: "Mali Blues",
+          artist: "Habib Koité",
+          duration: "3:55",
+          file: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview125/v4/bf/bb/6c/bfbb6c70-9e33-4a8e-5c4f-5d3b5c7b5b5b/mzaf_1234567890.plus.aac.p.m4a",
+          image:
+            "https://images.unsplash.com/photo-1511735111819-9a3f7709049c?auto=format&fit=crop&w=600&q=80",
+        },
+        {
+          id: 4,
+          title: "Djougal",
+          artist: "Oumou Sangaré",
+          duration: "4:10",
+          file: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview115/v4/5a/6b/3a/5a6b3a0a-0b0a-0b0a-0b0a-0b0a0b0a0b0a/mzaf_9876543210.plus.aac.p.m4a",
+          image:
+            "https://images.unsplash.com/photo-1519677100203-a0e668c92439?auto=format&fit=crop&w=600&q=80",
+        },
+      ];
+
+      // Set global track list for mini player
+      window.currentTrackList = tracks.map(t => ({
+        id: t.id,
+        title: t.title,
+        artist: t.artist,
+        cover: t.image,
+        file_url: t.file
+      }));
+      window.currentTrackIndex = 0;
+
+      let currentTrack = 0;
+      let isPlaying = false;
+      let shuffleEnabled = false;
+      let repeatEnabled = false;
+
+      // --- Charger une piste ---
+      function loadTrack(index) {
+        if (index < 0) index = tracks.length - 1;
+        if (index >= tracks.length) index = 0;
+        currentTrack = index;
+        window.currentTrackIndex = index; // Sync with mini player
+        const track = tracks[currentTrack];
+
+        // Image pochette
+        const imgEl = document.getElementById("track-img");
+        if (imgEl && track.image) imgEl.src = track.image;
+
+        // Titre / artiste : supporte plusieurs templates (classes ou ids)
+        const titleEl =
+          document.querySelector(".track-text .title") ||
+          document.getElementById("track-title");
+        if (titleEl) titleEl.textContent = track.title || "";
+
+        const artistElLocal =
+          document.querySelector(".track-text .artist") ||
+          document.getElementById("track-artist");
+        if (artistElLocal)
+          artistElLocal.textContent = track.artist || "Inconnu";
+
+        if (typeof totalTimeEl !== "undefined" && totalTimeEl)
+          totalTimeEl.textContent = track.duration || "0:00";
+        if (typeof currentTimeEl !== "undefined" && currentTimeEl)
+          currentTimeEl.textContent = "0:00";
+
+        if (track.file) {
+          audio.src = track.file;
+          try {
+            audio.load();
+          } catch (e) {}
+        }
+        if (track.id !== undefined) audio.dataset.trackId = track.id;
+        if (expandBtn) expandBtn.dataset.trackId = track.id;
+
+        if (playlistItems && playlistItems.length) {
+          playlistItems.forEach((item, i) => {
+            try {
+              item.classList.toggle("active", i === index);
+            } catch (e) {
+              /* ignore */
+            }
+          });
+        }
+      }
+
+      // --- Lecture / Pause ---
+      function playPause() {
+        if (audio.paused) {
+          audio.play();
+          playPauseBtn.innerHTML = '<i class="fas fa-pause"></i>';
+          isPlaying = true;
+        } else {
+          audio.pause();
+          playPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
+          isPlaying = false;
+        }
+      }
+
+      // --- Suivant / Précédent ---
+      function nextTrack() {
+        loadTrack(currentTrack + 1);
+        if (isPlaying) audio.play();
+      }
+      function prevTrack() {
+        if (audio.currentTime > 3) audio.currentTime = 0;
+        else {
+          loadTrack(currentTrack - 1);
+          if (isPlaying) audio.play();
+        }
+      }
+
+      // --- Barre de progression ---
+      function updateProgress() {
+        const { currentTime, duration } = audio;
+        if (duration) {
+          progressBar.style.width = `${(currentTime / duration) * 100}%`;
+          currentTimeEl.textContent = `${Math.floor(currentTime / 60)}:${String(
+            Math.floor(currentTime % 60)
+          ).padStart(2, "0")}`;
+        }
+      }
+      function setProgress(e) {
+        audio.currentTime = (e.offsetX / this.clientWidth) * audio.duration;
+      }
+
+      // --- Volume ---
+      function setVolume(e) {
+        const v = e.offsetX / this.clientWidth;
+        audio.volume = v;
+        volumeLevel.style.width = `${v * 100}%`;
+      }
+
+      // --- Shuffle / Repeat ---
+      shuffleBtn.addEventListener("click", () => {
+        shuffleEnabled = !shuffleEnabled;
+        shuffleBtn.style.color = shuffleEnabled ? "#6e8efb" : "#555";
+      });
+      repeatBtn.addEventListener("click", () => {
+        repeatEnabled = !repeatEnabled;
+        repeatBtn.style.color = repeatEnabled ? "#6e8efb" : "#555";
+      });
+
+      // --- Bouton agrandir ---
+      if (expandBtn) {
+        expandBtn.addEventListener("click", () => {
+          const trackId = expandBtn.dataset.trackId;
+          if (!trackId) return alert("Aucune piste en cours !");
+          const playerState = {
+            src: audio.src,
+            currentTime: audio.currentTime,
+            paused: audio.paused,
+            volume: audio.volume,
+            trackId: trackId,
+            shuffle: shuffleEnabled,
+            repeat: repeatEnabled,
+            currentTrackIndex: currentTrack,
+          };
+          localStorage.setItem("playerState", JSON.stringify(playerState));
+          playerContainer?.classList.add("fade-out");
+          setTimeout(
+            () => (window.location.href = `/track/play/${trackId}/`),
+            300
+          );
+        });
+      }
+
+      // --- Playlist clic ---
+      playlistItems.forEach((item, index) => {
+        item.addEventListener("click", () => {
+          loadTrack(index);
+          if (!isPlaying) playPause();
+        });
+      });
+
+      // --- Événements ---
+      playPauseBtn.addEventListener("click", playPause);
+      nextBtn.addEventListener("click", nextTrack);
+      prevBtn.addEventListener("click", prevTrack);
+      audio.addEventListener("timeupdate", updateProgress);
+      document
+        .querySelector(".progress-bar")
+        ?.addEventListener("click", setProgress);
+      document
+        .querySelector(".volume-bar")
+        ?.addEventListener("click", setVolume);
+
+      // --- Restaurer la lecture (grand ou petit lecteur) ---
+      function tryRestoreState(key) {
+        // Prioritize sessionStorage (more likely to be available immediately after redirect)
+        let raw = null;
+        try {
+          raw = sessionStorage.getItem(key);
+        } catch (e) {
+          raw = null;
+        }
+        if (!raw) {
+          try {
+            raw = localStorage.getItem(key);
+          } catch (e) {
+            raw = null;
+          }
+        }
+        if (!raw) return null;
+        try {
+          return JSON.parse(raw);
+        } catch (e) {
+          console.warn("[play_track] invalid JSON in", key, e);
+          return null;
+        }
+      }
+
+      console.log("[play_track] script init");
+      
+      (async function tryRestoreWithRetry() {
+        const maxAttempts = 8; // ~8 * 80ms = ~640ms
+        const delayMs = 80;
+        let attempt = 0;
+        let data = null;
+        while (attempt < maxAttempts && !data) {
+          data =
+            tryRestoreState("playerState") || tryRestoreState("currentPlayer");
+          if (data) break;
+          attempt += 1;
+          await new Promise((r) => setTimeout(r, delayMs));
+        }
+
+        if (data) {
+          console.log(
+            "[play_track] restoring playback state (after",
+            attempt,
+            "attempts)",
+            data
+          );
+          try {
+            console.log("[play_track] restoring json", JSON.stringify(data));
+          } catch (e) {}
+          // create a small debug overlay so the user sees the restoration data even if console is hidden
+          (function showDebugOverlay(msg) {
+            try {
+              let dbg = document.getElementById("player-debug");
+              if (!dbg) {
+                dbg = document.createElement("div");
+                dbg.id = "player-debug";
+                dbg.style.position = "fixed";
+                dbg.style.right = "12px";
+                dbg.style.bottom = "12px";
+                dbg.style.background = "rgba(0,0,0,0.75)";
+                dbg.style.color = "white";
+                dbg.style.padding = "8px 10px";
+                dbg.style.borderRadius = "6px";
+                dbg.style.zIndex = 20000;
+                dbg.style.fontSize = "12px";
+                dbg.style.maxWidth = "300px";
+                dbg.style.maxHeight = "120px";
+                dbg.style.overflow = "auto";
+                document.body.appendChild(dbg);
+              }
+              dbg.textContent = msg;
+            } catch (e) {}
+          })(
+            "[play_track] restoring (after " +
+              attempt +
+              " attempts) " +
+              (JSON.stringify(data) || String(data))
+          );
+          const trackIndex = tracks.findIndex((t) => t.id == data.trackId);
+          // Apply muted flag as early as possible so autoplay policies and loading
+          // respect the user's mute choice.
+          try {
+            if (typeof data.muted !== 'undefined') {
+              audio.muted = !!data.muted;
+              console.log('[play_track] restored muted=', audio.muted);
+            }
+          } catch (e) {}
+          // If we have an explicit src from the small player, prefer it when it
+          // differs from the local tracks[trackIndex].file (avoids using a local
+          // placeholder/sample with the same id).
+          if (data.src) {
+            const localMatch =
+              trackIndex >= 0 && tracks[trackIndex] && tracks[trackIndex].file;
+            const localFile = localMatch ? tracks[trackIndex].file : null;
+            if (!localFile || localFile === data.src) {
+              // local file equals remote src (or no local file): load local track
+              if (trackIndex >= 0) loadTrack(trackIndex);
+              else {
+                // no local match, fallback to using src below
+              }
+            } else {
+              // local file differs from data.src -> prefer data.src (fallback)
+              console.log(
+                "[play_track] local track file differs from saved src; using saved src instead"
+              );
+              // execute fallback below by not calling loadTrack here
+            }
+          } else if (trackIndex >= 0) {
+            loadTrack(trackIndex);
+          } else {
+            // Fallback : la piste n'est pas dans l'array tracks local.
+            // On utilise les métadonnées envoyées par le petit lecteur (src/title/artist/cover)
+            console.log(
+              "[play_track] track not found in local tracks array, using fallback metadata"
+            );
+            if (data.title) {
+              const titleEl =
+                document.querySelector(".track-text .title") ||
+                document.getElementById("track-title");
+              if (titleEl) titleEl.textContent = data.title;
+            }
+            if (data.artist) {
+              const artistElLocal =
+                document.querySelector(".track-text .artist") ||
+                document.getElementById("track-artist");
+              if (artistElLocal) artistElLocal.textContent = data.artist;
+            }
+            if (data.cover) {
+              const imgEl = document.getElementById("track-img");
+              if (imgEl) imgEl.src = data.cover;
+            }
+            if (data.src) {
+              // Attach one-shot handler so we can set currentTime after metadata is ready
+              const onMeta = () => {
+                try {
+                  audio.currentTime = data.currentTime ?? 0;
+                } catch (e) {}
+                audio.removeEventListener("loadedmetadata", onMeta);
+              };
+              audio.addEventListener("loadedmetadata", onMeta);
+              audio.src = data.src;
+              try {
+                audio.load();
+              } catch (e) {}
+              audio.dataset.trackId = data.trackId || "";
+            }
+          }
+          audio.volume = data.volume ?? 1;
+          // If we have a prevVolume stored (previous non-zero volume), prefer it when current volume is 0
+          try {
+            if ((audio.volume === 0 || typeof audio.volume === 'undefined') && typeof data.prevVolume === 'number' && data.prevVolume > 0) {
+              audio.volume = data.prevVolume;
+              console.log('[play_track] restored prevVolume ->', audio.volume);
+            }
+          } catch (e) {}
+          // restore muted flag if present
+          try { audio.muted = !!data.muted; } catch (e) {}
+          shuffleEnabled = data.shuffle ?? false;
+          repeatEnabled = data.repeat ?? false;
+          shuffleBtn.style.color = shuffleEnabled ? "#6e8efb" : "#555";
+          repeatBtn.style.color = repeatEnabled ? "#6e8efb" : "#555";
+          // Update visual volume bar and icon if present
+          try {
+            const vl = document.querySelector('.volume-level');
+            if (vl) vl.style.width = (audio.muted ? 0 : (audio.volume * 100)) + "%";
+            const volIcon = document.querySelector('.volume-container i');
+            if (volIcon) {
+              if (audio.muted || audio.volume === 0) volIcon.className = 'fas fa-volume-mute';
+              else if (audio.volume < 0.5) volIcon.className = 'fas fa-volume-down';
+              else volIcon.className = 'fas fa-volume-up';
+            }
+          } catch (e) {}
+
+          audio.addEventListener("loadedmetadata", () => {
+            audio.currentTime = data.currentTime ?? 0;
+            if (!data.paused) {
+              audio.play().catch(() => {});
+              playPauseBtn.innerHTML = '<i class="fas fa-pause"></i>';
+              isPlaying = true;
+            } else {
+              // ensure UI shows Play when paused
+              playPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
+            }
+          });
+          // If the restored track isn't present in the local tracks list, show a list of similar tracks (same artist when possible)
+          try {
+            if (typeof trackIndex !== 'undefined' && trackIndex < 0) {
+              const pl = document.getElementById('playlist');
+              if (pl) {
+                // find same-artist tracks
+                let similar = [];
+                if (data.artist) {
+                  similar = tracks.filter(t => t.artist && t.artist.toLowerCase() === data.artist.toLowerCase());
+                }
+                if (!similar || similar.length === 0) {
+                  // fallback: first 3 tracks
+                  similar = tracks.slice(0, 3);
+                }
+                // build list
+                pl.innerHTML = '';
+                similar.forEach(s => {
+                  const li = document.createElement('li');
+                  li.innerHTML = `<i class="fas fa-music"></i><div class="track-details"><div class="title">${s.title}</div><div class="artist">${s.artist}</div></div><div class="track-duration">${s.duration || ''}</div>`;
+                  // click -> find index in tracks and load
+                  li.addEventListener('click', () => {
+                    const idx = tracks.findIndex(t => t.title === s.title && t.artist === s.artist);
+                    if (idx >= 0) {
+                      loadTrack(idx);
+                      if (!isPlaying) {
+                        audio.play().catch(() => {});
+                        playPauseBtn.innerHTML = '<i class="fas fa-pause"></i>';
+                        isPlaying = true;
+                      }
+                    }
+                  });
+                  pl.appendChild(li);
+                });
+              }
+            }
+          } catch (e) {}
+          // cleanup: remove the persistent localStorage keys but keep sessionStorage
+          // so that navigating back (bfcache) or returning to the previous page
+          // can still read sessionStorage and restore the small player.
+          try {
+            localStorage.removeItem("playerState");
+          } catch (e) {}
+          try {
+            localStorage.removeItem("currentPlayer");
+          } catch (e) {}
+        } else {
+          console.log(
+            "[play_track] no saved playerState/currentPlayer to restore (after retries)"
+          );
+        }
+      })();
+    </script>
+    <script src="/static/js/player.js" defer></script>
+    <script src="/static/js/search.js" defer></script>
+  </body>
+{% endblock playtrack %}

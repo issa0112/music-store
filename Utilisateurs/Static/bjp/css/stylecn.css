@@ -1,0 +1,176 @@
+/* Corps de la page */
+
+/* Container principal */
+/* .container {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  
+}  */
+
+/* Formulaire */
+form {
+  background: rgba(255, 255, 255, 0.06);
+  color: #fff;
+  padding: 3em;
+  height: auto;
+  border-radius: 20px 0 0 20px;
+  border-left: 1px solid rgba(255, 255, 255, 0.3);
+  border-top: 1px solid rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(10px);
+  box-shadow: 20px 20px 20px -6px rgba(0, 0, 0, 0.2);
+  text-align: center;
+  transition: all 0.2s ease-in-out;
+}
+
+form p {
+  font-weight: 900;
+  color: #fff;
+  opacity: 0.7;
+  font-size: 2rem;
+  margin-bottom: 25px;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+form input {
+  background: transparent;
+  width: 200px;
+  padding: 1em;
+  margin-bottom: 2em;
+  border-left: 1px solid rgba(255, 255, 255, 0.3);
+  border-top: 1px solid rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(5px);
+  text-align: center;
+  color: #fff;
+  font-weight: 500;
+  border-radius: 5000px;
+  box-shadow: inset 4px 4px 6px -1px rgba(0,0,0,0.2),
+            inset -4px -4px 6px -1px rgba(255,255,255,0.7),
+            -0.5px -0.5px 0px rgba(255,255,255,1),
+            0.5px 0.5px 0px rgba(0,0,0,0.15),
+            0px 12px 10px -10px rgba(0,0,0,0.05);
+  border: 1px solid rgba(0,0,0,0.1);
+  transform: translateY(0.5em);
+    }
+
+form input:hover,
+form input:focus {
+  background: rgba(255, 255, 255, 0.1);
+  box-shadow: 4px 4px 60px 8px rgba(0, 0, 0, 0.2);
+
+}
+
+form input[type="submit"] {
+  margin-top: 50px;
+  width: 150px;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+/* Menu global */
+.menu ul {
+  list-style: none;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.menu ul li {
+  margin: 0 15px;
+}
+
+.menu ul li button {
+  background-color: #f4f6f8;
+  color: white;
+  padding: 10px 15px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+    /* background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%236291fd' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' class='feather feather-search'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cline x1='21' y1='21' x2='16.65' y2='16.65'/%3E%3C/svg%3E"); */
+
+/* Formulaire popup */
+.popup-form {
+  display: flex;
+  position: fixed;
+  top: 60px;  /* Hauteur du menu */
+  right: -300px; /* Commence hors de l'écran à droite */
+  width: auto;
+  border-radius: 20px 0 0 20px;
+  background-color: rgba(255, 255, 255, 0);
+  box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.3);
+  z-index: 1000;
+  transition: transform 0.5s linear, opacity 0.5s linear; /* Utilisation de cubic-bezier pour un effet de glissement */
+  opacity: 0;
+  transform: translateX(0); /* Légère translation vers le haut lors de l'apparition */
+}
+
+.popup-form.show {
+  display: flex;
+  opacity: 1;
+  transform: translateX(-300px) translateY(-20px); /* Glisse de la droite et monte légèrement */
+}
+
+
+.popup-form input[type="text"],
+.popup-form input[type="password"],
+.popup-form input[type="email"] {
+  width: 100%;
+  padding: 10px;
+  margin: 10px 0;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  color: #fff; 
+}
+.popup-form p,
+.popup-form input[type="text"],
+.popup-form input[type="password"],
+.popup-form input[type="submit"],
+.popup-form input[type="email"],
+.popup-form a {
+  color: #ffffff; /* Met le texte en blanc */
+}
+
+.popup-form a {
+  color: #29b8c0; /* Lien en bleu pour une meilleure visibilité */
+}
+.popup-form input[type="submit"] {
+  width: 100%;
+  padding: 10px;
+  margin-top: 20px;
+  background-color: #f2f3f4;
+  color: rgb(12, 12, 12);
+  border: solid 1px #29b8c0 ;
+  border-radius: 5px;
+}
+
+.popup-form input[type="submit"]:hover {
+  background-color: #18191b62;
+  color: #ddd;
+  
+}
+.popup-form input {
+  width: 100%; /* Les champs prennent toute la largeur */
+}
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0);
+  display: none;
+  z-index: 999;
+}
+
+.overlay.show {
+  display: block;
+}
+/* Messages d'erreur */
+.error-messages p.error {
+  color: red;
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+

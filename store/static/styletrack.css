@@ -1,0 +1,235 @@
+/* Styles globaux */
+body {
+        font-family: "Times New Roman", Times, serif;
+        background: url('wall.jpg') no-repeat center center fixed;;
+        background-size: cover;
+        background-position: center;
+        color: #222;
+        margin: 60px 0 0 0;
+        padding: 0;
+        height: 100vh; /* S'adapte à la hauteur totale de la fenêtre */
+        /* overflow: hidden; Empêche les barres de défilement inutiles */
+        
+    }
+    
+
+/* En-tête */
+header {
+    background-color: rgb(49, 138, 138); /* Couleur Spotify-like */
+    color: white;
+    padding: 15px 20px;
+    text-align: center;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+header h1 {
+    margin: 0;
+    font-size: 1.8em;
+}
+
+
+
+a {
+    display: block;
+    text-align: center; /* Centrer les liens */
+    color: rgb(0, 0, 0); /* Couleur des liens */
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: none;
+}
+
+/* Section principale */
+.main {
+        color: #fff;
+        /* padding: 50px 10%; */
+        margin: 20px;
+        margin-bottom: 30px;
+        background: rgba(255, 255, 255, 0.06);
+        padding: 20px;
+        border-radius: 20px;
+        border-left: 1px solid rgb(71, 145, 139);
+        border-top: 1px solid rgb(71, 145, 139);
+        backdrop-filter: blur(10px);
+        box-shadow: 20px 20px 20px -6px rgb(71, 145, 139);
+        text-align: center;
+        position: relative;
+        transition: all 0.2s ease-in-out;
+}
+
+/* Cartes d'album et vidéo */
+.card {
+        background-color: rgba(255, 255, 255, 0.6);
+        border-radius: 8px;
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.416);
+        overflow: hidden;
+        margin-bottom: 20px; 
+        width: 350px; /* Fixe la largeur des cartes à 200px */
+        text-align: center; 
+        backdrop-filter: blur(30px); /* L'effet de flou sur l'arrière-plan derrière la carte */
+        -webkit-backdrop-filter: blur(30px); /* Pour le support de Safari */
+    
+}
+
+.card:hover {
+    box-shadow: inset 4px 4px 6px -1px rgba(0,0,0,0.2),
+            inset -4px -4px 6px -1px rgba(255,255,255,0.7),
+            -0.5px -0.5px 0px rgba(255,255,255,1),
+            0.5px 0.5px 0px rgba(0,0,0,0.15),
+            0px 12px 10px -10px rgba(0,0,0,0.05);
+    border: 1px solid rgba(0,0,0,0.1);
+    transform: translateY(0.5em);
+    }
+.bt svg {
+    transition: transform 0.5s;
+    }
+.card:hover svg {
+    transform: scale(0.9);
+    fill: #333333;
+    }
+
+    .card img {
+        width: 100%; /* Remplit la largeur de la carte */
+        height: 200px; /* Remplit la hauteur de la carte */
+        object-fit: cover; /* Ajuste la vidéo pour qu'elle couvre entièrement la carte, en coupant si nécessaire */
+        border-radius: 8px; /* Garde les coins arrondis */
+    }
+    audio{
+        padding: 8px;
+        border-radius: 8px;
+    }
+.card-content {
+    padding: 10px; /* Réduire le padding autour du contenu */
+    background-color: rgba(255, 255, 255, 0.3);
+}
+
+.card-title {
+    font-size: 1.2em; /* Réduire la taille du titre */
+    margin: 0;
+    color: #333;
+}
+
+.card-description {
+    color: #666;
+    font-size: 0.9em;
+    margin-top: 10px;
+}
+
+/* Liste d'albums et vidéos */
+.list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px; /* Espace entre les cartes vidéo augmenté */
+    justify-content: start;
+}
+
+.list-item {
+    flex: 1 1 calc(20% - 10px); /* Ajuster la taille des éléments en fonction de l'espace disponible */
+    box-sizing: border-box;
+    margin: 5px; /* Réduire la marge autour de chaque album */
+}
+
+
+#fullscreen-player {
+position: fixed;
+    top: 10px; /* juste en dessous du nav (ajuste selon la hauteur du menu) */
+    left: 0;
+    width: 100%;
+    height: calc(100% - 60px); /* prend tout sauf la hauteur du nav */
+    z-index: 999;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    background: rgba(0,0,0,0.95);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+
+/* Visible */
+#fullscreen-player.fs-visible {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+/* Fond flou */
+.fs-bg {
+    position: absolute;
+    inset: 0;
+    background-size: cover;
+    background-position: center;
+    filter: blur(40px) brightness(0.35);
+    z-index: -1;
+}
+
+/* Header Spotify */
+.fs-header {
+    height: 70px;
+    display: flex;
+    align-items: center;
+    padding: 15px;
+}
+
+.fs-btn {
+    position: absolute;
+    top: 80px;
+    right: 20px;
+    background: rgba(255,255,255,0.1);
+    padding: 8px;
+    border-radius: 50%;
+    cursor: pointer;
+    color: #fff;
+    font-size: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Pochette grande centrée */
+.fs-center {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0 20px;
+    margin-top: 20px;
+}
+
+#fs-cover {
+    width: 75Vw;
+    max-width: 450px;
+    height: 300px;      /* hauteur fixe, ajustable */
+    object-fit: cover; 
+    border-radius: 12px;
+    box-shadow: 0 0 40px rgba(0,0,0,.6);
+    animation: zoomin .45s ease;
+}
+
+@keyframes zoomin {
+    from { opacity: 0; transform: scale(.85); }
+    to   { opacity: 1; transform: scale(1); }
+}
+
+/* Bas Spotify */
+.fs-bottom {
+    text-align: center;
+    margin-bottom: 45px;
+    animation: slideup .5s ease;
+}
+
+@keyframes slideup {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+#fs-title {
+    color: #fff;
+    font-size: 1.9rem;
+    font-weight: 700;
+    margin-bottom: 4px;
+}
+
+#fs-artist {
+    color: #cfcfcf;
+    font-size: 1.1rem;
+}

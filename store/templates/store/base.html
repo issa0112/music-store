@@ -1,0 +1,937 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <title>Inova Music</title>
+    <meta http-equiv="Content-Language" content="fr">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{% static 'styleHome.css' %}">
+    <link rel="stylesheet" href="{% static 'styleprofil.css' %}">
+    <link rel="stylesheet" href="{% static 'bjp/css/stylecn.css' %}">
+    <link rel="stylesheet" href="{% static 'styleNav.css' %}">
+    <link rel="stylesheet" href="{% static 'styletrack.css' %}">
+    <link rel="stylesheet" href="{% static 'stylevid.css' %}">
+    <link rel="stylesheet" href="{% static 'styleAL.css' %}">
+    <link rel="stylesheet" href="{% static 'librairy.css' %}">
+    <link rel="stylesheet" href="{% static 'stylebase.css' %}">
+    <link rel="stylesheet" href="{% static 'search_style.css' %}">
+    <link rel="stylesheet" href="{% static 'css/player.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"/>
+    <!-- Stripe -->
+    <script src="https://js.stripe.com/v3/"></script>
+
+    <!-- PayPal -->
+    <script src="https://www.paypal.com/sdk/js?client-id=VOTRE_CLIENT_ID_PAYPAL&currency=USD"></script>
+
+
+
+    
+</head>
+<style>
+  
+    /* === Conteneur global === */
+
+#global-audio-player {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  display: none;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.543); /* Fond semi-transparent pour mieux voir le flou */
+  backdrop-filter: blur(10px); /* Effet de flou */
+  -webkit-backdrop-filter: blur(10px); /* Prise en charge de Safari */
+  color: white;
+  z-index: 1000;
+  box-shadow: 0 -2px 20px rgba(0,0,0,0.5);
+  border-top: 1px solid rgba(255,255,255,0.1);
+  backdrop-filter: blur(10px);
+  transition: background 0.8s ease, box-shadow 0.8s ease;
+  padding: 5px 0;
+  
+}
+
+.player-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 95%;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 10px 0;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+
+.player-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+  min-width: 150px;
+}
+#player-cover {
+  width: 60px;
+  height: 60px;
+  border-radius: 8px;
+  object-fit: cover;
+  box-shadow: 0 0 15px rgba(0,0,0,0.5);
+}
+.track-info { display: flex; flex-direction: column; }
+#audio-title { font-weight: bold; }
+#audio-artist { font-size: 14px; opacity: 0.8; }
+
+.player-center {
+  flex: 2 1 auto;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+ 
+}
+.controls { display: flex; gap: 10px; margin-bottom: 5px; }
+.player-btn {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 20px;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+.player-btn:hover {
+    color: rgb(0, 255, 255);
+    outline-color: rgb(0, 255, 255);
+    /* box-shadow: -3px -3px 15px rgb(0, 255, 255); */
+    filter: drop-shadow(0px 0px 8px rgb(0, 255, 255 ));
+    transition-property: box-shadow;
+    transform: translateY(0.1em);
+    border: 1px #00ffffff; 
+ }
+.progress-bar {
+  width: 70%;
+  height: 4px;
+  border-radius: 2px;
+  background: #333;
+  accent-color: #1db954; /* couleur verte Spotify */
+  cursor: pointer;
+}
+
+#progress-bar {
+  flex: 1;
+  height: 5px;
+  appearance: none;
+  border-radius: 2px;
+  background: #555;
+  cursor: pointer;
+}
+
+#player-visualizer {
+  display: block;
+  width: 300px;       /* taille fixe */
+  height: 20px;       /* hauteur fixe */
+  margin: 0px auto 0 auto; /* centré horizontalement */
+  background: transparent;
+  pointer-events: none; /* pour que le canvas ne bloque pas la barre */
+}
+
+
+
+#progress-bar::-webkit-slider-thumb {
+  appearance: none;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #00ffffff;
+}
+#time-display { font-size: 12px; margin-top: 2px; }
+
+.player-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+  justify-content: flex-end;
+  min-width: 120px;
+  margin-left: 15px
+}
+#volume { width: 80px; }
+
+#global-audio-player.glow {
+  box-shadow: 0 -5px 40px var(--glow-color, #00ffffff);
+  transition: box-shadow 0.8s ease, background 0.8s ease;
+}
+/* Logo plus grand et bien visible */
+.nav-logo img {
+    height: 50px; /* augmente la taille selon ton souhait */
+    width: auto;
+    display: block;
+    margin-right: 20px 20px 0 0; /* espace entre logo et menu */
+}
+
+#share-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+#share-content {
+  position: relative;
+  background: #1e1e1e;
+  color: white;
+  padding: 20px;
+  border-radius: 15px;
+  width: 90%;
+  max-width: 400px;
+  text-align: center;
+  box-shadow: 0 0 15px rgba(0, 255, 255, 0.4);
+  animation: popIn 0.25s ease-out;
+}
+
+#share-content h3 {
+  margin-bottom: 10px;
+  color: #00ffff;
+}
+
+#close-share {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: none;
+  border: none;
+  color: white;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.share-action {
+  background: #00ffff;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 8px;
+  cursor: pointer;
+  color: #000;
+  margin-top: 10px;
+  width: 80%;
+  font-weight: bold;
+}
+
+.share-action:hover {
+  background: #00cccc;
+}
+.fade-out {
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+
+@keyframes popIn {
+  from { transform: scale(0.9); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+#close-player {
+  position: absolute;
+  top: 5px;
+  right: 10px;
+  background: none;
+  border: none;
+  color: white;
+  font-size: 20px;
+  cursor: pointer;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1100;
+  transition: all 0.3s ease;
+   
+}
+
+#close-player:hover {
+  
+    color: rgb(0, 255, 255);
+    outline-color: rgb(0, 255, 255);
+    /* box-shadow: -3px -3px 15px rgb(0, 255, 255); */
+    filter: drop-shadow(0px 0px 8px rgb(0, 255, 255 ));
+    transition-property: box-shadow;
+    transform: translateY(0.1em);
+    border: 1px #00ffffff; 
+}
+
+#expand-player {
+  position: absolute;
+  bottom: 5px;
+  right: 10px;
+  background: none;
+  border: none;
+  color: white;
+  font-size: 20px;
+  cursor: pointer;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1100;
+  transition: all 0.3s ease;
+}
+
+#expand-player:hover {
+  color: rgb(0, 255, 255);
+  filter: drop-shadow(0px 0px 8px rgb(0, 255, 255));
+  transform: translateY(0.1em);
+}
+
+.fade-out {
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+input[type="range"].progress-bar {
+  --progress: 0%;
+  background: linear-gradient(to right, #1db954 var(--progress), #d8d8d8 var(--progress));
+}
+
+
+@media (max-width: 700px) {
+  .player-inner {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+  .player-left, .player-center, .player-right {
+    justify-content: center;
+    width: 100%;
+  }
+  #progress-bar {
+    max-width: 90%;
+  }
+}
+
+
+
+</style>
+    <div id="global-audio-player">
+        <div id="close-player" title="Fermer le lecteur">
+        <i class="bi bi-x"></i>
+        </div>
+        <div id="expand-player" data-track-id="" title="Ouvrir en grand">
+            <i class="bi bi-arrows-fullscreen"></i>
+        </div>
+
+
+    <div class="player-inner">
+    
+        <!-- Partie gauche : pochette + infos -->
+        <div class="player-left">
+        <img id="player-cover" src="/static/img/trackdefault.png" alt="cover">
+        <div class="track-info">
+            <div id="audio-title">Titre du morceau</div>
+            <div id="audio-artist">Artiste</div>
+        </div>
+        </div>
+
+        <!-- Partie centrale : contrôles -->
+                <div class="player-center">
+            <div class="controls">
+                    <div id="prev" class="player-btn"><i class="bi bi-skip-backward-fill"></i></div>
+                    <div id="play-pause" class="player-btn"><i class="bi bi-play-fill"></i></div>
+                    <div id="next" class="player-btn"><i class="bi bi-skip-forward-fill"></i></div>
+                    <div id="shuffle" class="player-btn"><i class="bi bi-shuffle"></i></div>
+                    <div id="loop" class="player-btn"><i class="bi bi-arrow-repeat"></i></div>
+            </div>
+
+            <!-- ICI on ajoute le temps avant/après -->
+            <div style="display:flex; align-items:center; justify-content:center; gap:8px; width:100%;">
+                <span id="current-time">0:00</span>
+                <input type="range" id="progress-bar" min="0" max="100" value="0" step="0.1" class="progress-bar">
+                <span id="total-time">0:00</span>
+            </div>
+
+            <canvas id="player-visualizer"></canvas>
+
+            <div id="time-display"></div>
+            </div>
+
+
+        <!-- Partie droite : volume + actions -->
+        <div class="player-right">
+    <div id="mute-btn" class="player-btn" title="Muet / Son">
+      <i class="bi bi-volume-up"></i>
+    </div>
+    <input type="range" id="volume" min="0" max="1" step="0.01" value="1">
+        <div id="like" class="player-btn"><i class="bi bi-heart"></i></div>
+        <div id="add-to-playlist" class="player-btn"><i class="bi bi-plus-circle"></i></div>
+        <div id="share" class="player-btn" title="Partager"><i class="bi bi-share"></i></div>
+        </div>
+
+        <!-- Élément audio -->
+        <audio id="audio-player">
+        <source id="audio-source" src="" type="audio/mpeg">
+        </audio>
+
+    </div>
+    </div>
+
+
+
+<body>
+    <!-- Fenêtre de partage personnalisée -->
+
+
+    <nav>
+    <div class="nav-logo">
+        <a href="{% url 'homepage' %}">
+            <img src="{% static 'img/logotramo.png' %}" alt="Inova Music">
+        </a>
+    </div>
+
+        <!-- Logo à gauche -->
+        {% comment %} <a href="{% url 'homepage' %}" class="logo">
+            <img src="{% static 'img/logotramo.png' %}" alt="Inova Music" style="height:50px;">
+        </a> {% endcomment %}
+        <ul>
+            <li>
+                <a href="{% url 'homepage' %}" class="{% if request.path == '/' %}active{% endif %}">
+                    <span class="icon">
+                        <ion-icon name="home-outline"></ion-icon>
+                    </span>
+                    <span class="text">Accueil</span>
+                </a>
+            </li>
+            <li class="deroulant">
+                <a href="{% url 'album_list' %}" class="{% if request.path == '/album/' %}active{% endif %}">
+                    <span class="icon">
+                        <ion-icon name="albums-outline"></ion-icon>
+                    </span>
+                    <span class="text">Musique</span>
+                </a>
+                <ul class="sous">
+                    <li><a href="#">Albums</a></li>
+                    <li><a href="#">Pistes</a></li>
+                    <!-- Commentaire concernant PHP/MySQL
+                    <li><a href="#">Cours PHP et MySQL</a></li>
+                    -->
+                </ul>
+            </li>
+            <li class="deroulant">
+                <a href="{% url 'video_list' %}" class="{% if request.path == '/videos/' %}active{% endif %}">
+                    <span class="icon">
+                            <ion-icon name="videocam-outline"></ion-icon>
+                        </span>
+                    <span class="text">Vidéos</span>
+                </a>
+                <ul class="sous">
+                    <li><a href="#">Clip</a></li>
+                    <li><a href="#">Cinéma</a></li>
+                    <li><a href="#">Sketch</a></li>
+                </ul>
+            </li>
+        </ul>
+        <div class="search-bar search-container" >
+
+            <div class="search-container">
+                <div class="search-icon" id="search-toggle">
+                    <i class="bi bi-search"></i>
+                </div>
+                <input type="text" id="query" class="inputsearch" placeholder="Que souhaitez-vous regarder ou écouter?" autocomplete="off">
+                <input type="hidden" id="search-url" data-url="{% url 'recherche_globale' %}">
+                <div id="search-results" style="display:none;"></div>
+            </div>
+
+        </div>
+         
+          <a href="{% url 'panier' %}" class="cart-icon">
+              <i class="bi-journal-album"></i>
+              {% if panier_count %}
+                  <span class="cart-count" id="cart-count">{{ panier_count }}</span>
+              {% endif %}
+          </a>
+        {% if user.is_authenticated %}
+    <button id="openLoginProfilButton" class="user-avatar-btn">
+        {% if user.profile.photo %}
+                    <img src="{{ user.profile.photo.url }}" alt="profil">
+                {% else %}
+                    {{ user.username|first|upper }}
+                {% endif %}
+            </button>
+        {% else %}
+            <button id="openLoginFormButton" class="open-form-button right-align">
+                Connexion
+            </button>
+        {% endif %}
+
+
+        <div class="menu-toggle" id="mobile-menu">
+            <ion-icon name="menu-outline"></ion-icon>
+        </div>
+
+
+
+    </nav>
+
+      <div>
+        <div id="open-library-btn" class="library-toggle-btn">
+          <i class="bi bi-collection"></i> Bibliothèque
+        </div>
+      </div>
+    {% comment %} {% include "store/library_sidebar.html" %} {% endcomment %}
+     
+<!-- === Panneau latéral Bibliothèque === -->
+{% include "store/library_sidebar.html" %}
+
+    <!-- Section principale -->
+   <!-- Contenu principal à recharger dynamiquement -->
+    <div id="main-content">
+        {% block artist %}{% endblock artist %}
+        {% block tracks %}{% endblock tracks %}
+        {% block videos %}{% endblock videos %}
+        {% block homepage %}{% endblock homepage %}
+        {% block Albums %}{% endblock Albums %}
+        {% block recherche %}{% endblock recherche %}
+        {% block videoP %}{% endblock videoP %}
+        {% block panier %}{% endblock panier %}
+        {% block playtrack %}{% endblock playtrack %}
+        {% block profil %}{% endblock profil %}
+    </div>
+
+
+    <div id="popupLoginProfil" class="popup-form">
+      <div class="container">
+        {% if user.is_authenticated %}
+          <form id="logoutForm" method="POST" action="{% url 'logout' %}">
+            {% csrf_token %}
+            <div class="form-group">
+              <a href="#">Profil</a>
+              <a href="#">Contactez nous</a>
+              <a href="#">Preference</a>
+            </div>
+            {% comment %} <div id="user-playlists" class="form-group">
+              <!-- Les playlists seront chargées ici -->
+              <p>Chargement de vos playlists...</p>
+            </div> {% endcomment %}
+            <div class="see-more-btn">
+              <button type="submit" class="btn">Déconnexion</button>
+            </div>
+          </form>
+        {% else %}
+          <div id="suggested-tracks">
+            <p>Chargement de suggestions...</p>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+
+
+
+
+<div id="popupLoginForm" class="popup-form">
+    <div class="container">
+        <form id="loginForm" method="POST" data-url="{% url 'connexion' %}">
+            {% csrf_token %}
+            
+            <p>Connexion</p>
+
+            <div id="loginMessages" class="messages"></div>
+
+            <div id="loginFields">
+                <input type="text" name="username" id="loginUsername" placeholder="Nom d'utilisateur" required><br>
+                <input type="password" name="password" id="loginPassword" placeholder="Mot de passe" required><br>
+                <input type="submit" value="Connexion"><br>
+
+                <a href="#" id="openSignupFormLink">Pas de compte ? S'inscrire</a>
+            </div>
+              <!-- Boutons de connexion sociale -->
+              <h3>Ou connectez-vous avec :</h3>
+              <div class="social-icons">
+                  
+                  <!-- Bouton Google -->
+                  <div href="#" class="icon google" >
+                      <i class="bi bi-google"></i> 
+                  </div>
+                  
+                  <!-- Bouton Facebook -->
+                  <div href="#" class="icon facebook" >
+                      <i class="bi bi-facebook"></i> 
+                  </div>
+              </div>
+        </form>
+
+    </div>
+</div>
+
+
+
+
+    <!-- Formulaire popup pour l'inscription -->
+<!-- Popup Inscription -->
+    <div id="popupSignupForm" class="popup-form">
+    <div class="container">
+        <form id="signupForm" method="POST" action="{% url 'inscription' %}">
+        {% csrf_token %}
+        <p>Inscription</p>
+
+        <div id="signupMessages" class="messages"></div>
+
+        <div id="signupFields">
+            <input type="text" name="username" placeholder="Nom d'utilisateur" required><br>
+            <input type="email" name="email" placeholder="Adresse mail" required><br>
+            <input type="password" name="password" placeholder="Mot de passe" required><br>
+            <input type="password" name="password_confirm" placeholder="Confirmation du mot de passe" required><br>
+
+            <input type="submit" value="S'inscrire"><br>
+            <a href="#" id="openLoginFormLink">J'ai déjà un compte</a>
+        </div>
+        </form>
+    </div>
+    </div>
+
+<!-- Fullscreen Spotify-like -->
+<div id="fullscreen-player">
+    <div class="fs-bg"></div>
+
+    <div class="fs-header">
+        <!-- Optionnel : boutons de navigation ou menu -->
+    </div>
+
+    <div class="fs-center">
+        <img id="fs-cover" src="/static/img/trackdefault.png" alt="cover">
+    </div>
+
+    <div class="fs-bottom">
+        <div id="fs-title">Titre du morceau</div>
+        <div id="fs-artist">Artiste</div>
+        <div id="fs-close" class="fs-btn">
+            <i class="bi bi-chevron-down"></i>
+        </div>
+    </div>
+</div>
+
+
+
+
+    <!-- Superposition sombre pour l'arrière-plan -->
+    <div id="overlay" class="overlay"></div>
+
+    <!-- Pied de page -->
+    <footer>
+        <p>&copy; 2024 Inova-Music</p>
+    </footer>
+    
+    <!-- JS pour afficher/masquer les formulaires -->
+ 
+
+    {% comment %} <div id="global-audio-player" style="display: none; position: fixed; bottom: 0; left: 0; width: 100%; background: #222; color: white; z-index: 1000; padding: 10px; box-shadow: 0 -2px 10px rgba(0,0,0,0.5);"> {% endcomment %}
+    <!-- <audio id="audio-player" controls style="width: 100%;">
+        <source id="audio-source" src="" type="audio/mpeg">
+        Votre navigateur ne supporte pas l'audio HTML5.
+    </audio>
+    <div id="audio-title" style="margin-top: 5px; text-align: center;"></div>
+    </div> --> 
+    {% comment %} <div id="track-info">
+        🎵 <strong id="current-title">Aucune musique</strong>
+    </div>
+
+    <audio id="audio" style="width: 100%;" controls>
+        <source src="" id="audio-source" type="audio/mpeg">
+        Votre navigateur ne supporte pas l'audio HTML5.
+    </audio>
+
+    <div style="text-align: center; margin-top: 8px;">
+        <button onclick="prevTrack()">⏮️</button>
+        <button onclick="togglePlayPause()">▶️/⏸️</button>
+        <button onclick="nextTrack()">⏭️</button>
+    </div> {% endcomment %}
+<script>
+  const userIsLoggedIn = {{ user.is_authenticated|yesno:"true,false" }};
+</script>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const sidebar = document.getElementById("library-sidebar");
+  const openBtn = document.getElementById("open-library-btn");
+  const closeBtn = document.getElementById("library-close");
+  const expandBtn = document.getElementById("library-expand");
+  const mainContent = document.getElementById("main-content");
+
+  // === Ouvrir / Fermer la bibliothèque ===
+  openBtn.addEventListener("click", () => {
+    sidebar.classList.add("library-open");
+    sidebar.classList.remove("library-expanded");
+    mainContent.classList.add("main-shifted");
+    openBtn.classList.add("hidden"); // 👈 cache le bouton
+  });
+
+  // === Fermer la bibliothèque ===
+  closeBtn.addEventListener("click", () => {
+    sidebar.classList.remove("library-open", "library-expanded");
+    mainContent.classList.remove("main-shifted", "main-expanded");
+    openBtn.classList.remove("hidden"); // 👈 réaffiche le bouton
+  });
+  // === Agrandir / Réduire ===
+  expandBtn.addEventListener("click", () => {
+    const expanded = sidebar.classList.toggle("library-expanded");
+    mainContent.classList.toggle("main-expanded", expanded);
+  });
+
+  // === Onglets ===
+  const tabBtns = document.querySelectorAll(".tab-btn");
+  const tabContents = document.querySelectorAll(".tab-content");
+
+  tabBtns.forEach(btn => {
+    btn.addEventListener("click", () => {
+      tabBtns.forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      const tabName = btn.dataset.tab;
+      tabContents.forEach(c => {
+        c.classList.toggle("active", c.id === `tab-${tabName}`);
+      });
+    });
+  });
+});
+
+
+const progressBar = document.getElementById("progress-bar");
+const currentTimeEl = document.getElementById("current-time");
+const totalTimeEl = document.getElementById("total-time");
+const audio = document.getElementById("audio-player");
+let isSeeking = false;
+let rafId = null;
+
+// Fonction pour formater le temps
+function formatTime(seconds) {
+  if (isNaN(seconds)) return "0:00";
+  const min = Math.floor(seconds / 60);
+  const sec = Math.floor(seconds % 60);
+  return `${min}:${sec < 10 ? "0" + sec : sec}`;
+}
+
+// === 🔹 Mise à jour de la position visuelle ===
+function updateProgressBar() {
+  if (!audio.duration || isSeeking) return; // stop pendant le drag
+
+  const progress = (audio.currentTime / audio.duration) * 100;
+  progressBar.value = progress;
+  progressBar.style.setProperty("--progress", `${progress}%`);
+  currentTimeEl.textContent = formatTime(audio.currentTime);
+  totalTimeEl.textContent = formatTime(audio.duration);
+}
+
+// === 🔹 Animation fluide via requestAnimationFrame ===
+function animateProgress() {
+  updateProgressBar();
+  rafId = requestAnimationFrame(animateProgress);
+}
+requestAnimationFrame(animateProgress);
+
+// === 🔹 Positionner à un point (clic) ===
+progressBar.addEventListener("click", (e) => {
+  if (!audio.duration) return;
+  const rect = progressBar.getBoundingClientRect();
+  const pos = e.clientX - rect.left;
+  const percentage = (pos / rect.width) * 100;
+  audio.currentTime = (percentage / 100) * audio.duration;
+  progressBar.value = percentage;
+  progressBar.style.setProperty("--progress", `${percentage}%`);
+});
+
+// === 🔹 Début du glissement ===
+progressBar.addEventListener("pointerdown", (e) => {
+  if (!audio.duration) return;
+  isSeeking = true;
+  progressBar.setPointerCapture(e.pointerId);
+  cancelAnimationFrame(rafId); // stop l’animation temporairement
+});
+
+// === 🔹 Pendant le glissement ===
+progressBar.addEventListener("pointermove", (e) => {
+  if (!isSeeking) return;
+  const rect = progressBar.getBoundingClientRect();
+  const pos = Math.max(0, Math.min(rect.width, e.clientX - rect.left));
+  const percentage = (pos / rect.width) * 100;
+  progressBar.value = percentage;
+  progressBar.style.setProperty("--progress", `${percentage}%`);
+  currentTimeEl.textContent = formatTime((percentage / 100) * audio.duration);
+});
+
+// === 🔹 Fin du glissement ===
+progressBar.addEventListener("pointerup", (e) => {
+  if (!isSeeking) return;
+  isSeeking = false;
+
+  const rect = progressBar.getBoundingClientRect();
+  const pos = Math.max(0, Math.min(rect.width, e.clientX - rect.left));
+  const percentage = (pos / rect.width) * 100;
+  audio.currentTime = (percentage / 100) * audio.duration;
+
+  // Reprise de l’animation
+  requestAnimationFrame(animateProgress);
+
+  try {
+    progressBar.releasePointerCapture(e.pointerId);
+  } catch (err) {}
+});
+
+// 🔒 Helper CSRF
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== "") {
+        const cookies = document.cookie.split(";");
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === name + "=") {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+const csrftoken = getCookie("csrftoken");
+
+// ✅ Mettre à jour le badge du panier
+async function updateCartCount() {
+    try {
+        const response = await fetch("{% url 'panier_count' %}");
+        if (!response.ok) return;
+
+        const data = await response.json();
+        let cartCount = document.getElementById("cart-count");
+
+        if (data.count > 0) {
+            if (!cartCount) {
+                const newBadge = document.createElement("span");
+                newBadge.id = "cart-count";
+                newBadge.classList.add("cart-count");
+                newBadge.textContent = data.count;
+                document.querySelector(".cart-icon")?.appendChild(newBadge);
+            } else {
+                cartCount.textContent = data.count;
+            }
+        } else {
+            if (cartCount) cartCount.remove();
+        }
+    } catch (err) {
+        console.error("Erreur de mise à jour du panier :", err);
+    }
+}
+
+// 🔁 Mettre à jour le compteur toutes les 10 secondes
+setInterval(updateCartCount, 10000);
+
+// 🔹 Tout le JS principal après chargement du DOM
+document.addEventListener("DOMContentLoaded", () => {
+    updateCartCount(); // mise à jour immédiate du badge
+
+    // For debugging: log current pathname and cart count
+    console.log("Page loaded:", window.location.pathname);
+
+    // On panier page, refresh badge count again to ensure sync
+    if (window.location.pathname === "/panier/") {
+        console.log("On panier page - refreshing cart count");
+        updateCartCount();
+    }
+});
+
+// === Ajout au panier avec délégation d'événements ===
+document.addEventListener("click", async (e) => {
+    const btn = e.target.closest(".add-to-cart");
+    if (!btn) return;
+
+    e.preventDefault();
+
+    const albumId = btn.dataset.album;
+    const formData = new FormData();
+    formData.append("quantite", 1);
+
+    try {
+        const response = await fetch(`/panier/ajouter/${albumId}/`, {
+            method: "POST",
+            headers: { "X-CSRFToken": csrftoken },
+            body: formData
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            // Mettre à jour le badge directement avec le count retourné
+            let cartCount = document.getElementById("cart-count");
+            if (data.count > 0) {
+                if (!cartCount) {
+                    const newBadge = document.createElement("span");
+                    newBadge.id = "cart-count";
+                    newBadge.classList.add("cart-count");
+                    newBadge.textContent = data.count;
+                    document.querySelector(".cart-icon")?.appendChild(newBadge);
+                } else {
+                    cartCount.textContent = data.count;
+                }
+            } else {
+                if (cartCount) cartCount.remove();
+            }
+            // Rediriger vers le panier
+            window.location.href = "/panier/";
+        } else {
+            alert("Erreur : " + (data.error || "Impossible d’ajouter."));
+        }
+    } catch(err) {
+        console.error("Erreur AJAX panier :", err);
+    }
+});
+
+
+document.addEventListener("DOMContentLoaded", () => {
+  const menuToggle = document.getElementById("mobile-menu");
+  const navUl = document.querySelector("nav ul");
+
+  menuToggle.addEventListener("click", () => {
+    navUl.classList.toggle("active");
+    const icon = menuToggle.querySelector("ion-icon");
+    icon.name = icon.name === "menu-outline" ? "close-outline" : "menu-outline";
+  });
+});
+
+
+</script>
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+
+
+    <script src="{% static 'menu.js' %}"></script>
+    <script src="{% static 'auth.js' %}"></script>
+    <script src="{% static 'conn.js' %}"></script>
+    <script src="{% static 'profil.js' %}"></script>
+    <!-- Ton HTML ... -->
+
+<!-- Charger les scripts -->
+    <script src="/static/js/player.js" defer></script>
+    <script src="/static/js/search.js" defer></script>
+    <script src="/static/js/scroll.js" defer></script>
+
+    <script>
+      const libraryDataUrl = "{% url 'library_data' %}";
+    </script>
+    <script src="{% static 'js/library.js' %}" defer></script>
+
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/color-thief/2.3.2/color-thief.umd.js"></script>
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+    
+</body>
+
+</html>

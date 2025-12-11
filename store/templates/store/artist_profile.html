@@ -1,0 +1,151 @@
+{% extends 'store/base.html' %}
+{% block title %}Profil Artiste{% endblock %}
+
+{% block profil %}
+<div class="profile-page">
+
+    <!-- HEADER -->
+    <header class="profile-header">
+
+        <div class="profile-cover"
+            style="background-image: url({% if artist and artist.image %}'{{ artist.image.url }}'{% else %}'/static/img/default-cover.jpg'{% endif %});">
+        </div>
+
+        <div class="profile-info">
+
+            <div class="avatar-wrapper">
+                <img class="profile-avatar"
+                    src="{% if artist and artist.image %}{{ artist.image.url }}
+                        {% elif profile_user.avatar %}{{ profile_user.avatar.url }}
+                        {% else %}/static/img/default-avatar.png{% endif %}"
+                    alt="{{ profile_user.username }}">
+
+                {# Bouton caméra visible uniquement si l’utilisateur connecté est le propriétaire #}
+                {% if request.user.is_authenticated and request.user == profile_user %}
+                    <div id="avatar-form" method="POST" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <input type="file" id="avatar-input" name="avatar" accept="image/*" style="display:none;">
+                        <label for="avatar-input" class="camera-btn">
+                            <i class="fa fa-camera"></i>
+                        </label>
+                    </div>
+                {% endif %}
+            </div>
+
+
+            <div class="profile-text">
+                {# Affiche le nom de l’artiste si c’est une page artiste #}
+                {% if artist %}
+                    <h1>{{ artist.name }}</h1>
+                    <span class="artist-badge">Artiste</span>
+                {% else %}
+                    <h1>{{ profile_user.username }}</h1>
+                {% endif %}
+
+                <p class="followers">{{ profile_user.followers.count }} abonnés</p>
+
+                {# Bouton suivre / suivi #}
+                {% if request.user.is_authenticated %}
+                    {% if request.user != profile_user %}
+                        {% if request.user in profile_user.followers.all %}
+                            <form method="POST" action="{% url 'unfollow' profile_user.id %}">
+                                {% csrf_token %}
+                                <button type="submit" class="btn-follow followed">Suivi</button>
+                            </form>
+                        {% else %}
+                            <form method="POST" action="{% url 'follow' profile_user.id %}">
+                                {% csrf_token %}
+                                <button type="submit" class="btn-follow">Suivre</button>
+                            </form>
+                        {% endif %}
+                    {% endif %}
+                {% else %}
+                    <a href="{% url 'login' %}" class="btn-follow">Se connecter pour suivre</a>
+                {% endif %}
+
+            </div>
+        </div>
+
+    </header>
+
+
+    <!-- NAVIGATION -->
+    <div class="profile-nav">
+        <ul>
+            <li class="active" data-tab="tracks">Titres</li>
+            {% if artist %}
+            <li data-tab="albums">Albums</li>
+            <li data-tab="videos">Vidéos</li>
+            {% endif %}
+            <li data-tab="playlists">Playlists</li>
+        </ul>
+    </div>
+
+    <!-- CONTENU -->
+    <div class="profile-content">
+
+        <!-- TITRES -->
+        <div id="tracks" class="tab-content active">
+            {% for track in tracks %}
+            <div class="media-item"
+                 data-type="audio"
+                 data-url="{{ track.file.url }}"
+                 data-cover="{{ track.cover_image.url }}"
+                 data-title="{{ track.title }}"
+                 data-artist="{{ profile_user.username }}">
+                <img src="{{ track.cover_image.url|default:'/static/img/trackdefault.png' }}" alt="{{ track.title }}">
+                <div class="media-info">
+                    <h3>{{ track.title }}</h3>
+                    <p>{{ track.duration }}</p>
+                </div>
+                <button class="play-btn"><i class="fa fa-play"></i></button>
+            </div>
+            {% empty %}
+            <p>Aucun titre disponible.</p>
+            {% endfor %}
+        </div>
+
+        <!-- ALBUMS -->
+        <div id="albums" class="tab-content">
+            {% for album in albums %}
+            <div class="album-item">
+                <img src="{{ album.cover_image.url }}" alt="{{ album.title }}">
+                <h3>{{ album.title }}</h3>
+            </div>
+            {% empty %}
+            <p>Aucun album disponible.</p>
+            {% endfor %}
+        </div>
+
+        <!-- VIDEOS -->
+        <div id="videos" class="tab-content">
+            {% for video in videos %}
+            <div class="media-item"
+                 data-type="video"
+                 data-url="{{ video.file.url }}"
+                 data-cover="{{ video.thumbnail.url }}"
+                 data-title="{{ video.title }}"
+                 data-artist="{{ profile_user.username }}">
+                <img src="{{ video.thumbnail.url }}" alt="{{ video.title }}">
+                <h3>{{ video.title }}</h3>
+            </div>
+            {% empty %}
+            <p>Aucune vidéo disponible.</p>
+            {% endfor %}
+        </div>
+
+        <!-- PLAYLISTS -->
+        <div id="playlists" class="tab-content">
+            {% for playlist in playlists %}
+            <div class="playlist-item">
+                <img src="{{ playlist.cover_url|default:'/static/img/playlistdefault.png' }}" alt="{{ playlist.name }}">
+                <h3>{{ playlist.name }}</h3>
+            </div>
+            {% empty %}
+            <p>Aucune playlist disponible.</p>
+            {% endfor %}
+        </div>
+
+    </div>
+</div>
+{% endblock profil %}

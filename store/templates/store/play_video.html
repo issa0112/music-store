@@ -1,0 +1,394 @@
+﻿{% extends 'store/base.html' %}
+{% block title %}Page principale{% endblock %}
+{% block videoP %}
+    <style>
+        {% comment %} body { font-family: Arial, sans-serif; margin: 20px; background: #f4f4f4; } {% endcomment %}
+        /* Make container background transparent so the page background shows through */
+        .container { background: transparent; padding: 20px; border-radius: 8px; max-width: 800px; margin: auto; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+        {% comment %} {% endcomment %}
+    </style>
+
+
+    <div class="spacer"></div>
+    <div class="main">
+    <div class="list">
+        {% comment %} {% for video in object_list %} {% endcomment %}
+        <div class="list-item">
+            <div class="">
+                <div class="main-player">
+                    <video id="mainVideo" muted playsinline preload="metadata" controls >
+                        <source src="{{ video.file.url }}" type="video/mp4">
+                        Votre navigateur ne supporte pas la lecture vidéo.
+
+                    </video>
+                    <button id="ytMuteBtn" class="yt-mute-btn">
+                          <i class="bi bi-volume-mute-fill"></i>
+                    </button>
+                    <img id="mainThumbnail" src="{{ video.thumbnail.url }}" alt="{{ video.title }}" style="display:none;">
+                    
+                    <h3>{{ video.title }}</h3>
+                    <div class="video-stats">
+                        <span><i class="fa-regular fa-eye"></i></ion-icon> {{ video.play_count }}</span>
+                        <span><i class="fa-solid fa-download"></i> {{ video.download_count }}</span>
+                        <span><i class="fa-regular fa-heart"></i> {{ video.like_count }}</span>
+                    </div>
+                    {% comment %} <button id="pipBtn" class="pip-btn">📺</button> {% endcomment %}
+                </div>
+
+                {% comment %} <div id="miniPlayerContainer"></div> {% endcomment %}
+            </div>
+        </div>
+
+        {% comment %} {% endfor %} {% endcomment %}
+    </div>
+    <h2>Autres vidéos de {{ video.artist.name }}</h2>
+
+    <div class="carousel-container">
+        <button class="carousel-button left" onclick="scrollCarousel('left')" aria-label="Précédent" title="Précédent" aria-hidden="true" tabindex="-1">&#10094;</button>
+
+        <div class="carousel-track" id="carousel-track">
+            {% for video in artist_videos %}
+            <div class="list-item">
+                <div class="card">
+                    <a href="#" 
+                    class="video-link" 
+                    data-src="{{ video.file.url }}" 
+                    data-title="{{ video.title }}" 
+                    data-views="{{ video.play_count }}"
+                    data-downloads="{{ video.download_count }}"
+                    data-likes="{{ video.like_count }}">
+                        <img src="{{ video.thumbnail.url }}" alt="{{ video.title }}">
+                        <h3>{{ video.title }}</h3>
+                        <div class="stats">
+                            <span><i class="fa-regular fa-eye"></i> {{ video.play_count }}</span>
+                            <span><i class="fa-solid fa-download"></i> {{ video.download_count }}</span>
+                            <span><i class="fa-regular fa-heart"></i> {{ video.like_count }}</span>
+                        </div>
+                        <div class="play-icon">
+                            <i class="fa fa-play"></i>
+                        </div>
+                    </a>
+                </div>
+            </div>
+            {% empty %}
+            <p>Aucune autre vidéo pour cet artiste.</p>
+            {% endfor %}
+        </div>
+
+        <button class="carousel-button right" onclick="scrollCarousel('right')" aria-label="Suivant" title="Suivant" aria-hidden="true" tabindex="-1">&#10095;</button>
+    </div>
+
+
+</div>
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    const video = document.getElementById("mainVideo");
+    const muteBtn = document.getElementById("ytMuteBtn");
+    const pipBtn = document.getElementById("pipBtn");
+    const miniContainer = document.getElementById("miniPlayerContainer");
+
+    let pipActive = false;  // <-- Nouveau drapeau
+    let miniVisible = false;
+
+    // -------------------
+    // MUTE / UNMUTE
+    // -------------------
+    const muteIcon = muteBtn.querySelector("i");
+    const updateMuteIcon = () => {
+        if(video.muted){
+            muteBtn.classList.remove("hidden");
+            muteIcon.className = "bi bi-volume-mute-fill";
+        } else {
+            muteBtn.classList.add("hidden");
+        }
+    }
+    muteBtn.addEventListener("click", () => {
+        video.muted = false;
+        video.volume = 1;
+        updateMuteIcon();
+        handleUnmute(video);
+    });
+    updateMuteIcon();
+
+    // -------------------
+    // PIP Button
+    // -------------------
+    pipBtn.addEventListener("click", async () => {
+        if ('pictureInPictureEnabled' in document) {
+            try {
+                if(video !== document.pictureInPictureElement){
+                    await video.requestPictureInPicture();
+                    pipActive = true; // PiP actif
+                    // Masque mini-player si PiP
+                    if(miniVisible){
+                        miniPlayer.style.display = "none";
+                        miniVisible = false;
+                    }
+                } else {
+                    await document.exitPictureInPicture();
+                    pipActive = false;
+                }
+            } catch(err){
+                console.error("Erreur PiP :", err);
+            }
+        } else {
+            alert("Picture-in-Picture non supporté");
+        }
+    });
+
+    // -------------------
+    // Mini-player flottant au scroll
+    // -------------------
+    const miniPlayer = document.createElement("div");
+    miniPlayer.className = "mini-player";
+    const miniVideo = video.cloneNode(true);
+    miniVideo.muted = video.muted;
+    miniPlayer.appendChild(miniVideo);
+    miniContainer.appendChild(miniPlayer);
+
+    window.addEventListener("scroll", () => {
+        const isUnmuted = localStorage.getItem("videoUnmuted") === "true";
+        if(window.scrollY > 300 && !miniVisible && !pipActive && isUnmuted){
+            miniPlayer.style.display = "block";
+            miniVideo.play();
+            miniVisible = true;
+        } else if((window.scrollY < 300 || pipActive || !isUnmuted) && miniVisible){
+            miniPlayer.style.display = "none";
+            miniVideo.pause();
+            miniVisible = false;
+        }
+    });
+
+    // Clique sur mini-player pour revenir à la vidéo principale
+    miniPlayer.addEventListener("click", () => {
+        window.scrollTo({ top: video.offsetTop - 20, behavior: 'smooth' });
+        miniPlayer.style.display = "none";
+        miniVisible = false;
+    });
+});
+
+
+document.addEventListener("DOMContentLoaded", () => {
+    const player = document.querySelector(".main-player");
+
+    if (!player) {
+        console.error("main-player introuvable !");
+        return;
+    }
+
+    // Force apparition immédiate en cas de bug
+    function showPlayer() {
+        player.classList.add("in-view");
+    }
+
+    // Si Observer n’est pas supporté → afficher immédiatement
+    if (!("IntersectionObserver" in window)) {
+        showPlayer();
+        return;
+    }
+
+    const obs = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                showPlayer();
+                obs.disconnect(); // Animation une seule fois
+            }
+        });
+    });
+
+    obs.observe(player);
+
+    // Sécurité : après 800ms → afficher quand même
+    setTimeout(showPlayer, 800);
+});
+
+document.addEventListener("DOMContentLoaded", () => {
+    const video = document.getElementById("mainVideo");
+
+    if (!video) return;
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            const isMuted = video.muted; // vrai si muet
+
+            if (entry.isIntersecting) {
+                // La vidéo entre dans la vue → autoplay (toujours)
+                video.play().catch(e => console.log("Autoplay bloqué:", e));
+            } else {
+                // La vidéo sort de la vue → pause seulement si muette
+                if (isMuted) {
+                    video.pause();
+                }
+                // Sinon (unmute) → continue de jouer
+            }
+        });
+    }, { threshold: 0.5 });
+
+    observer.observe(video);
+});
+
+
+
+
+
+function scrollCarousel(direction) {
+    const track = document.getElementById("carousel-track");
+    const scrollAmount = 300;
+
+    if (direction === "left") {
+        track.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
+    } else {
+        track.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+    }
+}
+
+
+document.querySelectorAll(".video-link").forEach(link => {
+    link.addEventListener("click", e => {
+        e.preventDefault();
+
+        const mainVideo = document.getElementById("mainVideo");
+        const mainTitleEl = document.querySelector(".main-player h3");
+        const mainStats = document.querySelector(".video-stats");
+        const mainThumbnailEl = document.getElementById("mainThumbnail");
+
+        if (!mainVideo || !mainTitleEl || !mainStats || !mainThumbnailEl) return;
+
+        // --- Infos de la vidéo cliquée
+        const clickedSrc = link.dataset.src;
+        const clickedTitle = link.dataset.title;
+        const clickedViews = link.dataset.views;
+        const clickedDownloads = link.dataset.downloads;
+        const clickedLikes = link.dataset.likes;
+        const clickedThumbnail = link.querySelector("img").src;
+
+        // --- Infos de la vidéo principale actuelle
+        const currentMainSrc = mainVideo.currentSrc || mainVideo.src;
+        const currentMainTitle = mainTitleEl.textContent;
+        const currentMainViews = mainStats.querySelector("span:nth-child(1)").textContent.replace(/[^\d]/g,'');
+        const currentMainDownloads = mainStats.querySelector("span:nth-child(2)").textContent.replace(/[^\d]/g,'');
+        const currentMainLikes = mainStats.querySelector("span:nth-child(3)").textContent.replace(/[^\d]/g,'');
+        const currentMainThumbnail = mainThumbnailEl.src;
+
+        // 1️⃣ Swap dans le lecteur principal
+        mainVideo.src = clickedSrc;
+        mainVideo.load();
+        mainVideo.play().catch(err => console.log("Autoplay bloqué:", err));
+        mainTitleEl.textContent = clickedTitle;
+        mainStats.innerHTML = `
+            <span><i class="fa-regular fa-eye"></i> ${clickedViews}</span>
+            <span><i class="fa-solid fa-download"></i> ${clickedDownloads}</span>
+            <span><i class="fa-regular fa-heart"></i> ${clickedLikes}</span>
+        `;
+        mainThumbnailEl.src = clickedThumbnail;
+
+        // 2️⃣ Swap dans le carousel
+        link.dataset.src = currentMainSrc;
+        link.dataset.title = currentMainTitle;
+        link.dataset.views = currentMainViews;
+        link.dataset.downloads = currentMainDownloads;
+        link.dataset.likes = currentMainLikes;
+
+        const titleEl = link.querySelector("h3");
+        const statsEl = link.querySelector(".stats");
+        const imgEl = link.querySelector("img");
+
+        titleEl.textContent = currentMainTitle;
+        statsEl.innerHTML = `
+            <span><i class="fa-regular fa-eye"></i> ${currentMainViews}</span>
+            <span><i class="fa-solid fa-download"></i> ${currentMainDownloads}</span>
+            <span><i class="fa-regular fa-heart"></i> ${currentMainLikes}</span>
+        `;
+        imgEl.src = currentMainThumbnail;
+
+        // 3️⃣ Mini-player si présent
+        const miniVideo = document.querySelector(".mini-player video");
+        if(miniVideo){
+            miniVideo.src = clickedSrc;
+            miniVideo.load();
+        }
+    });
+});
+
+
+
+</script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+    const containers = document.querySelectorAll('.carousel-container');
+    containers.forEach(container => {
+        const track = container.querySelector('.carousel-track');
+        const buttons = container.querySelectorAll('.carousel-button');
+        // ensure initial aria and tabindex states
+        buttons.forEach(b => { b.setAttribute('aria-hidden', 'true'); b.setAttribute('tabindex', '-1'); });
+
+        let timeoutId;
+        // Check if carousel needs controls (overflow) and set class accordingly
+        function updateNeedsControls(){
+            if (!track) return;
+            const needs = track.scrollWidth > track.clientWidth + 2;
+            container.classList.toggle('needs-controls', needs);
+            // hide controls and make aria-hidden if not needed
+            if (!needs){
+                container.classList.remove('show-controls');
+                buttons.forEach(b => { b.setAttribute('aria-hidden','true'); b.setAttribute('tabindex','-1'); });
+            } else {
+                // If needs, allow the normal hover/focus logic to show controls
+                // Set initial aria-hidden true until visible
+                buttons.forEach(b => { if (!container.classList.contains('show-controls')){ b.setAttribute('aria-hidden','true'); b.setAttribute('tabindex','-1'); } });
+            }
+        }
+        // run initial check (take into account images loading slow)
+        updateNeedsControls();
+        function showControlsTemporarily() {
+            clearTimeout(timeoutId);
+            container.classList.add('show-controls');
+            buttons.forEach(b => { b.setAttribute('aria-hidden','false'); b.setAttribute('tabindex','0'); });
+            timeoutId = setTimeout(() => {
+                container.classList.remove('show-controls');
+                buttons.forEach(b => { b.setAttribute('aria-hidden','true'); b.setAttribute('tabindex','-1'); });
+            }, 2400);
+        }
+
+        container.addEventListener('touchstart', function(e){ if (container.classList.contains('needs-controls')) showControlsTemporarily(); }, { passive: true });
+        container.addEventListener('mouseenter', () => {
+            if (!container.classList.contains('needs-controls')) return;
+            container.classList.add('show-controls');
+            buttons.forEach(b => { b.setAttribute('aria-hidden','false'); b.setAttribute('tabindex','0'); });
+        });
+        container.addEventListener('mouseleave', () => {
+            if (!container.classList.contains('needs-controls')) return;
+            container.classList.remove('show-controls');
+            buttons.forEach(b => { b.setAttribute('aria-hidden','true'); b.setAttribute('tabindex','-1'); });
+        });
+        container.addEventListener('focusin', () => {
+            if (!container.classList.contains('needs-controls')) return;
+            container.classList.add('show-controls');
+            buttons.forEach(b => { b.setAttribute('aria-hidden','false'); b.setAttribute('tabindex','0'); });
+        });
+        container.addEventListener('focusout', () => {
+            if (!container.classList.contains('needs-controls')) return;
+            container.classList.remove('show-controls');
+            buttons.forEach(b => { b.setAttribute('aria-hidden','true'); b.setAttribute('tabindex','-1'); });
+        });
+        // Make left/right keyboard navigation global while focused on a child
+        container.addEventListener('keydown', function(e){
+            if (e.key === 'ArrowLeft') {
+                e.preventDefault(); scrollCarousel('left');
+            } else if (e.key === 'ArrowRight') {
+                e.preventDefault(); scrollCarousel('right');
+            }
+        });
+        // keep an eye on resize & content load to re-check overflow
+        window.addEventListener('resize', updateNeedsControls);
+        // re-check when images inside the track load (covers)
+        const imgs = track ? track.querySelectorAll('img') : [];
+        imgs.forEach(img => img.addEventListener('load', updateNeedsControls));
+    });
+});
+</script>
+
+
+
+{% endblock videoP %}

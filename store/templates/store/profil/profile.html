@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="profil-container">
+    <h1>Mon Profil</h1>
+    <p><strong>Nom :</strong> {{ user.last_name }}</p>
+    <p><strong>Prénom :</strong> {{ user.first_name }}</p>
+    <p><strong>Nom d'utilisateur :</strong> {{ user.username }}</p>
+    <p><strong>Email :</strong> {{ user.email }}</p>
+
+    <!-- Si tu as un modèle Profil lié à l'utilisateur -->
+    {# <p><strong>Téléphone :</strong> {{ user.profil.telephone }}</p> #}
+
+    <a href="{% url 'logout' %}">Déconnexion</a>
+</div>
+{% endblock %}

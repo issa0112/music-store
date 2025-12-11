@@ -1,0 +1,31 @@
+{% extends 'store/base.html' %} {% block title %}Liste des videos{% endblock %}
+{% block Albums %}
+<!-- Section principale -->
+<div class="main">
+  <div class="list">
+    {% for album in object_list %}
+    <div class="list-item">
+      <div class="crd">
+        <a href="{% url 'album_detail' album.pk %}">
+          <img src="{{ album.cover_image.url }}" alt="{{ album.title }}" />
+          <div class="crd-contenta">
+            <h2 class="crd-titlea">{{ album.title }}</h2>
+            <p>Artiste: {{ album.artist.name }}</p>
+          </div>
+        </a>
+        <!-- Bouton Acheter -->
+        <div class="crd-actions">
+          <div style="margin-top: 8px">
+            <div class="btn btn-primary add-to-cart"
+              data-album="{{ album.pk }}">
+              Acheter
+          </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+
+{% endblock Albums %}

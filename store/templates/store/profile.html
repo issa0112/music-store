@@ -1,0 +1,160 @@
+{% extends 'store/base.html' %}
+{% block title %}Profil{% endblock %}
+
+{% block profil %}
+<div class="profile-page">
+
+    <!-- HEADER -->
+    <header class="profile-header">
+
+        <!-- Couverture -->
+        <div class="profile-cover" 
+             style="background-image: url(
+                {% if artist and artist.image %}{{ artist.image.url }}{% else %}/static/img/default-cover.jpg{% endif %});
+             ">
+        </div>
+
+        <!-- Infos profil -->
+        <div class="profile-info">
+
+            <!-- Avatar -->
+            <div class="avatar-wrapper">
+
+                <img class="profile-avatar"
+                     src="{% if artist and artist.image %}{{ artist.image.url }}
+                          {% elif profile_user.avatar %}{{ profile_user.avatar.url }}
+                          {% else %}/static/img/default-avatar.png{% endif %}"
+                     alt="{{ profile_user.username }}"
+                     onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+
+                <!-- Lettre si pas d'image -->
+                <div class="avatar-letter" style="display:none;">
+                    {{ profile_user.username|first|upper }}
+                </div>
+
+            </div>
+
+            <div class="profile-text">
+                <h1>{{ profile_user.username }}</h1>
+
+                {% if artist %}
+                    <span class="artist-badge">Artiste</span>
+                {% endif %}
+
+                <p class="followers">{{ profile_user.followers.count }} abonnés</p>
+
+                {% if request.user != profile_user %}
+                    <button>
+                        {% if is_following %}Suivi{% else %}Suivre{% endif %}
+                    </button>
+                {% endif %}
+            </div>
+        </div>
+    </header>
+
+    <!-- NAVIGATION -->
+    <nav class="profile-nav">
+        <ul>
+            <li class="active" data-tab="tracks">Titres</li>
+            {% if artist %}
+                <li data-tab="albums">Albums</li>
+                <li data-tab="videos">Vidéos</li>
+            {% endif %}
+            <li data-tab="playlists">Playlists</li>
+        </ul>
+    </nav>
+
+    <!-- CONTENU -->
+    <div class="profile-content">
+
+        <!-- TITRES -->
+        <div id="tracks" class="tab-content active">
+            {% if tracks %}
+                {% for track in tracks %}
+                    <div class="media-item"
+                         data-type="audio"
+                         data-url="{{ track.file.url }}"
+                         data-cover="{{ track.cover_image.url }}"
+                         data-title="{{ track.title }}"
+                         data-artist="{{ profile_user.username }}">
+
+                        <img src="{{ track.cover_image.url|default:'/static/img/trackdefault.png' }}" alt="{{ track.title }}">
+
+                        <div class="media-info">
+                            <h3>{{ track.title }}</h3>
+                            <p>{{ track.duration }}</p>
+                        </div>
+
+                        <button class="play-btn"><i class="fa fa-play"></i></button>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <p>Aucun titre disponible.</p>
+            {% endif %}
+        </div>
+
+        <!-- ALBUMS -->
+        {% if artist %}
+        <div id="albums" class="tab-content">
+            {% if albums %}
+                {% for album in albums %}
+                    <div class="album-item">
+                        <img src="{{ album.cover_image.url }}" alt="{{ album.title }}">
+                        <h3>{{ album.title }}</h3>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <p>Aucun album disponible.</p>
+            {% endif %}
+        </div>
+
+        <!-- VIDEOS -->
+        <div id="videos" class="tab-content">
+            {% if videos %}
+                {% for video in videos %}
+                    <div class="media-item"
+                         data-type="video"
+                         data-url="{{ video.file.url }}"
+                         data-cover="{{ video.thumbnail.url }}"
+                         data-title="{{ video.title }}"
+                         data-artist="{{ profile_user.username }}">
+                        <img src="{{ video.thumbnail.url }}" alt="{{ video.title }}">
+                        <h3>{{ video.title }}</h3>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <p>Aucune vidéo disponible.</p>
+            {% endif %}
+        </div>
+        {% endif %}
+
+        <!-- PLAYLISTS -->
+        <div id="playlists" class="tab-content">
+            {% if playlists %}
+                {% for playlist in playlists %}
+                    <div class="playlist-item">
+                        <img src="{{ playlist.cover_url|default:'/static/img/playlistdefault.png' }}" alt="{{ playlist.name }}">
+                        <h3>{{ playlist.name }}</h3>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <p>Aucune playlist disponible.</p>
+            {% endif %}
+        </div>
+
+    </div>
+</div>
+
+<!-- MINI PLAYER -->
+<div id="mini-player" class="mini-player">
+    <img id="mini-cover" src="/static/img/trackdefault.png" alt="cover">
+    <div class="mini-info">
+        <h4 id="mini-title">Titre</h4>
+        <p id="mini-artist">Artiste</p>
+    </div>
+    <audio id="mini-audio" controls></audio>
+    <video id="mini-video" controls style="display:none; width:150px;"></video>
+    <button id="mini-close">&times;</button>
+    <button id="pip-btn">PiP</button>
+</div>
+{% endblock profil %}

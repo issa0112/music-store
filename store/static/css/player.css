@@ -1,0 +1,125 @@
+    #playlist-player {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background: #111;
+    color: #fff;
+    padding: 10px 20px;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: 0 -2px 5px rgba(0,0,0,0.5);
+    }
+
+    #playlist-player audio {
+    width: 300px;
+    }
+
+    #playlist-player button {
+    background: #333;
+    color: white;
+    border: none;
+    margin: 0 5px;
+    padding: 5px 10px;
+    cursor: pointer;
+    border-radius: 4px;
+    }
+#audio-player::-webkit-media-controls-panel {
+    background-color: #222;
+    color: white;
+}
+#global-audio-player {
+    transition: background-color 0.5s ease-in-out, background-image 0.5s ease-in-out;
+    padding: 1rem;
+    color: white;
+    background-color: #bc5353;  /* Couleur par défaut */
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+#playlist-player {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background: #111;
+    color: white;
+    padding: 10px;
+    box-shadow: 0 -2px 8px rgba(0,0,0,0.5);
+    z-index: 10000;
+    font-family: Arial, sans-serif;
+}
+
+#playlist-player button {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 24px;
+    margin: 0 10px;
+    cursor: pointer;
+}
+
+#track-info {
+    text-align: center;
+    margin-bottom: 8px;
+    font-weight: bold;
+}
+
+
+.carousel-container {
+    background-color: transparent; /* au lieu de #111 */
+    padding: 20px;
+    border-radius: 0; /* ou garder si tu veux un léger arrondi */
+    position: relative;
+    overflow: hidden;
+}
+
+.carousel-track {
+    display: flex;
+    overflow-x: auto;
+    scroll-behavior: smooth;
+    gap: 20px;
+    padding-bottom: 10px;
+}
+
+.carousel-item {
+    flex: 0 0 auto;
+    width: 250px;
+    background-color: transparent; 
+    border-radius: 10px;
+    padding: 10px;
+    color: white;
+}
+
+.carousel-item video {
+    width: 100%;
+    border-radius: 8px;
+}
+.carousel-button.hidden {
+    display: none;
+}
+.carousel-button {
+    display: none; /* cacher par défaut */
+    position: absolute;
+    top: 40%;
+    transform: translateY(-50%);
+    background: rgba(0, 0, 0, 0.6);
+    color: white;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    padding: 10px;
+    z-index: 10;
+    border-radius: 50%;
+}
+
+.carousel-button.left { left: 0; }
+.carousel-button.right { right: 0; }
+
+/* affichage quand nécessaire via JS */
+.carousel-button.show {
+    display: block;
+}

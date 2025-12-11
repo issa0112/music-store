@@ -1,0 +1,20 @@
+{% for video in videos %}
+<div class="list-item">
+    <div class="card">
+        <a href="{% url 'video_detail' video.id %}">
+            <img src="{{ video.thumbnail.url }}" alt="{{ video.title }}">
+            <div class="card-content">
+                <h3 class="card-title">{{ video.title }}</h3>
+                <div class="stats">
+                    <span><i class="bi bi-play-circle"></i> {{ video.play_count }}</span>
+                    <span><i class="bi bi-download"></i> {{ video.download_count }}</span>
+                    <span><i class="bi bi-balloon-heart"></i> {{ video.like_count }}</span>
+                </div>
+            </div>
+            <div class="play-icon">
+                <i class="fa fa-play"></i> <!-- Font Awesome ou autre icône -->
+            </div>
+        </a>
+    </div>
+</div>
+{% endfor %}

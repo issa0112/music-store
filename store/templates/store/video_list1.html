@@ -1,0 +1,52 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Liste des vidéos</title>
+    <link rel="stylesheet" href="{% static 'stylevid.css' %}"> <!-- Lien vers le fichier CSS -->
+    {% comment %} <link rel="stylesheet" href="{% static 'styleM.css' %}"> {% endcomment %}
+    <link rel="stylesheet" href="{% static 'bjp/css/stylecn.css' %}">
+    <link rel="stylesheet" href="{% static 'styleNav.css' %}">
+</head>
+<body>
+    
+    <nav>
+        <a href="#">Accueil</a>
+        <a href="#">Albums</a>
+        <a href="#">Vidéos</a>
+        <!-- Le bouton Connexion -->
+        <button id="openLoginFormButton" class="open-form-button right-align">Connexion</button>
+    </nav>
+
+    <!-- Section principale -->
+    <div class="main">
+        <div class="list">
+            {% for video in object_list %}
+            <div class="list-item">
+                <div class="card">
+                    <a href="#">
+                        <video controls onplay="videoPlay({{ video.id }})">
+                            <source src="{{ video.file.url }}" type="video/mp4">
+                            Votre navigateur ne supporte pas la lecture vidéo.
+                        </video>
+                        <h3>{{ video.title }}</h3>
+                        <span>Vues: {{ video.play_count }}</span>
+                        <span> - Téléchargements: {{ video.download_count }}</span>
+                    </a>
+                    
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Pied de page -->
+    <footer>
+        <p>&copy; 2024 Inova-Music</p>
+    </footer>
+
+    <script src="{% static 'menu.js' %}"></script>
+</body>
+</html>

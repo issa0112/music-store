@@ -1,0 +1,31 @@
+{% extends 'store/base.html' %}
+
+{% block title %}Liste des tracks{% endblock %}
+
+
+
+{% block tracks %}
+<div class="main">
+    <form class="d-flex" action="{% url 'recherche' %}" method='get'>
+        <input class="inputsearch" placeholder="Search..." type="text" name="produit">
+    </form>
+<div class="list">
+{% for track in tracks %}
+<div class="list-item">
+    <div class="card">
+        <a href="#">
+            <img src="{{ track.cover_image.url }}" alt="{{ track.title }}">
+            <h3>{{ track.title }}</h3>
+            <p>Artiste : {{ track.artist.name }}</p>
+            <audio controls >
+                <source src="{{ track.file.url }}" type="audio/mpeg">
+                Votre navigateur ne supporte pas l'élément audio.
+            </audio>
+        </a>
+    </div>
+</div>
+{% endfor %}
+</div>
+</div>
+{% endblock tracks %}
+

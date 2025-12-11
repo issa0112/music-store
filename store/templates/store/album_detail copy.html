@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lecteur Audio avec Playlist</title>
+<style>
+#playlist-player {
+width: 300px;
+padding: 20px;
+background-color: #f0f0f0;
+border-radius: 10px;
+}
+#play-pause-btn, #prev-btn, #next-btn {
+width: 80px;
+height: 30px;
+margin: 5px;
+}
+#seek-bar {
+width: 100%;
+margin-top: 10px;
+}
+#playlist {
+list-style-type: none;
+padding: 0;
+}
+#playlist li {
+cursor: pointer;
+padding: 5px;
+}
+#playlist li:hover {
+background-color: #ddd;
+}
+</style>
+</head>
+<body>
+<div class="container">
+        <h1>{{ track.title }}</h1>
+        <p><strong>Artiste :</strong> {{ track.artist.name }}</p>
+        <p><strong>Nombre d'écoutes :</strong> {{ track.play_count }}</p>
+    </div>
+
+    <div id="playlist-player">
+        <audio id="audio-element" controls>
+            <source src="{{ track.file.url }}" type="audio/mpeg">
+            Votre navigateur ne supporte pas la lecture audio.
+        </audio>
+        <br>
+        <button id="prev-btn">Précédent</button>
+        <button id="play-pause-btn">Lecture</button>
+        <button id="next-btn">Suivant</button>
+        <input type="range" id="seek-bar" value="0">
+        <ul id="playlist">
+            <li data-src="{{ track.file.url }}">{{ track.title }}</li>
+            <!-- Tu peux ajouter d'autres morceaux ici dynamiquement si besoin -->
+        </ul>
+    </div>
+</body>
+
+<script>
+const audio = document.getElementById('audio-element');
+const playPauseBtn = document.getElementById('play-pause-btn');
+const prevBtn = document.getElementById('prev-btn');
+const nextBtn = document.getElementById('next-btn');
+const seekBar = document.getElementById('seek-bar');
+const playlist = document.getElementById('playlist');
+let currentTrack = 0;
+
+function loadTrack(index) {
+const tracks = playlist.getElementsByTagName('li');
+if (index >= 0 && index < tracks.length) {
+currentTrack = index;
+audio.src = tracks[currentTrack].getAttribute('data-src');
+audio.load();
+playPauseBtn.textContent = 'Lecture';
+}
+}
+
+function playPause() {
+if (audio.paused) {
+audio.play();
+playPauseBtn.textContent = 'Pause';
+} else {
+audio.pause();
+playPauseBtn.textContent = 'Lecture';
+}
+}
+
+playPauseBtn.addEventListener('click', playPause);
+
+prevBtn.addEventListener('click', () => {
+loadTrack(currentTrack - 1);
+});
+
+nextBtn.addEventListener('click', () => {
+loadTrack(currentTrack + 1);
+});
+
+audio.addEventListener('timeupdate', () => {
+const progress = (audio.currentTime / audio.duration) * 100;
+seekBar.value = progress;
+});
+
+seekBar.addEventListener('input', () => {
+const time = (seekBar.value / 100) * audio.duration;
+audio.currentTime = time;
+});
+
+playlist.addEventListener('click', (e) => {
+if (e.target.tagName === 'LI') {
+const tracks = playlist.getElementsByTagName('li');
+loadTrack([...tracks].indexOf(e.target));
+playPause();
+}
+});
+
+loadTrack(0);
+</script>
+</body>
+</html>

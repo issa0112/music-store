@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Inscription</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 20px;
+      }
+      .social-buttons {
+        margin-bottom: 20px;
+      }
+      .social-buttons a {
+        display: inline-block;
+        margin: 5px;
+        padding: 10px 20px;
+        text-decoration: none;
+        color: white;
+        border-radius: 5px;
+      }
+      .facebook {
+        background-color: #1877f2;
+      }
+      .google {
+        background-color: #db4437;
+      }
+    </style>
+  </head>
+  <body>
+    <h2>Inscription</h2>
+
+    <div class="social-buttons">
+      <a href="{% provider_login_url 'facebook' %}" class="facebook"
+        >S'inscrire avec Facebook</a
+      >
+      <a href="{% provider_login_url 'google' %}" class="google"
+        >S'inscrire avec Google</a
+      >
+    </div>
+
+    <form method="POST">
+      {% csrf_token %} {{ form.as_p }}
+      <button type="submit">Enregistrer</button>
+    </form>
+
+    <p>Déjà un compte ? <a href="{% url 'login' %}">Se connecter</a></p>
+  </body>
+</html>

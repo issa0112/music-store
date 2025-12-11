@@ -1,0 +1,224 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{% static 'styleHome.css' %}">
+    <link rel="stylesheet" href="{% static 'bjp/css/stylecn.css' %}">
+    <link rel="stylesheet" href="{% static 'styleNav.css' %}">
+    <link rel="stylesheet" href="{% static 'stylesidebar.css' %}">
+    <link rel="stylesheet" href="{% static 'styletrack.css' %}">
+    <link rel="stylesheet" href="{% static 'stylevid.css' %}">
+    <link rel="stylesheet" href="{% static 'styleAL.css' %}">
+    <link rel="stylesheet" href="{% static 'stylebase.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+
+<body>
+
+    <nav>
+        <ul>
+            <li>
+                <a href="{% url 'homepage' %}" class="{% if request.path == '/' %}active{% endif %}">
+                    <span class="icon">
+                        <ion-icon name="home-outline"></ion-icon>
+                    </span>
+                    <span class="text">Accueil</span>
+                </a>
+            </li>
+            <li class="deroulant">
+                <a href="{% url 'album_list' %}">
+                    <span class="icon">
+                        <ion-icon name="albums-outline"
+                            class="{% if request.path == '/albums/' %}active{% endif %}"></ion-icon>
+                    </span>
+                    
+                    <span class="text">Musique</span>
+                </a>
+                <ul class="sous">
+                    <li><a href="#">Albums</a></li>
+                    <li><a href="#">Pistes</a></li>
+                    <!-- Commentaire concernant PHP/MySQL
+                    <li><a href="#">Cours PHP et MySQL</a></li>
+                    -->
+                </ul>
+            </li>
+            <li class="deroulant">
+                <a href="{% url 'video_list' %}" class="{% if request.path == '/videos/' %}active{% endif %}">
+                    <span class="icon">
+                        <ion-icon name="videocam-outline"></ion-icon>
+                    </span>
+                    <span class="text">Vidéos</span>
+                </a>
+                <ul class="sous">
+                    <li><a href="#">Clip</a></li>
+                    <li class="deroulant">
+                        <a href="{% url 'cinema_videos' %}">Film</a>
+                        <ul class="sous">
+                            <li><a href="{% url 'long_metrage_videos' %}">Long-métrage</a></li>
+                            <li><a href="{% url 'serie_videos'%}">Série</a></li>
+                        </ul>
+                    </li>
+                    <li><a href="#">Sketch</a></li>
+                </ul>
+            </li>
+            
+        </ul>
+        <div class="search-bar search-container">
+        
+            <div class="search-container">
+                <input type="text" name="q" id="query" class="inputsearch" placeholder="Que souhaitez-vous regarder ou écouter?" autocomplete="on">
+                <input type="hidden" id="search-url" data-url="{% url 'recherche_globale' %}">
+                <input type="hidden" id="search-type" value="all"> <!-- Valeur par défaut "all" -->
+            </div>
+        </div>
+        
+        <!-- Le bouton Connexion -->
+        {% if user.is_authenticated %}
+            <div class="profile-menu">
+                <button id="profileButton" class="open-profile-button right-align">
+                <i class="fas fa-user"></i> {{ user.username }}
+                </button>
+            </div>
+        {% else %}
+            <button id="openLoginFormButton" class="open-form-button right-align">Connexion</button>
+        {% endif %}
+
+    </nav>
+    <!-- Sidebar Profil -->
+    <div id="popupProfileForm" class="popup-form">
+        <div class="container">
+            <button id="closeProfileForm" class="close-button">&times;</button>
+            <h3>Mon Profil</h3>
+            <p>Nom d'utilisateur: {{ user.username }}</p>
+            <p>Email: {{ user.email }}</p>
+            <a href="{% url 'profile' %}">Voir mon profil</a>
+            <a href="{% url 'logout' %}" class="logout-button">Déconnexion</a>
+        </div>
+    </div>
+    
+
+
+    <!-- Section principale -->
+    <div>
+        {% block tracks %}
+        {% endblock tracks %}
+
+        {% block videos %}
+        {% endblock videos %}
+
+        {% block homepage %}
+        {% endblock homepage %}
+
+        {% block albums %}
+        {% endblock albums %}
+
+        {% block recherche %}
+        {% endblock recherche %}
+        
+        {% block categorie %}
+        {% endblock categorie %}
+
+        
+        
+
+    </div>
+
+
+    <!-- Formulaire popup pour la connexion -->
+    <div id="popupLoginForm" class="popup-form">
+        <div class="container">
+            <form id="loginForm" method="POST" action="{% url 'connexion' %}">
+                <!-- Token CSRF pour protéger contre les attaques CSRF -->
+                {% csrf_token %}
+                
+                <p>Connexion</p>
+    
+                <!-- Conteneur pour afficher les messages d'erreur ou de succès de connexion -->
+                <div id="loginMessages" class="messages"></div>
+    
+                <!-- Champs de connexion -->
+                <input type="text" name="username" id="loginUsername" placeholder="Nom d'utilisateur" required><br>
+                <input type="password" name="password" id="loginPassword" placeholder="Mot de passe" required><br>
+    
+                <!-- Bouton de soumission du formulaire -->
+                <input type="submit" value="Connexion"><br>
+    
+                <!-- Lien pour ouvrir le popup d'inscription -->
+                <a href="#" id="openSignupFormLink">Pas de compte ? S'inscrire</a>
+            </form>
+        </div>
+    </div>
+    
+
+
+
+    <!-- Formulaire popup pour l'inscription -->
+<div id="popupSignupForm" class="popup-form">
+    <div class="container">
+        <form id="signupForm" method="POST" action="{% url 'creer_compte' %}">
+            <!-- Token CSRF pour protéger contre les attaques CSRF -->
+            {% csrf_token %}
+            
+            <p>Inscription</p>
+
+            <!-- Conteneur pour afficher les messages d'erreur ou de succès d'inscription -->
+            <div id="signupMessages" class="messages"></div>
+
+            <!-- Champs d'inscription -->
+            <input type="text" name="username" id="signupUsername" placeholder="Nom d'utilisateur" required><br>
+            <input type="email" name="email" id="signupEmail" placeholder="Adresse mail" required><br>
+            <input type="password" name="password" id="signupPassword" placeholder="Mot de passe" required><br>
+            <input type="password" name="password_confirm" placeholder="Confirmation Mot de passe" required><br>
+
+            <!-- Bouton d'envoi du formulaire -->
+            <input type="submit" value="S'inscrire"><br>
+
+            <!-- Lien pour ouvrir le popup de connexion -->
+            <a href="#" id="openLoginFormLink">J'ai déjà un compte</a>
+        </form>
+    </div>
+</div>
+
+
+
+
+    <!-- Superposition sombre pour l'arrière-plan -->
+    <div id="overlay" class="overlay"></div>
+
+    <!-- Pied de page -->
+    <footer>
+        <p>&copy; 2024 Inova-Music</p>
+    </footer>
+
+    
+    <!-- JS pour afficher/masquer les formulaires -->
+    <script src="{% static 'menu.js' %}"></script>
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            let profileButton = document.getElementById("profileButton");
+            let popupProfileForm = document.getElementById("popupProfileForm");
+            let closeProfileForm = document.getElementById("closeProfileForm");
+    
+            if (profileButton && popupProfileForm && closeProfileForm) {
+                profileButton.addEventListener("click", function () {
+                    popupProfileForm.style.display = "block";
+                });
+    
+                closeProfileForm.addEventListener("click", function () {
+                    popupProfileForm.style.display = "none";
+                });
+            } else {
+                console.error("Un ou plusieurs éléments ne sont pas trouvés !");
+            }
+        });
+    </script>
+
+</body>
+
+</html>

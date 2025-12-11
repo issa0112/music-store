@@ -1,0 +1,49 @@
+{% if musiques %}
+  <h3>Musiques :</h3>
+  <ul>
+    {% for track in musiques %}
+      <li>
+        <a href="{% url 'play_track' track.id %}">{{ track.title }}</a>
+      </li>
+    {% endfor %}
+  </ul>
+{% endif %}
+
+{% if artistes %}
+  <h3>Artistes :</h3>
+  <ul>
+    {% for artist in artistes %}
+      <li>
+        <a href="{% url 'artist_detail' artist.pk %}">{{ artist.name }}</a>
+      </li>
+    {% endfor %}
+  </ul>
+{% endif %}
+
+{% if videos %}
+  <h3>Vidéos :</h3>
+  <ul>
+    {% for video in videos %}
+      <li>
+        <a href="{% url 'play_video' video.id %}">
+          {{ video.title }} - {{ video.description }}
+        </a>
+      </li>
+    {% endfor %}
+  </ul>
+{% endif %}
+
+{% if albums %}
+  <h3>Albums :</h3>
+  <ul>
+    {% for album in albums %}
+      <li>
+        <a href="{% url 'album_detail' album.id %}">{{ album.title }}</a>
+      </li>
+    {% endfor %}
+  </ul>
+{% endif %}
+
+{% if not musiques and not artistes and not videos and not albums %}
+  <p>Aucun résultat trouvé.</p>
+{% endif %}

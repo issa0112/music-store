@@ -1,0 +1,356 @@
+html, body {
+    overflow-x: hidden;
+    width: 100%;
+}
+
+body {
+    font-family: "Times New Roman", Times, serif;
+    /* margin: 0px; */
+    padding-top: 100px;
+    background-color: #171515;
+    background: url('wall.jpg') no-repeat center center fixed;
+    /* L'image couvre tout l'écran */
+
+
+} 
+
+
+.spacer {
+    height: 20px; /* Ajuste cette valeur pour descendre la section */
+}
+
+.section {
+    color: #fff;
+    margin-top: 60px;
+    margin: 25px;
+    margin-bottom: 30px;
+    max-width: 1200px;
+
+    background: rgba(255, 255, 255, 0.06);
+
+    /* ESPACE INTERNE ÉGAL (gauche = droite = haut = bas) */
+    padding: 40px;
+
+    border-radius: 20px;
+    border-left: 1px solid rgb(71, 145, 139);
+    border-top: 1px solid rgb(71, 145, 139);
+
+    backdrop-filter: blur(10px);
+    box-shadow: 20px 20px 20px -6px rgb(71, 145, 139);
+
+    text-align: center;
+    position: relative;
+    transition: all 0.2s ease-in-out;
+}
+
+.section-inner {
+    max-width: 1200px;  /* largeur contrôlée du contenu */
+    margin: 0 auto;     /* centre le contenu */
+    padding: 0 40px;    /* espace égal à gauche et à droite */
+    box-sizing: border-box;
+}
+
+
+    h2 {
+        text-align: center;
+        margin-bottom: 20px;
+        position: relative;
+    }
+
+    .btn-top-left {
+        position: absolute;
+        left: 0;
+        top: -10px;
+        padding: 10px 15px;
+        background-color: #28282800;
+        color: #fff;
+        text-decoration: none;
+        border-radius: 8px;
+        font-size: 14px;
+        border: #fff 1px;
+    }
+.artist-container {
+  display: flex;
+  justify-content: space-around;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  width: 100%;
+  gap: 20px; /* espace entre chaque artiste */
+  overflow-x: auto;
+  scroll-behavior: smooth;
+}
+
+.artist-card {
+    position: relative;
+    width: 180px;
+    height: 180px;
+    border-radius: 50%;
+    overflow: hidden;
+    flex-shrink: 0;
+    margin: 0;
+}
+.artist-card img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover;
+    border-radius: 50%;
+    transition: transform 0.4s ease;
+}
+
+    /* Artistes Populaires — copie du style Produits Similaires */
+.popular-artists {
+    margin: 25px;
+    margin-bottom: 30px;
+    padding: 20px;
+    max-width: 1200px;
+}
+
+.popular-artists h2 {
+    margin-bottom: 20px;
+}
+.popular-artists .swiper {
+  width: 100%;
+  margin: 0 auto;
+}
+
+.popular-artists .swiper-slide {
+    margin-top: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;      /* centre horizontalement */
+    justify-content: center;  /* centre verticalement */
+    padding: 0px;
+    height: auto;
+    text-align: center;
+    box-sizing: border-box; /* évite que le padding gonfle la largeur */
+}
+
+
+
+
+
+.popular-artists .swiper-wrapper {
+    /* augmente l’espace entre les artistes */
+}
+
+
+
+.popular-artists .swiper-slide h4 {
+    font-size: 14px;
+    margin: 5px 0;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+.popular-artists .swiper-button-next,
+.popular-artists .swiper-button-prev {
+    color: black; /* même couleur que Produits */
+}
+
+
+    .slide-container {
+        display: flex;
+        overflow: hidden;
+        max-width: 100%;
+    }
+
+    .artist-container.slide {
+        display: flex;
+        transition: transform 0.3s ease-in-out;
+        width: calc(150px * 10); /* 10 artistes visibles au maximum */
+    }
+.popular-swiper {
+  max-width: 1200px;   /* même limite que .section */
+  margin: 0 auto;      /* centre le swiper */
+  padding: 0;          /* pas de padding qui gonfle */
+  box-sizing: border-box;
+}
+
+.swiper-wrapper {
+    display: flex;
+}
+.swiper-slide {
+    flex-shrink: 0;
+    margin: 0;
+}
+
+.artist-info {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.55);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 50%;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.35s ease;
+}
+
+/* Texte */
+.artist-info span {
+    color: white;
+    font-size: 1rem;
+    font-weight: 600;
+    opacity: 0;
+    transition: opacity 0.25s ease 0.1s;
+}
+
+.artist-card:hover img {
+    transform: scale(1.07);
+}
+
+.artist-card:hover .artist-info {
+    opacity: 1;
+    transform: translateY(0);
+}
+.artist-card:hover .artist-info span {
+    opacity: 1;
+}
+
+    .slide-btn {
+width: 50px;  /* La largeur du bouton */
+height: 50px; /* La hauteur du bouton */
+background-color: #28282800;
+color: #ffffff;
+font-size: 24px;
+border: 2px solid #fff;  /* Une bordure pour rendre le bouton plus visible */
+border-radius: 50%; /* Cela rend le bouton circulaire */
+cursor: pointer;
+margin: 10px;
+display: flex; /* Centrer le contenu dans le bouton */
+justify-content: center;
+align-items: center;
+transition: all 0.3s ease; /* Transition pour un effet fluide */
+backdrop-filter: blur(10px);
+box-shadow: 0 10px 20px rgba(0, 0, 0, 0.185);
+}
+
+.slide-btn:hover {
+background-color: #ffffff; /* Changer la couleur de fond au survol */
+color: #1b1717; /* Changer la couleur du texte au survol */
+border-color: #efe9e900; /* Changer la couleur de la bordure au survol */
+transform: scale(1.1); /* Agrandir légèrement le bouton au survol */
+backdrop-filter: blur(10px);
+box-shadow: 0 10px 20px rgba(0, 0, 0, 0.416);
+}
+
+
+
+    .btn-section {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        padding: 8px 12px;
+        background-color: #ff6f61;
+        color: white;
+        text-decoration: none;
+        border-radius: 5px;
+    }
+
+
+    .container-wrapper {
+        overflow-x: auto;
+        white-space: nowrap;
+        display: flex;
+        justify-content: center;
+    }
+    .album-card, .video-card, .category-card {
+background-color: rgba(255, 255, 255, 0.6);
+color: #171515;
+border-radius: 8px;
+box-shadow: 0 10px 20px rgba(0, 0, 0, 0.416);
+overflow: hidden;
+width: 200px; /* Taille fixe des cartes */
+text-align: center;
+display: inline-block;
+text-decoration: none;
+padding: 0; /* Retire tout padding dans la carte */
+margin: 0;
+margin-bottom: 20px;
+flex-shrink: 0; /* Empêche les cartes de rétrécir */
+backdrop-filter: blur(10px); /* L'effet de flou sur l'arrière-plan derrière la carte */
+-webkit-backdrop-filter: blur(10px); /* Pour le support de Safari */
+}
+    .album-container, .video-container, .category-container {
+        display: flex;
+        flex-wrap: wrap; /* Permet aux cartes de s'ajuster sur plusieurs lignes */
+        gap: 30px; /* Espace entre les cartes */
+        justify-content: center; /* Centrer les cartes */
+        max-width: 100%;
+    }
+
+    .album-card h3, .video-card h3, .category-card h3 {
+font-size: 16px;
+margin: 10px 0;
+white-space: nowrap; /* Empêche le texte de s'étendre sur plusieurs lignes */
+overflow: hidden; /* Cache les parties du texte qui débordent */
+text-overflow: ellipsis; /* Ajoute "..." si le texte dépasse la taille de la carte */
+color: #171515;
+
+}
+
+.album-card img, .video-card img, .category-card img {
+width: 100%; /* L'image occupe 100% de la largeur de la carte */
+height: 150px; /* Hauteur fixe de l'image */
+object-fit: cover; /* L'image est coupée pour remplir toute la zone sans être déformée */
+margin: 0; /* Supprime les marges autour de l'image */
+padding: 0; /* Supprime les paddings autour de l'image */
+display: block; /* Assure que l'image n'a pas d'espace en ligne résiduel */
+}
+
+    .btn {
+        display: inline-block;
+        margin-top: 10px;
+        padding: 10px 15px;
+        background-color: #282828ab;
+        color: #fff;
+        text-decoration: none;
+        border-radius: 8px;
+        backdrop-filter: blur(10px);
+    }
+
+    .btn:hover {
+        background-color: #efe8e83e;
+        border-radius: 8px;
+        backdrop-filter: blur(10px);
+    }
+
+    .see-more-btn {
+        text-align: center;
+        margin-top: 10px;
+    }
+a{
+text-decoration: none;
+color: #171515;
+}
+
+.swiper-slide .artist-card {
+    width: 180px !important;
+    height: 180px !important;
+    border-radius: 50% !important;
+    overflow: hidden;
+    display: block;
+    flex-shrink: 0;
+}
+
+
+/* === RESPONSIVE === */
+
+@media (max-width: 768px) {
+  .artist-card {
+    width: 120px;
+    height: 120px;
+  }
+}
+
+@media (max-width: 480px) {
+  .artist-card {
+    width: 110px;
+    height: 110px;
+  }
+}

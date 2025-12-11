@@ -1,0 +1,96 @@
+{% load static %}
+
+<style>
+#playlist-player {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background: #111;
+    color: white;
+    padding: 10px;
+    box-shadow: 0 -2px 8px rgba(0,0,0,0.5);
+    z-index: 10000;
+    font-family: Arial, sans-serif;
+}
+
+#playlist-player button {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 24px;
+    margin: 0 10px;
+    cursor: pointer;
+}
+
+#track-info {
+    text-align: center;
+    margin-bottom: 8px;
+    font-weight: bold;
+}
+</style>
+
+<div id="playlist-player">
+    <div id="track-info">
+        🎵 <strong id="current-title">Aucune musique</strong>
+    </div>
+
+    <audio id="audio" style="width: 100%;" controls>
+        <source src="" id="audio-source" type="audio/mpeg">
+        Votre navigateur ne supporte pas l'audio HTML5.
+    </audio>
+
+    <div style="text-align: center; margin-top: 8px;">
+        <button onclick="prevTrack()">⏮️</button>
+        <button onclick="togglePlayPause()">▶️/⏸️</button>
+        <button onclick="nextTrack()">⏭️</button>
+    </div>
+
+    <!-- Playlist cachée -->
+    <ul id="playlist" style="display: none;">
+        <li data-src="{% static 'media/musique1.mp3' %}" data-title="Titre 1">Titre 1</li>
+        <li data-src="{% static 'media/musique2.mp3' %}" data-title="Titre 2">Titre 2</li>
+        <li data-src="{% static 'media/musique3.mp3' %}" data-title="Titre 3">Titre 3</li>
+    </ul>
+</div>
+
+<script>
+let currentTrack = 0;
+const playlist = document.querySelectorAll('#playlist li');
+const audio = document.getElementById('audio');
+const source = document.getElementById('audio-source');
+const title = document.getElementById('current-title');
+
+function loadTrack(index) {
+    const track = playlist[index];
+    source.src = track.dataset.src;
+    title.textContent = track.dataset.title;
+    audio.load();
+    audio.play();
+}
+
+function nextTrack() {
+    currentTrack = (currentTrack + 1) % playlist.length;
+    loadTrack(currentTrack);
+}
+
+function prevTrack() {
+    currentTrack = (currentTrack - 1 + playlist.length) % playlist.length;
+    loadTrack(currentTrack);
+}
+
+function togglePlayPause() {
+    if (audio.paused) {
+        audio.play();
+    } else {
+        audio.pause();
+    }
+}
+
+audio.addEventListener('ended', nextTrack);
+
+// Charger la première piste
+if (playlist.length > 0) {
+    loadTrack(currentTrack);
+}
+</script>

@@ -1,0 +1,49 @@
+{% load static %}
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{% static 'bjp/css/stylecn.css' %}">
+    <title>Creation de compte.</title>
+</head>
+<body>
+<style>
+.error-messages p.error {
+  color: red;  /* Changez la couleur du texte */
+  font-weight: bold;  /* Grasseté */
+  margin-bottom: 5px;  /* Espacement inférieur */
+}
+
+</style>
+<div class="container">
+    {% if messages %}
+            <div style="text-align: center;" class="error-messages">
+                {% for message in messages %}
+                    <p class="error{% if message.tags %} {{ message.tags }}{% endif %}">{{ message }}</p>
+                {% endfor %}
+            </div>
+        {% endif %}
+    <form method="POST">
+        {% csrf_token %}
+        <p>Bienvenue</p>
+        <input type="text" name="username" id="username" placeholder="Nom d'utilisateur">
+        <input type="email" name="email" placeholder="Adresse mail"><br>
+        <input type="password" name="password" id="password" placeholder="Mot de passe">
+        <input type="password" name="password_confirm" placeholder="Confirmation Mot de passe"><br>
+        <input type="submit" value="Connexion"><br> 
+        <a href="{% url 'conn' %}">j'ai deja un compte.</a>
+    </form>
+    <div class="drops">
+        <div class="drop drop-1"></div>
+        <div class="drop drop-2"></div>
+        <div class="drop drop-3"></div>
+        <div class="drop drop-4"></div>
+        <div class="drop drop-5"></div>
+    </div>
+    </div>
+</body>
+</html>
+
+</html>
+

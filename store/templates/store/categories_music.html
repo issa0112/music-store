@@ -1,0 +1,20 @@
+{% extends 'store/base.html' %}
+{% block title %}Catégories de Musique{% endblock %}
+
+{% block categorie %}
+<section id="music-categories" class="section">
+    <h2>Catégories de Musique</h2>
+    <div class="container-wrapper">
+        <div class="album-container">
+            {% for category in categories %}
+                <div class="album-card">
+                    <a href="#">
+                        <img src="{{ category.cover_image.url }}" alt="{{ category.name }}">
+                        <h3>{{ category.name }}</h3>
+                    </a>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endblock categorie %}

@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Popup Simple</title>
+    <link rel="stylesheet" href="stylem.css">
+</head>
+<body>
+
+    <nav>
+        <ul>
+            <li>
+                <a href="{% url 'homepage' %}" class="{% if request.path == '/' %}active{% endif %}">
+                    <span class="icon">
+                        <ion-icon name="home-outline"></ion-icon>
+                    </span>
+                    <span class="text">Accueil</span>
+                </a>
+            </li>
+            <li class="deroulant">
+                <a href="{% url 'album_list' %}">
+                    <span class="icon">
+                        <ion-icon name="albums-outline" class="{% if request.path == '/albums/' %}active{% endif %}"></ion-icon>
+                    </span>
+                    <span class="text">Musique</span>
+                </a>
+                <ul class="sous">
+                    <li><a href="#">Albums</a></li>
+                    <li><a href="#">Pistes</a></li>
+                    <!-- Commentaire concernant PHP/MySQL
+                    <li><a href="#">Cours PHP et MySQL</a></li>
+                    -->
+                </ul>
+            </li>
+            <li class="deroulant">
+                <a href="{% url 'video_list' %}" class="{% if request.path == '/videos/' %}active{% endif %}">
+                    <span class="icon">
+                        <ion-icon name="videocam-outline"></ion-icon>
+                    </span>
+                    <span class="text">Vidéos</span>
+                </a>
+                <ul class="sous">
+                    <li><a href="#">Clip</a></li>
+                    <li><a href="#">Cinéma</a></li>
+                    <li><a href="#">Sketch</a></li>
+                </ul>
+            </li>
+        </ul>
+        <!-- Le bouton Connexion -->
+        <button id="openLoginFormButton" class="open-form-button right-align">Connexion</button>
+    </nav>
+</body>
+</html>

@@ -1,0 +1,109 @@
+{% extends 'store/base.html' %} {% load static %} {% block title %}{{
+video.title }}{% endblock %} {% block content %}
+<div class="container">
+  <h1>{{ video.title }}</h1>
+
+  <div style="position: relative; max-width: 900px">
+    <!-- Vidéo streamable -->
+    <video
+      id="videoPlayer"
+      controls
+      muted
+      preload="metadata"
+      poster="{{ video.thumbnail.url }}"
+      style="width: 100%"
+    >
+      <source src="{{ video.file.url }}" type="video/mp4" />
+      Votre navigateur ne supporte pas la lecture vidéo.
+    </video>
+
+    <!-- Bouton lecture/activer le son -->
+    <button
+      id="playBtn"
+      style="
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        padding: 12px 20px;
+        background: rgba(0, 0, 0, 0.7);
+        color: white;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 16px;
+      "
+    >
+      Lire la vidéo
+    </button>
+  </div>
+
+  <p>{{ video.description }}</p>
+
+  <div class="stats">
+    <span id="playCount"
+      ><i class="bi bi-play-circle"></i> {{ video.play_count }}</span
+    >
+    <span><i class="bi bi-download"></i> {{ video.download_count }}</span>
+  </div>
+</div>
+{% endblock %} {% block extra_js %}
+<script>
+  const video = document.getElementById("videoPlayer");
+  const playBtn = document.getElementById("playBtn");
+  const playCount = document.getElementById("playCount");
+  let playedOnce = false;
+
+  // Fonction pour démarrer la vidéo et incrémenter le compteur
+  function startVideo() {
+    video.muted = false; // démute si nécessaire
+    video.play().catch(() => {
+      // Autoplay bloqué sur mobile, laisser le bouton visible
+      console.log("Autoplay bloqué, l'utilisateur doit cliquer.");
+    });
+
+    // Incrémenter le compteur une seule fois
+    if (!playedOnce) {
+      playedOnce = true;
+      fetch("{% url 'increment_play' video.id %}", {
+        method: "POST",
+        headers: {
+          "X-CSRFToken": "{{ csrf_token }}",
+          "Content-Type": "application/json",
+        },
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.status === "success") {
+            playCount.textContent = ` ${data.play_count}`;
+          }
+        })
+        .catch((err) => console.error(err));
+    }
+
+    playBtn.style.display = "none"; // cacher le bouton
+  }
+
+  // Lecture automatique sur desktop si possible
+  window.addEventListener("load", () => {
+    setTimeout(() => {
+      video.muted = true; // Ensure muted before autoplay
+      console.log("Attempting autoplay...");
+      video
+        .play()
+        .then(() => {
+          console.log("Autoplay succeeded.");
+          playBtn.style.display = "none";
+        })
+        .catch((error) => {
+          console.log("Autoplay failed:", error);
+          // Autoplay bloqué, bouton visible
+          playBtn.style.display = "block";
+        });
+    }, 200);
+  });
+
+  // Clic sur le bouton pour lancer la vidéo
+  playBtn.addEventListener("click", startVideo);
+</script>
+{% endblock %}

@@ -1,0 +1,50 @@
+{% extends 'store/base.html' %}
+{% block title %}Profil{% endblock %}
+
+{% block profil %}
+<div class="profile-page">
+
+    <!-- HEADER -->
+    <header class="profile-header">
+
+        <!-- Couverture -->
+        <div class="profile-cover" style="background-image: url('/static/img/default-cover.jpg');"></div>
+
+        <!-- Infos profil -->
+        <div class="profile-info">
+
+            <div class="avatar-wrapper">
+                <img class="profile-avatar"
+                     src="{% if profile_user.avatar %}{{ profile_user.avatar.url }}{% else %}/static/img/default-avatar.png{% endif %}"
+                     alt="{{ profile_user.username }}"
+                     onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                <div class="avatar-letter" style="display:none;">
+                    {{ profile_user.username|first|upper }}
+                </div>
+            </div>
+
+            <div class="profile-text">
+                <h1>{{ profile_user.username }}</h1>
+                <p class="followers">{{ profile_user.followers.count }} abonnés</p>
+            </div>
+
+        </div>
+    </header>
+
+    <!-- Playlists -->
+    <div class="profile-content">
+        <h2>Playlists</h2>
+        <div class="playlist-container">
+            {% for playlist in playlists %}
+            <div class="playlist-item">
+                <img src="{{ playlist.cover_url|default:'/static/img/playlistdefault.png' }}" alt="{{ playlist.name }}">
+                <h3>{{ playlist.name }}</h3>
+            </div>
+            {% empty %}
+            <p>Aucune playlist disponible.</p>
+            {% endfor %}
+        </div>
+    </div>
+
+</div>
+{% endblock profil %}

@@ -1,0 +1,51 @@
+services:
+  - type: web
+    name: music-store
+    env: python
+
+    buildCommand: "./build.sh"
+    startCommand: "gunicorn music_store.wsgi:application"
+
+    plan: starter  # ou free si tu veux tester
+
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12
+
+      - key: DJANGO_SETTINGS_MODULE
+        value: music_store.settings
+
+      - key: REMOVED
+        sync: false
+
+      - key: DEBUG
+        value: "0"
+
+      - key: REMOVED
+        sync: false
+      - key: REMOVED
+        sync: false
+      - key: AWS_STORAGE_BUCKET_NAME
+        sync: false
+      - key: AWS_S3_ENDPOINT_URL
+        sync: false
+      - key: AWS_S3_REGION_NAME
+        sync: false
+
+      - key: STRIPE_PUBLIC_KEY
+        sync: false
+      - key: REMOVED
+        sync: false
+
+      - key: REMOVED
+        sync: false
+      - key: REMOVED
+        sync: false
+      - key: REMOVED
+        sync: false
+
+databases:
+  - name: music_store_db
+    plan: free
+    engine: postgres
+    version: 15

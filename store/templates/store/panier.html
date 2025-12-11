@@ -1,0 +1,549 @@
+{% extends "store/base.html" %}
+{% load static %}
+{% block panier %}
+
+<div class="container-panier">
+  <h1>
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-journal-album" viewBox="0 0 16 16">
+      <path d="M5.5 4a.5.5 0 0 0-.5.5v5a.5.5 0 0 0 .5.5h5a.5.5 0 0 0 .5-.5v-5a.5.5 0 0 0-.5-.5zm1 7a.5.5 0 0 0 0 1h3a.5.5 0 0 0 0-1z"/>
+      <path d="M3 0h10a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2v-1h1v1a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H3a1 1 0 0 0-1 1v1H1V2a2 2 0 0 1 2-2"/>
+      <path d="M1 5v-.5a.5.5 0 0 1 1 0V5h.5a.5.5 0 0 1 0 1h-2a.5.5 0 0 1 0-1zm0 3v-.5a.5.5 0 0 1 1 0V8h.5a.5.5 0 0 1 0 1h-2a.5.5 0 0 1 0-1zm0 3v-.5a.5.5 0 0 1 1 0v.5h.5a.5.5 0 0 1 0 1h-2a.5.5 0 0 1 0-1z"/>
+    </svg>
+    {% if produits|length > 1 %} Vos Albums {% else %} Votre Album {% endif %}
+  </h1>
+
+  <div id="cart-content" {% if produits|length == 0 %}style="display: none;"{% endif %}>
+    <table class="table-panier">
+      <thead>
+        <tr>
+          <th>Image</th>
+          <th>Titre</th>
+          <th>Prix</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in produits %}
+        <tr>
+          <td><img src="{{ item.image }}" alt="{{ item.nom }}" width="60" /></td>
+          <td>{{ item.nom }}</td>
+          <td>{{ item.prix }}</td>
+          <td>
+            <button class="btn-supprimer retirer-btn" data-id="{{ item.id }}">
+              <i class="bi bi-trash"></i> Retirer
+            </button>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <div class="total-panier">
+      <h3>Total général : {{ total_general }}</h3>
+    </div>
+
+    <div class="paiement-options">
+      <h2>Choisissez un moyen de paiement</h2>
+
+      <div class="main-payment-choice">
+        <div class="main-btn" id="btn-carte" onclick="showSection('carte')">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-credit-card-2-back" viewBox="0 0 16 16">
+            <path d="M11 5.5a.5.5 0 0 1 .5-.5h2a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1-.5-.5z"/>
+            <path d="M2 2a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2zm13 2v5H1V4a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1m-1 9H2a1 1 0 0 1-1-1v-1h14v1a1 1 0 0 1-1 1"/>
+          </svg>
+          Carte / Stripe / PayPal
+        </div>
+        <div class="main-btn" id="btn-mobile" onclick="showSection('mobile')">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-phone-flip" viewBox="0 0 16 16">
+            <path fill-rule="evenodd" d="M11 1H5a1 1 0 0 0-1 1v6a.5.5 0 0 1-1 0V2a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v6a.5.5 0 0 1-1 0V2a1 1 0 0 0-1-1m1 13a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-2a.5.5 0 0 0-1 0v2a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2v-2a.5.5 0 0 0-1 0zM1.713 7.954a.5.5 0 1 0-.419-.908c-.347.16-.654.348-.882.57C.184 7.842 0 8.139 0 8.5c0 .546.408.94.823 1.201.44.278 1.043.51 1.745.696C3.978 10.773 5.898 11 8 11q.148 0 .294-.002l-1.148 1.148a.5.5 0 0 0 .708.708l2-2a.5.5 0 0 0 0-.708l-2-2a.5.5 0 1 0-.708.708l1.145 1.144L8 10c-2.04 0-3.87-.221-5.174-.569-.656-.175-1.151-.374-1.47-.575C1.012 8.639 1 8.506 1 8.5c0-.003 0-.059.112-.17.115-.112.31-.242.6-.376Zm12.993-.908a.5.5 0 0 0-.419.908c.292.134.486.264.6.377.113.11.113.166.113.169s0 .065-.13.187c-.132.122-.352.26-.677.4-.645.28-1.596.523-2.763.687a.5.5 0 0 0 .14.99c1.212-.17 2.26-.43 3.02-.758.38-.164.713-.357.96-.587.246-.229.45-.537.45-.919 0-.362-.184-.66-.412-.883s-.535-.411-.882-.571M7.5 2a.5.5 0 0 0 0 1h1a.5.5 0 0 0 0-1z"/>
+          </svg>
+          Mobile Money
+        </div>
+      </div>
+
+      <!-- Section Carte / Stripe / PayPal -->
+      <div id="section-carte" class="payment-section" style="display: none">
+        <h3>Paiement par carte ou PayPal</h3>
+
+        <!-- Stripe -->
+        <div id="stripe-button" class="btn-stripe">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-stripe" viewBox="0 0 16 16">
+            <path d="M2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2zm6.226 5.385c-.584 0-.937.164-.937.593 0 .468.607.674 1.36.93 1.228.415 2.844.963 2.851 2.993C11.5 11.868 9.924 13 7.63 13a7.7 7.7 0 0 1-3.009-.626V9.758c.926.506 2.095.88 3.01.88.617 0 1.058-.165 1.058-.671 0-.518-.658-.755-1.453-1.041C6.026 8.49 4.5 7.94 4.5 6.11 4.5 4.165 5.988 3 8.226 3a7.3 7.3 0 0 1 2.734.505v2.583c-.838-.45-1.896-.703-2.734-.703"/>
+          </svg>
+          Payer avec Stripe
+        </div>
+        <div id="stripe-payment-form" style="display: none; margin-top: 20px">
+          <form id="payment-form">
+            <div id="card-element" style="padding: 10px; border: 1px solid #ccc; border-radius: 4px; background: white;"></div>
+            <div id="submit-payment" class="btn-stripe" style="margin-top: 10px">Confirmer le paiement</div>
+            <div id="card-errors" role="alert" style="color: red; margin-top: 10px"></div>
+          </form>
+        </div>
+
+        <!-- PayPal -->
+        <div id="paypal-button-container" class="paypal-container"></div>
+      </div>
+
+      <!-- Section Mobile Money -->
+      <div id="section-mobile" class="payment-section" style="display: none">
+        <h3>Choisissez votre opérateur Mobile Money</h3>
+        <div class="mobile-buttons">
+          <div class="mobile-btn orange" onclick="showMoneyForm('orange')">🟧 Orange Money</div>
+          <div class="mobile-btn moov" onclick="showMoneyForm('moov')">🟦 Moov Money</div>
+          <div class="mobile-btn wave" onclick="showMoneyForm('wave')">🌊 Wave</div>
+        </div>
+
+        <div id="form-orange" class="money-form">
+          <input class="form-control" type="text" name="orange_numero" placeholder="77xxxxxxx"/>
+          <button onclick="payMobileMoney('orange')">Payer Orange</button>
+        </div>
+        <div id="form-moov" class="money-form">
+          <input class="form-control" type="text" name="moov_numero" placeholder="66xxxxxxx"/>
+          <button onclick="payMobileMoney('moov')">Payer Moov</button>
+        </div>
+        <div id="form-wave" class="money-form">
+          <input class="form-control" type="text" name="wave_numero" placeholder="70xxxxxxx"/>
+          <button onclick="payMobileMoney('wave')">Payer Wave</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="empty-cart" {% if produits|length > 0 %}style="display: none;"{% endif %}>
+    <p>Votre panier est vide.</p>
+  </div>
+</div>
+
+<!-- === Stripe JS === -->
+<script src="https://js.stripe.com/v3/"></script>
+<script>
+const stripe = Stripe("pk_test_XXXX"); // 🔑 clé publique
+
+let cardElement;
+
+document.getElementById("stripe-button")?.addEventListener("click", () => {
+    document.getElementById("stripe-payment-form").style.display = "block";
+    if (!cardElement) {
+      const elements = stripe.elements();
+      cardElement = elements.create("card");
+      cardElement.mount("#card-element");
+
+      // Gestion des erreurs de validation
+      cardElement.on("change", (event) => {
+        const displayError = document.getElementById("card-errors");
+        if (event.error) {
+          displayError.textContent = event.error.message;
+        } else {
+          displayError.textContent = "";
+        }
+      });
+    }
+  });
+
+  // Cacher le formulaire Stripe si on clique à l'extérieur
+  document.addEventListener("click", (event) => {
+    const stripeForm = document.getElementById("stripe-payment-form");
+    const stripeButton = document.getElementById("stripe-button");
+
+    if (stripeForm && stripeForm.style.display === "block") {
+      // Vérifier si le clic est à l'extérieur du formulaire et du bouton
+      if (
+        !stripeForm.contains(event.target) &&
+        !stripeButton.contains(event.target)
+      ) {
+        stripeForm.style.display = "none";
+      }
+    }
+  });
+
+  // Gestionnaire pour le bouton de confirmation
+  document
+    .getElementById("submit-payment")
+    ?.addEventListener("click", async (event) => {
+      event.preventDefault();
+
+      const { error, paymentMethod } = await stripe.createPaymentMethod({
+        type: "card",
+        card: cardElement,
+      });
+
+      if (error) {
+        document.getElementById("card-errors").textContent = error.message;
+        return;
+    }
+    const response = await fetch("{% url 'create_payment_intent' %}", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ payment_method_id: paymentMethod.id })
+    });
+    const data = await response.json();
+    if (data.error) {
+        document.getElementById("card-errors").textContent = data.error;
+        return;
+    }
+    const { error: confirmError } = await stripe.confirmCardPayment(data.client_secret, { payment_method: paymentMethod.id });
+    if (confirmError) {
+        document.getElementById("card-errors").textContent = confirmError.message;
+    } else {
+        alert("Paiement Stripe réussi !");
+        window.location.href = "/albums/mes-albums/"; // 🔑 redirection après paiement
+    }
+});
+
+function showSection(type) {
+    document.getElementById("section-carte").style.display = type === "carte" ? "block" : "none";
+    document.getElementById("section-mobile").style.display = type === "mobile" ? "block" : "none";
+}
+
+  // Fonction pour afficher le bon formulaire Mobile Money
+  function showMoneyForm(type) {
+    ["orange", "moov", "wave"].forEach((t) => {
+      document.getElementById("form-" + t).style.display =
+        t === type ? "block" : "none";
+    });
+  }
+
+  function togglePaymentOptions() {
+    const checked = document.querySelector('input[name="paiement"]:checked');
+    const val = checked ? checked.value : null;
+    document.getElementById("carte-section").style.display =
+      val === "carte" ? "block" : "none";
+    document.getElementById("money-options").style.display =
+      val === "mobile" ? "block" : "none";
+  }
+
+  document.querySelectorAll('input[name="paiement"]').forEach((radio) => {
+    radio.addEventListener("change", function () {
+      document.getElementById("carte-section").style.display =
+        this.value === "carte" ? "block" : "none";
+      document.getElementById("money-options").style.display =
+        this.value === "mobile" ? "block" : "none";
+    });
+  });
+
+  document.querySelectorAll('input[name="moneyType"]').forEach((radio) => {
+    radio.addEventListener("change", function () {
+      document.getElementById("orange-field").style.display =
+        this.value === "orange" ? "block" : "none";
+      document.getElementById("moov-field").style.display =
+        this.value === "moov" ? "block" : "none";
+      document.getElementById("wave-field").style.display =
+        this.value === "wave" ? "block" : "none";
+    });
+  });
+
+  const toggle = document.querySelector(".menu-toggle");
+  const menu = document.querySelector(".nav-menu");
+  toggle.addEventListener("click", () => {
+    menu.classList.toggle("active");
+  });
+</script>
+
+<!-- === PayPal JS === -->
+<script src="https://www.paypal.com/sdk/js?client-id=AZDxjDScFpQtjWTOUtWKbyN_bDt4OgqaF4eYXlewfBP4-8aqX3PiV8e1GWU6liB2CUXlkA59kJXE7M6R&currency=EUR"></script>
+<script>
+  paypal
+    .Buttons({
+      createOrder: function (data, actions) {
+        return actions.order.create({
+          purchase_units: [
+            {
+              amount: { value: "{{ total_general }}" },
+            },
+          ],
+        });
+      },
+      onApprove: function (data, actions) {
+        return actions.order.capture().then(function (details) {
+          alert(
+            "Paiement PayPal effectué par " + details.payer.name.given_name
+          );
+          window.location.reload();
+        });
+      },
+    })
+    .render("#paypal-button-container");
+</script>
+<script>
+  function payMobileMoney(operateur) {
+    let numeroInput = document.querySelector(
+      `input[name="${operateur}_numero"]`
+    );
+    let numero = numeroInput ? numeroInput.value : null;
+
+    if (!numero) {
+      alert("Veuillez entrer votre numéro de téléphone pour " + operateur);
+      return;
+    }
+
+    // Rediriger vers la vue Django pour traiter le paiement Mobile Money
+    window.location.href = `/paiement_mobile/${operateur}/?numero=${encodeURIComponent(
+      numero
+    )}`;
+  }
+
+  // === Retirer un album du panier sans recharger la page ===
+  document.addEventListener("DOMContentLoaded", () => {
+    const csrftoken = getCookie("csrftoken");
+
+    document.querySelectorAll(".retirer-btn").forEach((btn) => {
+      btn.addEventListener("click", async (e) => {
+        e.preventDefault();
+        const albumId = btn.dataset.id;
+
+        if (!confirm("Retirer cet album du panier ?")) return;
+
+        try {
+          const response = await fetch(`/panier/retirer/${albumId}/`, {
+            method: "POST",
+            headers: { "X-CSRFToken": csrftoken },
+          });
+
+          const data = await response.json();
+
+          if (data.success) {
+            // Supprimer la ligne du tableau
+            const row = btn.closest("tr");
+            if (row) row.remove();
+
+            // Vérifier si le panier est vide
+            const tbody = document.querySelector(".table-panier tbody");
+            if (tbody && tbody.children.length === 0) {
+              // Masquer le contenu du panier et afficher le message vide
+              document.getElementById("cart-content").style.display = "none";
+              document.getElementById("empty-cart").style.display = "block";
+            } else {
+              // Mettre à jour le total
+              const totalElement = document.querySelector(".total-panier h3");
+              if (totalElement)
+                totalElement.textContent = `Total général : ${data.total}`;
+            }
+
+            // Mettre à jour le badge panier
+            if (window.updateCartCount) window.updateCartCount();
+          } else {
+            alert(
+              "Erreur : " + (data.error || "Impossible de retirer l’album.")
+            );
+          }
+        } catch (err) {
+          console.error("Erreur AJAX :", err);
+          alert("Une erreur s’est produite.");
+        }
+      });
+    });
+  });
+
+  // 🔒 Fonction pour récupérer le token CSRF
+  function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== "") {
+      const cookies = document.cookie.split(";");
+      for (let i = 0; i < cookies.length; i++) {
+        const cookie = cookies[i].trim();
+        if (cookie.substring(0, name.length + 1) === name + "=") {
+          cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+          break;
+        }
+      }
+    }
+    return cookieValue;
+  }
+</script>
+
+
+
+
+<style>
+  .container-panier {
+    max-width: 800px;
+    margin: 100px auto;
+
+    padding: 20px;
+    border-radius: 15px;
+    color: white;
+    color: #fff;
+    margin: 40px auto;
+    background: rgba(255, 255, 255, 0.06);
+    padding: 25px;
+    border-left: 1px solid rgb(71, 145, 139);
+    border-top: 1px solid rgb(71, 145, 139);
+    backdrop-filter: blur(10px);
+    box-shadow: 20px 20px 20px -6px rgb(71, 145, 139);
+    text-align: center;
+    position: relative;
+    transition: all 0.2s ease-in-out;
+    display: flex;
+    flex-direction: column; /* empile les éléments verticalement */
+    flex-wrap: wrap; /* permet aux contenus de passer à la ligne si besoin */
+    align-items: center; /* centre le contenu horizontalement */
+  }
+  .table-panier {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+  }
+  .table-panier th,
+  .table-panier td {
+    padding: 10px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  .table-panier img {
+    width: 60px; /* taille fixe */
+    height: 60px; /* carré */
+    object-fit: cover; /* recadrage si l'image n'est pas carrée */
+    border-radius: 8px; /* coins arrondis */
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  }
+  .btn-supprimer,
+  .btn-telecharger {
+    background: #00ffff;
+    color: black;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 8px;
+    text-decoration: none;
+    cursor: pointer;
+    transition: 0.2s;
+  }
+  .btn-supprimer:hover,
+  .btn-telecharger:hover {
+    background: #00cccc;
+  }
+
+  /* Stripe Button - Official Stripe Styling - Exact same size as PayPal */
+  .btn-stripe {
+    background: #635bff;
+    color: white;
+    border: none;
+    padding: 0;
+    border-radius: 4px;
+    text-decoration: none;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s ease;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    height: 48px;
+    width: 250px;
+    justify-content: center;
+    margin: 0;
+  }
+  .btn-stripe:hover {
+    background: #5a52d5;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+    transform: translateY(-1px);
+  }
+  .btn-stripe svg {
+    width: 20px;
+    height: 20px;
+  }
+  .total-panier {
+    text-align: right;
+    font-size: 1.2em;
+    margin-bottom: 20px;
+  }
+  .paiement-options {
+    margin-top: 30px;
+    text-align: center;
+  }
+  .paypal-container {
+    margin-top: 20px;
+  }
+
+  .paiement-options {
+    margin-top: 30px;
+    text-align: center;
+  }
+
+  .main-payment-choice {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin-bottom: 25px;
+    flex-wrap: wrap;
+  }
+
+  .main-btn {
+    background: linear-gradient(135deg, #00ffff, #0099cc);
+    color: black;
+    border: none;
+    padding: 15px 25px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 1.1em;
+    font-weight: bold;
+    transition: all 0.2s ease-in-out;
+  }
+
+  .main-btn:hover {
+    transform: scale(1.05);
+    background: linear-gradient(135deg, #00cccc, #0077aa);
+  }
+
+  .payment-section {
+    margin-top: 20px;
+    animation: fadeIn 0.3s ease-in-out;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .mobile-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin: 20px 0;
+    flex-wrap: wrap;
+  }
+
+  .mobile-btn {
+    border: none;
+    color: white;
+    padding: 12px 18px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.2s ease-in-out;
+  }
+
+  .mobile-btn.orange {
+    background-color: #ff6600;
+  }
+  .mobile-btn.moov {
+    background-color: #0044cc;
+  }
+  .mobile-btn.wave {
+    background-color: #00bfff;
+  }
+
+  .mobile-btn:hover {
+    transform: scale(1.05);
+    opacity: 0.9;
+  }
+
+  .money-form {
+    display: none;
+    margin-top: 10px;
+  }
+
+  .money-form input {
+    padding: 8px 12px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    width: 200px;
+  }
+</style>
+
+{% endblock panier %}

@@ -1,0 +1,733 @@
+/* Navigation */
+nav {
+  position: fixed; /* Fixe la barre de navigation en haut de la page */
+  top: 0;
+  left: 0;
+  width: 100%; /* Pour que la navigation prenne toute la largeur */
+  display: flex;
+  margin-top: 0px;
+  background: rgba(0, 0, 0, 0.543); /* Fond semi-transparent pour mieux voir le flou */
+  backdrop-filter: blur(10px); /* Effet de flou */
+  -webkit-backdrop-filter: blur(10px); /* Prise en charge de Safari */
+  box-shadow: 0 10px 8px  rgba(0, 0, 0, 0.639); /* Ajouter une ombre pour un effet visuel */ 
+  z-index: 1000; /* Assure que la barre est au-dessus du contenu */
+  justify-content: space-between; /* Pour séparer les éléments */
+  align-items: center; /* Pour centrer verticalement les éléments */
+  padding: 0px; /* Ajustez le padding selon vos besoins */
+}
+
+
+nav button{
+  color: white;
+  background-color: rgba(255, 255, 255, 0);
+  margin-right:0px;
+  background-color: rgba(255, 255, 255, 0);
+  font-size: 14px;
+  line-height: 24px;
+  padding: 0px 10px;
+  height: 32px;
+  background-size: 16px;
+  background-repeat: no-repeat;
+  background-position: left 10px center;
+  border: 1px solid rgb(255, 255, 255);
+  text-align:justify;
+  border-radius: 50%;
+  transition: 0.2s;
+  cursor: pointer;
+  box-shadow: inset 4px 4px 6px -1px rgba(0,0,0,0.2),
+          inset -4px -4px 6px -1px rgba(255,255,255,0.7),
+          -0.5px -0.5px 0px rgba(255,255,255,1),
+          0.5px 0.5px 0px rgba(0,0,0,0.15),
+          0px 12px 10px -10px rgba(0,0,0,0.05);
+  border: 1px solid rgba(0,0,0,0.1);
+  transform: translateY(0);
+}
+  
+nav button .icon :hover{
+  color: rgb(0, 255, 255);
+  outline-color: rgb(0, 255, 255);
+  box-shadow: -3px -3px 15px rgb(0, 255, 255);
+  transition-property: box-shadow;
+  }
+button:hover {
+  outline-color: rgb(0, 255, 255);
+  box-shadow: -3px -3px 15px rgb(0, 255, 255);
+}
+
+nav a {
+  display: flex; /* Utilisation de flex pour aligner les éléments en colonne */
+  flex-direction: column; /* Place le texte en dessous de l'icône */
+  align-items: center; /* Centre l'icône et le texte horizontalement */
+  justify-content: center; /* Centre l'icône et le texte verticalement */
+  margin: 0 5px; /* Ajuste cette valeur pour contrôler l'espacement horizontal */
+  padding: 5px; /* Ajuste la valeur du padding selon tes besoins */
+  text-decoration: none; /* Supprime la décoration du texte */
+  color: white; /* Couleur du texte */
+  position: relative; /* Position relative pour permettre un effet avec le texte */
+  overflow: hidden; /* Empêche le débordement du contenu */
+  width: 50px; /* Largeur du lien */
+  height: 40px; /* Hauteur du lien */
+  text-align: center; /* Centre le texte */
+}
+
+nav a .text {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-5px);
+  opacity: 0; /* Cache le texte */
+  transition: all 0.3s ease;
+  font-size: 0.9em;
+  color: white;
+}
+
+nav a .icon {
+  font-size: 1.5em;
+  color: white;
+  transition: all 0.3s ease;
+}
+nav a:hover{
+  color: rgb(0, 255, 255);
+  outline-color: rgb(0, 255, 255);
+  /* box-shadow: -3px -3px 15px rgb(0, 255, 255); */
+  filter: drop-shadow(0px 0px 8px rgb(0, 255, 255 ));
+  transition-property: box-shadow;
+  transform: translateY(0.1em);
+  border: 1px rgb(0, 255, 255); 
+}
+nav a:hover .text {
+  transform: translateY(10px); /* Descend le texte en dessous de l'icône lors du hover */
+  opacity: 1; /* Le texte devient visible */
+  color: rgb(0, 255, 255);
+}
+
+nav a:hover .icon {
+  transform: translateY(20px); /* L'icône monte légèrement lors du hover */
+}
+nav a:hover .icon {
+  color: rgb(0, 255, 255);
+  outline-color: rgb(0, 255, 255);
+  /* box-shadow: -3px -3px 15px rgb(0, 255, 255); */
+  filter: drop-shadow(0px 0px 8px rgb(0, 255, 255 ));
+  transition-property: box-shadow;
+  transform: translateY(0.1em);
+  border: 1px rgb(0, 255, 255); 
+  /* border-radius: 5px; */
+}
+nav a.active .icon {
+  color: rgb(0, 255, 255);
+  outline-color: rgb(0, 255, 255);
+  /* box-shadow: -3px -3px 15px rgb(0, 255, 255); */
+  filter: drop-shadow(0px 0px 8px rgb(0, 255, 255 ));
+  transition-property: box-shadow;
+  transform: translateY(0.1em);
+  border: 1px rgb(0, 255, 255); 
+  /* border-radius: 5px; */
+}
+/* nav ul::after{
+  content: "";
+  display: table;
+  clear: both; */
+/* } */
+nav ul li{
+  float: left;
+  width: 25%;
+  text-align: center;
+  position: relative;
+}
+nav ul{
+  list-style-type: none;
+  
+}
+.sous{
+  display: flex;
+  margin: 0;
+  box-shadow: 0 3px 5px  #29b8c0;
+  background: rgba(0, 0, 0, 0.543); /* Fond semi-transparent pour mieux voir le flou */
+  backdrop-filter: blur(20px); /* Effet de flou */
+  -webkit-backdrop-filter: blur(10px);
+  position: absolute;
+  width: 100%;
+  z-index: 1000;
+  align-items: center;
+  border-radius: 0 0 8px 8px;
+  
+}
+nav > ul li:hover .sous{
+  display: block;
+}
+.sous li{
+  float: none;
+  width: 100%;
+  text-align: center;
+}
+.sous a{
+  padding: 10px;
+  border-bottom: none;
+}
+.sous a:hover{
+  color: rgb(0, 255, 255);
+  outline-color: rgb(0, 255, 255);
+  /* box-shadow: -3px -3px 15px rgb(0, 255, 255); */
+  filter: drop-shadow(0px 0px 8px rgb(0, 255, 255 ));
+  transition-property: box-shadow;
+  transform: translateY(0.1em);
+  border: 1px rgb(0, 255, 255); 
+}
+.deroulant ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  position: absolute;
+  top: 100%;
+  left: 0; /* Aligne le sous-menu à droite */
+  width: 80px;
+  display: none;
+}
+
+.deroulant:hover ul,
+.deroulant:focus ul {
+  display: block;
+}
+
+
+/* .conteneur{
+  margin: 50px 20px;
+  height: 1500px;
+} */
+
+/* Corps de la page */
+
+/* Container principal */
+/* .container {
+position: absolute;
+top: 50%;
+left: 50%;
+transform: translate(-50%, -50%);
+
+}  */
+
+/* Formulaire */
+form {
+  background: rgba(255, 255, 255, 0.06);
+  color: #fff;
+  padding: 3em;
+  height: auto;
+  border-radius: 20px 0 0 20px;
+  border-left: 1px solid rgba(255, 255, 255, 0.3);
+  border-top: 1px solid rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(10px);
+  box-shadow: 20px 20px 20px -6px rgba(0, 0, 0, 0.2);
+  text-align: center;
+  transition: all 0.2s ease-in-out;
+}
+
+form p {
+  font-weight: 900;
+  color: #fff;
+  opacity: 0.7;
+  font-size: 2rem;
+  margin-bottom: 25px;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+form input {
+  background: transparent;
+  width: 200px;
+  padding: 1em;
+  margin-bottom: 2em;
+  border-left: 1px solid rgba(255, 255, 255, 0.3);
+  border-top: 1px solid rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(5px);
+  text-align: center;
+  color: #fff;
+  font-weight: 500;
+  border-radius: 5000px;
+  box-shadow: inset 4px 4px 6px -1px rgba(0,0,0,0.2),
+            inset -4px -4px 6px -1px rgba(255,255,255,0.7),
+            -0.5px -0.5px 0px rgba(255,255,255,1),
+            0.5px 0.5px 0px rgba(0,0,0,0.15),
+            0px 12px 10px -10px rgba(0,0,0,0.05);
+  border: 1px solid rgba(0,0,0,0.1);
+  transform: translateY(0.5em);
+    }
+
+form input:hover,
+form input:focus {
+  background: rgba(255, 255, 255, 0.1);
+  box-shadow: 4px 4px 60px 8px rgba(0, 0, 0, 0.2);
+
+}
+
+form input[type="submit"] {
+  margin-top: 50px;
+  width: 150px;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+
+.social-login {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.social-login p {
+    margin-bottom: 10px;
+    color: #444;
+    font-weight: bold;
+}
+
+
+.social-icons {
+    display: flex;
+    justify-content: center; /* centre horizontal */
+    gap: 15px;
+    margin-bottom: 20px; /* espace entre icônes et copyright */
+}
+
+.social-icons .icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%; /* cercle */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    font-size: 18px;
+    text-decoration: none;
+    transition: 0.3s;
+    border-left: 1px solid rgb(71, 145, 139);
+    border-top: 1px solid rgb(71, 145, 139);
+    backdrop-filter: blur(30px);
+    -webkit-backdrop-filter: blur(30px);
+        /* backdrop-filter: blur(10px); */
+    box-shadow: 20px 20px 20px -6px rgb(71, 145, 139);
+
+}
+
+/* Couleurs */
+.facebook { background: #3b5998; }
+.google   { background: #db4437; }
+.twitter  { background: #1DA1F2; }
+
+/* Hover */
+.social-icons .icon:hover {
+    transform: scale(1.1);
+    opacity: 0.8;
+}
+
+/* Menu global */
+.menu ul {
+  list-style: none;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.menu ul li {
+  margin: 0 15px;
+}
+
+.menu ul li button {
+  background-color: #f4f6f8;
+  color: white;
+  padding: 10px 15px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+    /* background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%236291fd' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' class='feather feather-search'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cline x1='21' y1='21' x2='16.65' y2='16.65'/%3E%3C/svg%3E"); */
+
+/* Formulaire popup */
+.popup-form {
+  display: flex;
+  position: fixed;
+  top: 60px;  /* Hauteur du menu */
+  right: -300px; /* Commence hors de l'écran à droite */
+  width: auto;
+  border-radius: 20px 0 0 20px;
+  background-color: rgba(255, 255, 255, 0);
+  box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.3);
+  z-index: 1000;
+  transition: transform 0.5s linear, opacity 0.5s linear; /* Utilisation de cubic-bezier pour un effet de glissement */
+  opacity: 0;
+  transform: translateX(0); /* Légère translation vers le haut lors de l'apparition */
+}
+
+.popup-form.show {
+  display: flex;
+  opacity: 1;
+  transform: translateX(-300px) translateY(-2px); /* Glisse de la droite et monte légèrement */
+}
+
+
+.popup-form input[type="text"],
+.popup-form input[type="password"],
+.popup-form input[type="email"] {
+  width: 100%;
+  padding: 10px;
+  margin: 10px 0;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  color: #fff; 
+}
+.popup-form p,
+.popup-form input[type="text"],
+.popup-form input[type="password"],
+.popup-form input[type="submit"],
+.popup-form input[type="email"],
+.popup-form a {
+  color: #ffffff; /* Met le texte en blanc */
+}
+
+.popup-form a {
+  color: #29b8c0; /* Lien en bleu pour une meilleure visibilité */
+}
+.popup-form input[type="submit"] {
+  width: 100%;
+  padding: 10px;
+  margin-top: 20px;
+  background-color: #f2f3f4;
+  color: rgb(12, 12, 12);
+  border: solid 1px #29b8c0 ;
+  border-radius: 5px;
+}
+
+.popup-form input[type="submit"]:hover {
+  background-color: #18191b62;
+  color: #ddd;
+  
+}
+.popup-form input {
+  width: 100%; /* Les champs prennent toute la largeur */
+}
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0);
+  display: none;
+  z-index: 999;
+}
+
+.overlay.show {
+  display: block;
+}
+/* Messages d'erreur */
+.error-messages p.error {
+  color: red;
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+
+.open-form-button {
+  margin-left: auto; /* Pousse le bouton vers la droite */
+}
+
+.right-align {
+  margin-left: auto; /* Cette classe spécifique aligne le bouton à droite */
+}
+/* Pied de page */
+footer {
+  color: white;
+  text-align: center;
+  padding: 10px;
+  bottom: 0;
+  top: 0;
+  margin-left: -10px;
+  margin-bottom: -10px;
+  width: 100%; /* Pour que la navigation prenne toute la largeur */
+  display: flex;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.543); /* Fond semi-transparent pour mieux voir le flou */
+  margin-top: 0px;
+  backdrop-filter: blur(10px); /* Effet de flou */
+  -webkit-backdrop-filter: blur(10px); /* Prise en charge de Safari */
+  z-index: 1000; /* Assure que la barre est au-dessus du contenu */
+  box-shadow: 0px -8px 8px rgba(0, 0, 0, 0.639);
+   /* Ajouter une ombre pour un effet visuel */
+}
+.wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 2rem;
+}
+
+.icon1 {
+  width: 5.625rem;
+  height: 5.625rem;
+  background-color: #fff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  position: relative;
+}
+/* From Uiverse.io by Smit-Prajapati */ 
+footer .button {
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+footer .button .bloom-container {
+  position: relative;
+  transition: all 0.2s ease-in-out;
+  border: none;
+  background: none;
+}
+
+footer .button .bloom-container .button-container-main {
+  width: 60px;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  overflow: hidden;
+  position: relative;
+  display: grid;
+  place-content: center;
+  border-right: 5px solid white;
+  border-left: 5px solid rgba(128, 128, 128, 0.147);
+  transform: rotate(-45deg);
+  transition: all 0.5s ease-in-out;
+}
+
+footer .button .bloom-container .button-container-main .button-inner {
+  height: 60px;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  position: relative;
+  /* box-shadow: rgba(100, 100, 111, 0.5) -10px 5px 10px 0px; */
+  filter: drop-shadow(0px 0px 12px rgb(0, 255, 255));
+  transition: all 0.5s ease-in-out;
+}
+
+footer .button .bloom-container .button-container-main .button-inner .back {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: linear-gradient(
+    60deg,
+    rgb(1, 85, 103) 0%,
+    rgb(147, 245, 255) 100%
+  );
+}
+
+footer .button .bloom-container .button-container-main .button-inner .front {
+  position: absolute;
+  inset: 5px;
+  border-radius: 50%;
+  background: linear-gradient(
+    60deg,
+    rgb(0, 103, 140) 0%,
+    rgb(58, 209, 233) 100%
+  );
+  display: grid;
+  place-content: center;
+}
+
+footer .button .bloom-container .button-container-main .button-inner .front .svg {
+  fill: #ffffff;
+  opacity: 0.5;
+  width: 30px;
+  aspect-ratio: 1;
+  transform: rotate(45deg);
+  transition: all 0.2s ease-in;
+}
+
+footer .button .bloom-container .button-container-main .button-glass {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.888) 100%
+  );
+  transform: translate(0%, -50%) rotate(0deg);
+  transform-origin: bottom center;
+  transition: all 0.5s ease-in-out;
+}
+
+footer .button .bloom-container .bloom {
+  height: 1px;
+  width: 1px;
+  position: absolute;
+  background: white;
+}
+
+footer .button .bloom-container .bloom1 {
+  top: 10px;
+  right: 20px;
+  box-shadow:
+    rgb(255, 255, 255) 0px 0px 10px 10px,
+    rgb(255, 255, 255) 0px 0px 20px 20px;
+}
+
+footer .button .bloom-container .bloom2 {
+  bottom: 10px;
+  left: 20px;
+  box-shadow:
+    rgba(255, 255, 255, 0.5) 0px 0px 10px 10px,
+    rgba(255, 255, 255, 0.5) 0px 0px 30px 20px;
+}
+
+footer .button .bloom-container:hover {
+  transform: scale(1.1);
+}
+
+.button .bloom-container:hover .button-container-main .button-glass {
+  transform: translate(0%, -40%);
+}
+
+footer .button
+  .bloom-container:hover
+  .button-container-main
+  .button-inner
+  .front
+  .svg {
+  opacity: 1;
+  filter: drop-shadow(0 0 10px white);
+}
+
+footer .button .bloom-container:active {
+  transform: scale(0.7);
+}
+
+footer .button .bloom-container:active .button-container-main .button-inner {
+  transform: scale(1.2);
+}
+
+.icon1:hover > i {
+  scale:1.2;
+  color: #f1f1f1;
+  /* transition: transform 0.3s ease, color 0.3s ease; */
+}
+.icon1::before {
+  background: var(--color);
+  content: " ";
+  position: absolute;
+  width: 130%;
+  height: 130%;
+  left: -110%;
+  top: 80%;
+  transform: rotate(45deg);
+  transition: all 0.3s ease; /* Ajouté une transition pour rendre l'effet plus fluide */
+}
+
+.icon1:hover::before {
+  animation: slide 0.7s forwards;
+}
+
+@keyframes slide {
+  50% {
+    left: 10%;
+    top: -40%;
+  }
+  100% {
+    left: -15%;
+    top: -15%;
+  }
+}
+
+
+
+/* === Menu Burger pour mobile/tablette === */
+.menu-toggle {
+  display: none;
+  font-size: 2rem;
+  color: white;
+  cursor: pointer;
+  padding: 20px 20px;
+}
+
+@media (max-width: 900px) {
+  nav ul {
+    display: none; /* cache le menu */
+    flex-direction: column;
+    width: 100%;
+    position: absolute;
+    top: 60px; /* sous la barre de nav */
+    left: 0;
+    background: rgba(0,0,0,0.8);
+    border-top: 1px solid rgba(255,255,255,0.2);
+    z-index: 999;
+    padding: 20px;
+  }
+
+  nav ul.active {
+    display: flex;
+  }
+
+  nav ul li {
+    width: 100%;
+    text-align: center;
+    margin: 0;
+  }
+
+  nav .sous {
+    position: relative;
+    width: 100%;
+    flex-direction: column;
+    box-shadow: none;
+    backdrop-filter: blur(0);
+  }
+
+  .menu-toggle {
+    display: block; /* visible seulement sur mobile/tablette */
+  }
+
+  nav a {
+    width: 100%;
+    padding: 10px 0;
+  }
+
+  nav a .text {
+    position: static;
+    opacity: 1;
+    transform: none;
+  }
+
+  /* Search bar mobile */
+  .search-container {
+    position: relative;
+    display: inline-block;
+  }
+
+  .search-icon {
+    display: block;
+    background: none;
+    border: none;
+    color: white;
+    font-size: 1.5em;
+    cursor: pointer;
+    padding: 10px;
+  }
+
+.inputsearch {
+    position: fixed !important;
+    top: 60px;          /* sous la barre */
+    left: 50%;
+    transform: translateX(-50%);
+
+    width: 350px;
+    padding: 16px 20px;
+
+    border-radius: 25px;
+    border: 1px solid rgba(255,255,255,0.4);
+
+    background: rgba(0,0,0,0.55);
+    backdrop-filter: blur(12px);
+
+    color: white;
+
+    z-index: 10000 !important;
+    display: none;
+}
+
+  .inputsearch.show {
+    display: block;
+  }
+}

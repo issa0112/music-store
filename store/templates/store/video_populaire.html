@@ -1,0 +1,25 @@
+{% extends 'store/base.html' %}
+{% block title %}Liste des vidéos populaires{% endblock %}
+
+{% block videos %}
+<!-- Section principale -->
+<div class="main">
+    <div class="list">
+        {% for video in object_list %}
+            <div class="list-item">
+                <div class="card">
+                    <a href="#">
+                        <video controls onplay="videoPlay({{ video.id }})">
+                            <source src="{{ video.file.url }}" type="video/mp4">
+                            Votre navigateur ne supporte pas la lecture vidéo.
+                        </video>
+                        <h3>{{ video.title }}</h3>
+                        <span>Vues: {{ video.play_count }}</span>
+                        <span> - Téléchargements: {{ video.download_count }}</span>
+                    </a>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock videos %}

@@ -1,0 +1,53 @@
+{% extends 'store/base.html' %}
+{% load static %}
+
+{% block title %}Liste des vidéos{% endblock %}
+
+{% block videos %}
+<div class="main">
+    <div id="video-list" class="list">
+        <!-- Premiers éléments chargés côté serveur -->
+        {% include "store/components/video_items.html" with videos=object_list %}
+    </div>
+
+    <!-- Trigger invisible pour l'Infinite Scroll -->
+    <div id="load-more-trigger" style="height: 50px;"></div>
+</div>
+{% endblock videos %}
+
+{% block extra_js %}
+<script>
+let page = 2;
+let loading = false;
+let hasNext = true;
+
+const videoList = document.getElementById("video-list");
+
+const observer = new IntersectionObserver(async (entries) => {
+    if (entries[0].isIntersecting && hasNext && !loading) {
+        loading = true;
+
+        try {
+            const response = await fetch(`/videos/ajax/?page=${page}`);
+            const data = await response.json();
+
+            // Injecte les nouveaux items
+            videoList.insertAdjacentHTML("beforeend", data.html);
+
+            // Optionnel : initialise lazy loading sur nouvelles miniatures ou vidéos
+            const newVideos = videoList.querySelectorAll("video[loading='lazy']");
+            newVideos.forEach(v => v.load());
+
+            hasNext = data.has_next;
+            page++;
+        } catch (error) {
+            console.error(error);
+        }
+
+        loading = false;
+    }
+});
+
+observer.observe(document.getElementById("load-more-trigger"));
+</script>
+{% endblock extra_js %}

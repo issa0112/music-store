@@ -1,0 +1,27 @@
+{% extends "admin/base_site.html" %} {% load i18n admin_urls static %} {% block
+content %}
+<h1>Confirmer la fusion des playlists</h1>
+<p>
+  Vous êtes sur le point de fusionner les playlists sélectionnées par
+  utilisateur. Pour chaque utilisateur, la playlist avec l'ID le plus petit sera
+  conservée et les autres seront fusionnées dedans.
+</p>
+
+<form method="post">
+  {% csrf_token %}
+  <input type="hidden" name="confirm" value="yes" />
+  {% for pl in queryset %}
+  <input type="hidden" name="selected" value="{{ pl.pk }}" />
+  {% endfor %} {% for user, pls in playlists_by_user.items %}
+  <h3>Utilisateur: {{ user.username }}</h3>
+  <ul>
+    {% for p in pls %}
+    <li>#{{ p.id }} - {{ p.name }} ({{ p.tracks.count }} pistes)</li>
+    {% endfor %}
+  </ul>
+  {% endfor %}
+
+  <button type="submit" class="default">Confirmer la fusion</button>
+  <a href="{{ request.META.HTTP_REFERER|default:request.path }}">Annuler</a>
+</form>
+{% endblock %}

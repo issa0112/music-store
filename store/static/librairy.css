@@ -1,0 +1,296 @@
+/* ===== Bouton Bibliothèque ===== */
+.library-toggle-btn {
+  position: fixed;
+  top: 82px;
+  left: 0;
+  background: rgba(0, 0, 0, 0.543); /* Fond semi-transparent pour mieux voir le flou */
+  backdrop-filter: blur(10px); /* Effet de flou */
+  -webkit-backdrop-filter: blur(10px); /* Prise en charge de Safari */
+  box-shadow: 0 10px 8px  rgba(0, 0, 0, 0.639); /* Ajouter une ombre pour un effet visuel */
+  color: #fff;
+  border: none;
+  border-radius: 0 0 20px 0;
+  padding: 10px 16px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.3s ease;
+  z-index: 999;
+}
+.library-toggle-btn:hover {
+  
+   backdrop-filter: blur(10px); /* Effet de flou */
+  -webkit-backdrop-filter: blur(10px); /* Prise en charge de Safari */
+  background: #ffffff3e; 
+  transition: transform 0.2s ease;
+  transform: translateY(0.1em);
+}
+  
+
+/* ===== Sidebar ===== */
+#library-sidebar {
+  position: fixed;
+  top: 82px;
+  left: 0;
+  width: 0;
+  height: calc(100vh - 82px);
+  background: rgba(0, 0, 0, 0.543); /* Fond semi-transparent pour mieux voir le flou */
+  backdrop-filter: blur(10px); /* Effet de flou */
+  -webkit-backdrop-filter: blur(10px); /* Prise en charge de Safari */
+  box-shadow: 0 10px 8px  rgba(0, 0, 0, 0.639); /* Ajouter une ombre pour un effet visuel */ 
+  border-right: 1px solid rgba(255,255,255,0.1);
+  color: #fff;
+  transition: width 0.3s ease, transform 0.3s ease, opacity 0.3s ease;
+  z-index: 999;
+  opacity: 0;
+  transform: translateX(-100%);
+  pointer-events: none;
+  visibility: hidden;
+  backdrop-filter: blur(12px);
+}
+#library-sidebar.library-open,
+#library-sidebar.library-expanded {
+  opacity: 1;
+  transform: translateX(0);
+  pointer-events: auto;
+  visibility: visible;
+}
+#library-sidebar.library-open { width: 300px; }
+#library-sidebar.library-expanded { width: 500px; }
+
+/* ===== Topbar ===== */
+.library-topbar {
+  display: flex;
+  justify-content: space-between; /* Titre à gauche, icônes à droite */
+  align-items: center;
+  top: 82px;
+  /* padding-top: 10px; */
+  /* padding: 10px 20px; Espace intérieur global */
+  padding: 10px 22px 12px 20px; /* un peu moins haut */
+  min-height: 30px; /* garde une hauteur uniforme */
+  
+}
+
+/* Titre Bibliothèque */
+.library-topbar h3 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #fff;
+  /* margin-left: 10px; petite marge à gauche */
+  letter-spacing: 0.3px;
+  
+}
+
+.library-controls {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+} 
+
+/* Boutons d’icônes */
+.library-controls button {
+  background: none;
+  border: none;
+  color: #b3b3b3;
+  font-size: 1.1rem;
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.25s ease;
+}
+
+.library-controls button:hover {
+  color: #fff;
+  transform: scale(1.1);
+}
+
+
+/* Spécifique : bouton Fermer */
+.library-controls .close-btn {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+.library-controls .close-btn:hover {
+    color: rgb(0, 255, 255);
+    outline-color: rgb(0, 255, 255);
+    /* box-shadow: -3px -3px 15px rgb(0, 255, 255); */
+    filter: drop-shadow(0px 0px 8px rgb(0, 255, 255 ));
+    transition-property: box-shadow;
+    transform: translateY(0.1em);
+    border: 1px #00ffffff; 
+}
+
+/* Spécifique : bouton Agrandir */
+.library-controls .expand-btn {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+.library-controls .expand-btn:hover {
+    color: rgb(0, 255, 255);
+    outline-color: rgb(0, 255, 255);
+    /* box-shadow: -3px -3px 15px rgb(0, 255, 255); */
+    filter: drop-shadow(0px 0px 8px rgb(0, 255, 255 ));
+    transition-property: box-shadow;
+    transform: translateY(0.1em);
+    border: 1px #00ffffff; 
+}
+
+/* ===== Tabs ===== */
+.library-tabs {
+  display: flex;
+  justify-content: space-around;
+  box-shadow: 0 10px 8px  rgba(0, 0, 0, 0.639); /* Ajouter une ombre pour un effet visuel */ 
+  
+}
+.tab-btn {
+  flex: 1;
+  background: none;
+  border: none;
+  color: #b3b3b3;
+  font-weight: 600;
+  padding: 10px;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+.tab-btn:hover, .tab-btn.active {
+  color: #fff;
+  /* background: rgba(255,255,255,0.1); */
+}
+
+/* ===== Contenu ===== */
+.library-content {
+  padding: 10px 15px;
+  overflow-y: auto;
+  height: calc(100% - 110px);
+}
+.tab-content {
+  display: none;
+  animation: fadeIn 0.3s ease;
+}
+.tab-content.active {
+  display: block;
+}
+.tab-content ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.tab-content li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px;
+  border-radius: 6px;
+  transition: background 0.2s ease;
+}
+.tab-content li:hover {
+  background: rgba(255,255,255,0.08);
+}
+
+
+/* ===== Animation ===== */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Scrollbar */
+#library-sidebar::-webkit-scrollbar { width: 6px; }
+#library-sidebar::-webkit-scrollbar-thumb {
+  background: rgba(255,255,255,0.2);
+  border-radius: 3px;
+}
+
+
+
+/* === Animation === */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* === Scrollbar === */
+#library-sidebar::-webkit-scrollbar { width: 6px; }
+#library-sidebar::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 3px;
+}
+
+/* === Main content décalé === */
+#main-content {
+  transition: margin-left 0.3s ease;
+}
+
+#main-content.main-shifted { margin-left: 300px; }
+#main-content.main-expanded { margin-left: 500px; }
+
+/* === Masquer le bouton quand la bibliothèque est ouverte === */
+.library-toggle-btn.hidden {
+  opacity: 0;
+  pointer-events: none;
+  visibility: hidden;
+  transform: translateX(-20px);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+/* === Responsive === */
+@media (max-width: 900px) {
+  #library-sidebar {
+    top: 80px;
+    height: calc(100vh - 0px);
+  }
+  .library-toggle-btn {
+    top: 80px;
+    font-size: 0; /* cache le texte */
+  }
+  #open-library-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+    padding: 10px;       /* rond */
+    width: 20px;
+    height: 20px;
+  }
+  #open-library-btn {
+    font-size: 0;
+  }
+  #open-library-btn i {
+    font-size: 24px;
+  }
+    .library-toggle-btn {
+    padding: 0;              /* pour centrer l’icône */
+    justify-content: center;
+    font-size: 0;            /* cache le texte */
+    z-index: 1100;           /* inférieur à inputsearch */
+  }
+  .library-toggle-btn i {
+    font-size: 24px; /* réaffiche icône */
+  }
+  .library-toggle-btn:hover {
+  background: rgba(0,255,255,0.3);
+  transform: scale(1.05);
+}
+
+  #library-sidebar.library-open { width: 85vw; }
+  #main-content.main-shifted { margin-left: 0; }
+  .library-toggle-btn.moved { left: calc(85vw - 60px); }
+}
