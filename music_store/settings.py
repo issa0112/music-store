@@ -9,25 +9,20 @@ https://docs.djangoproject.com/en/5.0/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.0/ref/settings/
 """
-
 from pathlib import Path
 import os
 import dj_database_url
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+DEBUG = os.getenv("DEBUG", "0") == "1"
 
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
+# SECRET KEY from environment
+SECRET_KEY = os.getenv("SECRET_KEY")
 
-# SECURITY WARNING: keep the secret key used in production secret!
-# REMOVED = 'django-insecure-gu8ed)&texd6%8_fm7d8_zu2a)&9anq)kqb@(#4@_usciz!-gz'
+# Allowed hosts
+ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "*").split(",")
 
-# SECURITY WARNING: don't run with debug turned on in production!
-# DEBUG = True
-
-# ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
-ALLOWED_HOSTS = ['*']
 
 
 
@@ -138,6 +133,7 @@ if DEBUG:
         BASE_DIR / "store" / "static",
     ]
 
+
 # Ici Django va collecter les fichiers (via collectstatic) uniquement pour la prod
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
@@ -203,14 +199,7 @@ ORANGE_API_URL = "https://app.paydunya.com/api/v1/softpay/orange-money-mali"
 MOOV_API_URL   = "https://app.paydunya.com/api/v1/softpay/moov-mali"
 WAVE_API_URL   = "https://…"  # à renseigner si Wave a un endpoint similaire
 
-# Tes clés / tokens
-REMOVED = os.getenv("REMOVED")
-REMOVED   = os.getenv("REMOVED")
-REMOVED   = os.getenv("REMOVED")
 
-
-# DEBUG = True  # mode dev pour tester localement
-DEBUG = os.getenv("DEBUG", "0") == "1"
 
 from storages.backends.s3boto3 import S3Boto3Storage
 try:
@@ -245,10 +234,7 @@ else:
 # AWS_QUERYSTRING_AUTH = True       # URLs privées
 # AWS_S3_ADDRESSING_STYLE = "virtual"
 # AWS_DEFAULT_ACL = None
-REMOVED = os.getenv("REMOVED")
 
-REMOVED = os.getenv("REMOVED")
-REMOVED = os.getenv("REMOVED")
 
 AWS_STORAGE_BUCKET_NAME = os.getenv("AWS_STORAGE_BUCKET_NAME")
 AWS_S3_ENDPOINT_URL = os.getenv("AWS_S3_ENDPOINT_URL")
