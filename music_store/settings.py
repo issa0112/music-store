@@ -98,10 +98,10 @@ if DEBUG:
     }
 else:
     DATABASES = {
-        'default': dj_database_url.config(
-            default=os.environ.get("DATABASE_URL"),
+        'default': dj_database_url.parse(
+            os.environ.get("DATABASE_URL"),
             conn_max_age=600,
-            ssl_require=True,
+            ssl_require=True
         )
     }
 
@@ -127,14 +127,7 @@ USE_TZ = True
 # STATIC FILES (CSS / JS)
 # =========================
 STATIC_URL = '/static/'
-
-if DEBUG:
-    STATICFILES_DIRS = [
-        BASE_DIR / "store" / "static",
-    ]
-
 STATIC_ROOT = BASE_DIR / "staticfiles"
-
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # =========================
@@ -174,11 +167,19 @@ else:
 AWS_STORAGE_BUCKET_NAME = os.getenv("AWS_STORAGE_BUCKET_NAME")
 AWS_S3_ENDPOINT_URL = os.getenv("AWS_S3_ENDPOINT_URL")
 AWS_S3_REGION_NAME = os.getenv("AWS_S3_REGION_NAME")
-
 AWS_S3_FILE_OVERWRITE = False
 AWS_QUERYSTRING_AUTH = True
 AWS_DEFAULT_ACL = None
 AWS_S3_ADDRESSING_STYLE = "virtual"
+
+# =========================
+# SECURE HTTPS (Render)
+# =========================
+if not DEBUG:
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+    SECURE_SSL_REDIRECT = True
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
 
 # =========================
 # DEFAULT PK
