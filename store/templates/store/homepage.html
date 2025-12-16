@@ -1,139 +1,139 @@
-{% extends 'store/base.html' %}
-
-{% block title %}Page principale{% endblock %}
-
-
-{% block homepage %}
-
-    {% comment %} <div class="search-options">
-        <button type="button" class="search-option" data-type="musique">Musique</button>
-        <button type="button" class="search-option" data-type="video">Vidéo</button>
-        <button type="button" class="search-option" data-type="artiste">Artiste</button>
-        <button type="button" class="search-option" data-type="all">Tous</button>
-    </div>  {% endcomment %}
-    <div class="spacer"></div>
-    <!-- Section Artiste Populaire -->
-    <section id="popular-artists" class="section fade-in-scroll popular-artists">
-    <div class="section-inner">
+{% extends 'store/base.html' %} {% block title %}Page principale{% endblock %}
+{% block homepage %} {% comment %}
+<div class="search-options">
+  <button type="button" class="search-option" data-type="musique">
+    Musique
+  </button>
+  <button type="button" class="search-option" data-type="video">Vidéo</button>
+  <button type="button" class="search-option" data-type="artiste">
+    Artiste
+  </button>
+  <button type="button" class="search-option" data-type="all">Tous</button>
+</div>
+{% endcomment %}
+<div class="spacer"></div>
+<!-- Section Artiste Populaire -->
+<section id="popular-artists" class="section fade-in-scroll popular-artists">
+  <div class="section-inner">
     <h2>Artistes Populaires</h2>
 
     <div class="swiper popular-swiper">
-        <div class="swiper-wrapper">
-
-            {% for artist in popular_artists %}
-            <div class="swiper-slide">
-
-                {% if artist.user and artist.user.id %}
-                <div href="{% url 'artist_profile' artist.user.id %}" class="artist-card">
-                    <img src="{{ artist.image.url }}" alt="{{ artist.name }}">
-                    <div class="artist-info">
-                        <span>{{ artist.name }}</span>
-                    </div>
-                </div>
-                {% else %}
-                <div class="artist-card">
-                    <img src="{{ artist.image.url }}" alt="{{ artist.name }}">
-                    <div class="artist-info">
-                        <span>{{ artist.name }}</span>
-                    </div>
-                </div>
-                {% endif %}
-
+      <div class="swiper-wrapper">
+        {% for artist in popular_artists %}
+        <div class="swiper-slide">
+          {% if artist.user and artist.user.id %}
+          <div
+            href="{% url 'artist_profile' artist.user.id %}"
+            class="artist-card"
+          >
+            <img src="{{ artist.image.url }}" alt="{{ artist.name }}" />
+            <div class="artist-info">
+              <span>{{ artist.name }}</span>
             </div>
-            {% endfor %}
-
+          </div>
+          {% else %}
+          <div class="artist-card">
+            <img src="{{ artist.image.url }}" alt="{{ artist.name }}" />
+            <div class="artist-info">
+              <span>{{ artist.name }}</span>
+            </div>
+          </div>
+          {% endif %}
         </div>
+        {% endfor %}
+      </div>
 
-        <!-- Flèches -->
-        <div class="swiper-button-next"></div>
-        <div class="swiper-button-prev"></div>
+      <!-- Flèches -->
+      <div class="swiper-button-next"></div>
+      <div class="swiper-button-prev"></div>
     </div>
-</div>
+  </div>
 </section>
 
+<!-- Section Album Populaire -->
+<section id="popular-albums" class="section fade-in-scroll">
+  <h2>Albums Populaires</h2>
+  <div class="container-wrapper">
+    <div class="album-container">
+      {% for album in popular_albums|slice:":10" %}
+      <div class="album-card">
+        <a href="#">
+          <img src="{{ album.cover_image.url }}" alt="{{ album.title }}" />
+          <h3>{{ album.title }}</h3>
+          <p>Artiste : {{ album.artist.name }}</p>
+        </a>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  <div class="see-more-btn">
+    <a href="{% url 'album_list' %}" class="btn">Voir plus d'albums</a>
+  </div>
+</section>
 
+<!-- Section Vidéo Populaire -->
+<section id="popular-videos" class="section fade-in-scroll">
+  <h2>Vidéos Populaires</h2>
+  <div class="container-wrapper">
+    <div class="video-container">
+      {% for video in popular_videos|slice:":10" %}
+      <div class="video-card">
+        <a href="#">
+          <img src="{{ video.thumbnail.url }}" alt="{{ video.title }}" />
+          <h3>{{ video.title }}</h3>
+          <p>Artiste : {{ video.artist.name }}</p>
+        </a>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  <div class="see-more-btn">
+    <a href="{% url 'videos_populaires' %}" class="btn">Voir plus de vidéos</a>
+  </div>
+</section>
 
+<!-- Section Catégorie Musique -->
+<section id="music-categories" class="section fade-in-scroll">
+  <h2>Catégories Musique</h2>
+  <div class="container-wrapper">
+    <div class="album-container">
+      {% for category in music_categories %}
+      <div class="album-card">
+        <a href="#">
+          <img src="{{ category.cover_image.url }}" alt="{{ category.name }}" />
+          <h3>{{ category.name }}</h3>
+        </a>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  <div class="see-more-btn">
+    <a href="{% url 'categories_musique' %}" class="btn"
+      >Voir plus de catégories Musique</a
+    >
+  </div>
+</section>
 
-    <!-- Section Album Populaire -->
-    <section id="popular-albums" class="section fade-in-scroll">
-        <h2>Albums Populaires</h2>
-        <div class="container-wrapper">
-            <div class="album-container">
-                {% for album in popular_albums|slice:":10" %}
-                    <div class="album-card">
-                        <a href="#">
-                            <img src="{{ album.cover_image.url }}" alt="{{ album.title }}">
-                            <h3>{{ album.title }}</h3>
-                            <p>Artiste : {{ album.artist.name }}</p>
-                        </a>
-                    </div>
-                {% endfor %}
-            </div>
-        </div>
-        <div class="see-more-btn">
-            <a href="{% url 'album_list' %}" class="btn">Voir plus d'albums</a>
-        </div>
-    </section>
-
-    <!-- Section Vidéo Populaire -->
-    <section id="popular-videos" class="section fade-in-scroll">
-        <h2>Vidéos Populaires</h2>
-        <div class="container-wrapper">
-            <div class="video-container">
-                {% for video in popular_videos|slice:":10" %}
-                    <div class="video-card">
-                        <a href="#">
-                            <img src="{{ video.thumbnail.url }}" alt="{{ video.title }}">
-                            <h3>{{ video.title }}</h3>
-                            <p>Artiste : {{ video.artist.name }}</p>
-                        </a>
-                    </div>
-                {% endfor %}
-            </div>
-        </div>
-        <div class="see-more-btn">
-            <a href="{% url 'videos_populaires' %}" class="btn">Voir plus de vidéos</a>
-        </div>
-    </section>
-
-    <!-- Section Catégorie Musique -->
-    <section id="music-categories" class="section fade-in-scroll">
-        <h2>Catégories Musique</h2>
-        <div class="container-wrapper">
-            <div class="album-container">
-                {% for category in music_categories %}
-                    <div class="album-card">
-                        <a href="#">
-                            <img src="{{ category.cover_image.url }}" alt="{{ category.name }}">
-                            <h3>{{ category.name }}</h3>
-                        </a>
-                    </div>
-                {% endfor %}
-            </div>
-        </div>
-        <div class="see-more-btn">
-            <a href="{% url 'categories_musique' %}" class="btn">Voir plus de catégories Musique</a>
-        </div>
-    </section>
-
-    <!-- Section Catégorie Vidéo -->
-    <section id="video-categories" class="section fade-in-scroll">
-        <h2>Catégories Vidéo</h2>
-        <div class="container-wrapper">
-            <div class="video-container">
-                {% for category in video_categories %}
-                    <div class="video-card">
-                        <a href="#">
-                            <img src="{{ category.cover_image.url }}" alt="{{ category.name }}">
-                            <h3>{{ category.name }}</h3>
-                        </a>
-                    </div>
-                {% endfor %}
-            </div>
-        </div>
-        <div class="see-more-btn">
-            <a href="{% url 'categories_videos' %}" class="btn">Voir plus de catégories Vidéo</a>
-        </div>
-    </section>
+<!-- Section Catégorie Vidéo -->
+<section id="video-categories" class="section fade-in-scroll">
+  <h2>Catégories Vidéo</h2>
+  <div class="container-wrapper">
+    <div class="video-container">
+      {% for category in video_categories %}
+      <div class="video-card">
+        <a href="#">
+          <img src="{{ category.cover_image.url }}" alt="{{ category.name }}" />
+          <h3>{{ category.name }}</h3>
+        </a>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  <div class="see-more-btn">
+    <a href="{% url 'categories_videos' %}" class="btn"
+      >Voir plus de catégories Vidéo</a
+    >
+  </div>
+</section>
 
 {% endblock homepage %}

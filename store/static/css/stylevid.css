@@ -1,6 +1,6 @@
 /* Styles globaux */
 body {
-        background: url('wall.jpg') no-repeat center center fixed;;
+        background: url('../img/wall.jpg') no-repeat center center fixed;;
         background-size: cover;
         background-position: center;
         color: #222;
@@ -9,7 +9,7 @@ body {
         height: 100vh; /* S'adapte à la hauteur totale de la fenêtre */
         /* overflow: hidden; Empêche les barres de défilement inutiles */
         font-family: "Times New Roman", Times, serif;
-        
+
     }
     
 

@@ -1,10 +1,10 @@
-# TODO: Fix upload_media.py to preserve subdirectory structure for image display
+# TODO: Fix Media Loading on Blackblaze B2
 
 ## Completed Tasks
-- [x] Modify upload_file function to compute relative path and preserve subdirectory structure
-- [x] Update all calls to upload_file to pass media_root parameter
+- [x] Update settings.py to make media publicly accessible (AWS_DEFAULT_ACL = 'public-read', AWS_QUERYSTRING_AUTH = False)
+- [x] Add URL logging to storage_backends.py for debugging
+- [x] Modify storage_backends.py to check for B2 credentials and fallback to FileSystemStorage locally
+- [x] Update settings.py to always use MediaStorage for DEFAULT_FILE_STORAGE
 
-## Next Steps
-- [ ] Test the updated upload_media command to ensure images display correctly
-- [ ] Run the command: python manage.py upload_media
-- [ ] Verify that images are now displaying on the homepage and other pages
+## Summary
+Media files will now be uploaded to and served from Blackblaze B2 in production, but fallback to local FileSystemStorage in development if B2 credentials are not available, ensuring media loads in both environments.

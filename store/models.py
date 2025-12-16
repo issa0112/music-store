@@ -7,15 +7,14 @@ from store.storage_backends import MediaStorage
 
 class MusicCategory(models.Model):
     name = models.CharField(max_length=100)
-    cover_image = models.ImageField(upload_to='music_category_covers/', blank=True, null=True, storage=MediaStorage())
+    cover_image = models.ImageField(upload_to='music_category_covers/', blank=True, null=True)
 
     def __str__(self):
         return self.name
 
 class VideoCategory(models.Model):  # ✅ Conservez cette définition
     name = models.CharField(max_length=100)
-    cover_image = models.ImageField(upload_to='video_category_covers/', blank=True, null=True, storage=MediaStorage())
-
+    cover_image = models.ImageField(upload_to='video_category_covers/', blank=True, null=True)
     def __str__(self):
         return self.name
 
@@ -23,7 +22,7 @@ class Artist(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, null=True, blank=True)
     name = models.CharField(max_length=100, db_index=True)
     bio = models.TextField(blank=True)
-    image = models.ImageField(upload_to='artists/', blank=True, null=True, storage=MediaStorage())
+    image = models.ImageField(upload_to='artists/', blank=True, null=True)
     is_popular = models.BooleanField(default=False)
 
     def __str__(self):
@@ -44,8 +43,9 @@ class Album(models.Model):
     Music_Category = models.ForeignKey(MusicCategory, on_delete=models.CASCADE, null=True, blank=True)
     is_popular = models.BooleanField(default=False)
     price = models.DecimalField(max_digits=6, decimal_places=2, default=9.99)
-    cover_image = models.ImageField(upload_to='album_covers/', storage=MediaStorage())
-    fichier = models.FileField(upload_to='albums/', null=True, blank=True, storage=MediaStorage())
+    cover_image = models.ImageField(upload_to='album_covers/', blank=True, null=True)
+    fichier = models.FileField(upload_to='albums/', blank=True, null=True)
+
 
     def __str__(self):
         return self.title
@@ -57,8 +57,9 @@ class Track(models.Model):
     album = models.ForeignKey(Album, on_delete=models.CASCADE, related_name='tracks', null=True, blank=True)
     artist = models.ForeignKey(Artist, on_delete=models.CASCADE, null=True, blank=True, related_name='tracks')
     Music_Category = models.ForeignKey(MusicCategory, on_delete=models.CASCADE, null=True, blank=True)
-    file = models.FileField(upload_to='tracks/', storage=MediaStorage())
-    cover_image = models.ImageField(upload_to='track_covers/', blank=True, null=True, storage=MediaStorage())
+    file = models.FileField(upload_to='tracks/')
+    cover_image = models.ImageField(upload_to='track_covers/', blank=True, null=True)
+
     theme_color = models.CharField(max_length=7, null=True, blank=True)
     duration = models.DurationField()
     play_count = models.PositiveIntegerField(default=0)
@@ -107,8 +108,9 @@ class Video(models.Model):
     play_count = models.PositiveIntegerField(default=0)
     like_count = models.PositiveIntegerField(default=0)
     download_count = models.PositiveIntegerField(default=0)
-    file = models.FileField(upload_to='videos/', storage=MediaStorage())
-    thumbnail = models.ImageField(upload_to='video_thumbnails/', blank=True, null=True, storage=MediaStorage())
+    file = models.FileField(upload_to='videos/')
+    thumbnail = models.ImageField(upload_to='video_thumbnails/', blank=True, null=True)
+
     is_popular = models.BooleanField(default=False)
 
     def __str__(self):

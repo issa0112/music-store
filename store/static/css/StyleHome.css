@@ -8,7 +8,7 @@ body {
     /* margin: 0px; */
     padding-top: 100px;
     background-color: #171515;
-    background: url('wall.jpg') no-repeat center center fixed;
+    background: url('../img/wall.jpg') no-repeat center center fixed;
     /* L'image couvre tout l'écran */
 
 
