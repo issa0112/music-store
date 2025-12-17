@@ -130,6 +130,11 @@ STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / "staticfiles"
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
+
+STATICFILES_DIRS = [
+    BASE_DIR / 'store' / 'static',  # ton dossier 'static/' où tu as css/, js/, img/
+]
+
 # =========================
 # MEDIA FILES
 # =========================
