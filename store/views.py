@@ -963,3 +963,10 @@ def unfollow(request, user_id):
     user_to_unfollow = get_object_or_404(User, id=user_id)
     request.user.following.remove(user_to_unfollow)
     return JsonResponse({"status": "ok"})
+
+
+
+
+def library_api(request):
+    data = {"message": "API OK"}
+    return JsonResponse(data)

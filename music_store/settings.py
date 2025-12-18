@@ -1,18 +1,22 @@
-"""
-Django settings for music_store project.
-"""
-
 from pathlib import Path
 import os
 import dj_database_url
+from dotenv import load_dotenv
 
+# =========================
+# CHARGEMENT DU .env
+# =========================
+load_dotenv()
+
+# =========================
+# BASE DIR
+# =========================
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # =========================
 # ENVIRONNEMENT
 # =========================
 DEBUG = os.getenv("DJANGO_ENV") != "production"
-
 SECRET_KEY = os.getenv("SECRET_KEY", "unsafe-dev-key")
 
 ALLOWED_HOSTS = os.getenv(
@@ -87,8 +91,10 @@ TEMPLATES = [
 WSGI_APPLICATION = 'music_store.wsgi.application'
 
 # =========================
-# DATABASE
+# DATABASES
 # =========================
+DEBUG = os.environ.get("DEBUG", "True") == "True"  # ou ton booléen selon ton .env
+
 if DEBUG:
     DATABASES = {
         'default': {
@@ -97,6 +103,7 @@ if DEBUG:
         }
     }
 else:
+    import dj_database_url
     DATABASES = {
         'default': dj_database_url.parse(
             os.environ.get("DATABASE_URL"),
@@ -104,6 +111,7 @@ else:
             ssl_require=True
         )
     }
+
 
 # =========================
 # PASSWORDS
@@ -124,22 +132,40 @@ USE_I18N = True
 USE_TZ = True
 
 # =========================
-# STATIC FILES (CSS / JS)
+# STATIC FILES
 # =========================
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / "staticfiles"
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
-
 STATICFILES_DIRS = [
-    BASE_DIR / 'store' / 'static',  # ton dossier 'static/' où tu as css/, js/, img/
+    BASE_DIR / 'store' / 'static',
 ]
 
 # =========================
-# MEDIA FILES
+# MEDIA FILES → BACKBLAZE B2
 # =========================
-MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR / 'media'
+if DEBUG:
+    DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
+else:
+    DEFAULT_FILE_STORAGE = 'store.storage_backends.FallbackMediaStorage'
+
+
+
+AWS_ACCESS_KEY_ID = os.getenv("AWS_ACCESS_KEY_ID")
+AWS_SECRET_ACCESS_KEY = os.getenv("AWS_SECRET_ACCESS_KEY")
+
+AWS_STORAGE_BUCKET_NAME = os.getenv("AWS_STORAGE_BUCKET_NAME")
+AWS_S3_ENDPOINT_URL = os.getenv("AWS_S3_ENDPOINT_URL")
+AWS_S3_REGION_NAME = os.getenv("AWS_S3_REGION_NAME")
+
+AWS_S3_SIGNATURE_VERSION = "s3v4"
+AWS_S3_FILE_OVERWRITE = False
+AWS_QUERYSTRING_AUTH = True  # URLs privées
+AWS_DEFAULT_ACL = None
+AWS_S3_ADDRESSING_STYLE = "virtual"
+
+MEDIA_URL = f"{AWS_S3_ENDPOINT_URL}/{AWS_STORAGE_BUCKET_NAME}/"
 
 # =========================
 # AUTH / ALLAUTH
@@ -160,22 +186,6 @@ ACCOUNT_USERNAME_REQUIRED = True
 # STRIPE
 # =========================
 STRIPE_PUBLIC_KEY = os.getenv("STRIPE_PUBLIC_KEY")
-
-# =========================
-# BACKBLAZE B2 (django-storages)
-# =========================
-if DEBUG:
-    DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
-else:
-    DEFAULT_FILE_STORAGE = 'store.storage_backends.MediaStorage'
-
-AWS_STORAGE_BUCKET_NAME = os.getenv("AWS_STORAGE_BUCKET_NAME")
-AWS_S3_ENDPOINT_URL = os.getenv("AWS_S3_ENDPOINT_URL")
-AWS_S3_REGION_NAME = os.getenv("AWS_S3_REGION_NAME")
-AWS_S3_FILE_OVERWRITE = False
-AWS_QUERYSTRING_AUTH = True
-AWS_DEFAULT_ACL = None
-AWS_S3_ADDRESSING_STYLE = "virtual"
 
 # =========================
 # SECURE HTTPS (Render)

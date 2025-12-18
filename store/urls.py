@@ -60,7 +60,7 @@ urlpatterns = [
     # path('profile/<int:artist_id>/', artist_profile, name='artist_profile')
     path('profile/user/<int:user_id>/', user_profile, name='user_profile'),
     path('profile/artist/<int:artist_id>/', artist_profile, name='artist_profile'),
-
+    path('api/library/', library_api, name='library_api'),
 
 
 
