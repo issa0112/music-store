@@ -44,3 +44,5 @@ class FallbackMediaStorage(S3Boto3Storage):
             return super().exists(name)
         except ClientError:
             return local_storage.exists(name)
+# Alias pour compatibilité avec l'ancien code
+MediaStorage = FallbackMediaStorage
