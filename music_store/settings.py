@@ -21,7 +21,7 @@ SECRET_KEY = os.getenv("SECRET_KEY", "unsafe-dev-key")
 
 ALLOWED_HOSTS = os.getenv(
     "ALLOWED_HOSTS",
-    "localhost,127.0.0.1,music-store-ngen.onrender.com"
+    "localhost,127.0.0.1,tramo.com,www.tramo.com,music-store-ngen.onrender.com"
 ).split(",")
 
 # =========================
@@ -142,11 +142,12 @@ STATICFILES_DIRS = [
 # MEDIA FILES → BACKBLAZE B2
 # =========================
 if DEBUG:
-    # Développement : stockage local
     DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
+    MEDIA_ROOT = BASE_DIR / "media"
+    MEDIA_URL = "/media/"
 else:
-    # Production : B2 privé + fallback local
     DEFAULT_FILE_STORAGE = 'store.storage_backends.FallbackMediaStorage'
+    MEDIA_URL = "/media/"  # Django utilisera storage.url() pour générer les URLs signées
 
 AWS_ACCESS_KEY_ID = os.getenv("AWS_ACCESS_KEY_ID")
 AWS_SECRET_ACCESS_KEY = os.getenv("AWS_SECRET_ACCESS_KEY")
@@ -160,8 +161,6 @@ AWS_DEFAULT_ACL = None
 AWS_QUERYSTRING_AUTH = True           # URLs signées
 AWS_QUERYSTRING_EXPIRE = 3600         # URLs valables 1h
 AWS_S3_ADDRESSING_STYLE = "virtual"
-
-MEDIA_URL = f"{AWS_S3_ENDPOINT_URL}/{AWS_STORAGE_BUCKET_NAME}/"
 
 # =========================
 # AUTH / ALLAUTH
@@ -192,6 +191,23 @@ if not DEBUG:
     SECURE_SSL_REDIRECT = True
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
+
+# =========================
+# LOGGING
+# =========================
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'root': {
+        'handlers': ['console'],
+        'level': 'INFO',
+    },
+}
 
 # =========================
 # DEFAULT PK
