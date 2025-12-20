@@ -85,12 +85,12 @@ from storages.backends.s3boto3 import S3Boto3Storage
 # ✅ Storage pour audio/vidéo (B2)
 class MediaStorage(S3Boto3Storage):
     location = "media"
-    default_acl = "private"          # fichiers protégés
+    default_acl = None          # fichiers protégés
     file_overwrite = False
     querystring_auth = True          # URLs signées temporaires
 
 class PublicMediaStorage(S3Boto3Storage):
     location = "images"
-    default_acl = "public-read"
+    default_acl = None
     file_overwrite = False
     querystring_auth = False
