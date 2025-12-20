@@ -44,7 +44,11 @@ class Album(models.Model):
     is_popular = models.BooleanField(default=False)
     price = models.DecimalField(max_digits=6, decimal_places=2, default=9.99)
     cover_image = models.ImageField(upload_to='album_covers/', blank=True, null=True)
-    fichier = models.FileField(upload_to='albums/', blank=True, null=True)
+    fichier = models.FileField(
+        storage=MediaStorage(),       # ✅ B2
+        upload_to='albums/',
+        blank=True, null=True
+    )
 
 
     def __str__(self):
@@ -57,7 +61,10 @@ class Track(models.Model):
     album = models.ForeignKey(Album, on_delete=models.CASCADE, related_name='tracks', null=True, blank=True)
     artist = models.ForeignKey(Artist, on_delete=models.CASCADE, null=True, blank=True, related_name='tracks')
     Music_Category = models.ForeignKey(MusicCategory, on_delete=models.CASCADE, null=True, blank=True)
-    file = models.FileField(upload_to='tracks/')
+    file = models.FileField(
+        storage=MediaStorage(),       # ✅ B2
+        upload_to='tracks/'
+    )
     cover_image = models.ImageField(upload_to='track_covers/', blank=True, null=True)
 
     theme_color = models.CharField(max_length=7, null=True, blank=True)
@@ -108,7 +115,10 @@ class Video(models.Model):
     play_count = models.PositiveIntegerField(default=0)
     like_count = models.PositiveIntegerField(default=0)
     download_count = models.PositiveIntegerField(default=0)
-    file = models.FileField(upload_to='videos/')
+    file =models.FileField(
+        storage=MediaStorage(),       # ✅ B2
+        upload_to='videos/'
+    )
     thumbnail = models.ImageField(upload_to='video_thumbnails/', blank=True, null=True)
 
     is_popular = models.BooleanField(default=False)
