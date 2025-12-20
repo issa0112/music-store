@@ -1,20 +1,43 @@
+import os
 import logging
-from django.conf import settings
-from django.core.files.storage import FileSystemStorage
-from storages.backends.s3boto3 import S3Boto3Storage   # <-- IMPORT MANQUANT
+import boto3
 from botocore.exceptions import ClientError
+from django.core.files.storage import FileSystemStorage
+from storages.backends.s3boto3 import S3Boto3Storage
+
+# Configuration du logger
+logger = logging.getLogger(__name__)
+
+# Stockage local fallback
+local_storage = FileSystemStorage(location=os.path.join(os.path.dirname(__file__), '../../media_local'))
+
 class FallbackMediaStorage(S3Boto3Storage):
+    """
+    Stockage principal sur B2, fallback sur local en cas d'erreur.
+    Génère toujours des URLs signées pour B2, sinon URL locale.
+    """
     location = ''
     file_overwrite = False
+    default_acl = None  # Pour que le bucket reste privé
 
     def _save(self, name, content):
+        # 1️⃣ Tentative d'envoi sur B2
         try:
             result = super()._save(name, content)
             logger.info(f"✅ Fichier {name} envoyé sur B2 avec succès")
-            return result
         except ClientError as e:
             logger.error(f"❌ Échec upload B2 pour {name}, fallback local: {e}")
-            return local_storage._save(name, content)
+            result = local_storage._save(name, content)
+
+        # 2️⃣ Copier systématiquement le fichier local pour le fallback
+        try:
+            content.seek(0)
+            local_storage._save(name, content)
+            logger.info(f"✅ Fichier {name} copié localement")
+        except Exception as e:
+            logger.warning(f"⚠️ Échec sauvegarde locale pour {name}: {e}")
+
+        return result
 
     def _open(self, name, mode='rb'):
         try:
@@ -31,7 +54,7 @@ class FallbackMediaStorage(S3Boto3Storage):
 
     def url(self, name):
         """
-        Génère une URL signée pour les fichiers B2 privés.
+        Génère une URL signée B2 pour les fichiers privés.
         Si B2 est indisponible, retourne l'URL locale.
         """
         try:
@@ -45,11 +68,11 @@ class FallbackMediaStorage(S3Boto3Storage):
             return s3.generate_presigned_url(
                 "get_object",
                 Params={"Bucket": os.getenv("AWS_STORAGE_BUCKET_NAME"), "Key": name},
-                ExpiresIn=3600,  # valable 1h
+                ExpiresIn=3600,  # URL valable 1h
             )
         except ClientError as e:
             logger.warning(f"⚠️ URL signée B2 échouée pour {name}, fallback local: {e}")
             return local_storage.url(name)
 
-# Alias pour compatibilité avec l'ancien code
+# Alias pour compatibilité
 MediaStorage = FallbackMediaStorage

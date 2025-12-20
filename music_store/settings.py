@@ -1,5 +1,5 @@
-from pathlib import Path
 import os
+from pathlib import Path
 import dj_database_url
 from dotenv import load_dotenv
 
@@ -93,8 +93,6 @@ WSGI_APPLICATION = 'music_store.wsgi.application'
 # =========================
 # DATABASES
 # =========================
-DEBUG = os.environ.get("DEBUG", "True") == "True"  # ou ton booléen selon ton .env
-
 if DEBUG:
     DATABASES = {
         'default': {
@@ -103,15 +101,13 @@ if DEBUG:
         }
     }
 else:
-    import dj_database_url
     DATABASES = {
         'default': dj_database_url.parse(
-            os.environ.get("DATABASE_URL"),
+            os.getenv("DATABASE_URL"),
             conn_max_age=600,
             ssl_require=True
         )
     }
-
 
 # =========================
 # PASSWORDS
@@ -146,23 +142,23 @@ STATICFILES_DIRS = [
 # MEDIA FILES → BACKBLAZE B2
 # =========================
 if DEBUG:
+    # Développement : stockage local
     DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
 else:
+    # Production : B2 privé + fallback local
     DEFAULT_FILE_STORAGE = 'store.storage_backends.FallbackMediaStorage'
-
-
 
 AWS_ACCESS_KEY_ID = os.getenv("AWS_ACCESS_KEY_ID")
 AWS_SECRET_ACCESS_KEY = os.getenv("AWS_SECRET_ACCESS_KEY")
-
 AWS_STORAGE_BUCKET_NAME = os.getenv("AWS_STORAGE_BUCKET_NAME")
 AWS_S3_ENDPOINT_URL = os.getenv("AWS_S3_ENDPOINT_URL")
 AWS_S3_REGION_NAME = os.getenv("AWS_S3_REGION_NAME")
 
 AWS_S3_SIGNATURE_VERSION = "s3v4"
 AWS_S3_FILE_OVERWRITE = False
-AWS_QUERYSTRING_AUTH = True  # URLs privées
 AWS_DEFAULT_ACL = None
+AWS_QUERYSTRING_AUTH = True           # URLs signées
+AWS_QUERYSTRING_EXPIRE = 3600         # URLs valables 1h
 AWS_S3_ADDRESSING_STYLE = "virtual"
 
 MEDIA_URL = f"{AWS_S3_ENDPOINT_URL}/{AWS_STORAGE_BUCKET_NAME}/"
@@ -186,6 +182,7 @@ ACCOUNT_USERNAME_REQUIRED = True
 # STRIPE
 # =========================
 STRIPE_PUBLIC_KEY = os.getenv("STRIPE_PUBLIC_KEY")
+STRIPE_SECRET_KEY = os.getenv("STRIPE_SECRET_KEY")
 
 # =========================
 # SECURE HTTPS (Render)
