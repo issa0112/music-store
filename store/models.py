@@ -3,7 +3,8 @@ from django.contrib.auth.models import User
 from django.core.exceptions import PermissionDenied
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import GenericForeignKey
-from store.storage_backends import MediaStorage
+from store.storage_backends import MediaStorage, PublicMediaStorage
+from mutagen import File as MutagenFile
 
 class MusicCategory(models.Model):
     name = models.CharField(max_length=100)
@@ -22,7 +23,11 @@ class Artist(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, null=True, blank=True)
     name = models.CharField(max_length=100, db_index=True)
     bio = models.TextField(blank=True)
-    image = models.ImageField(upload_to='artists/', blank=True, null=True)
+    image = models.ImageField(
+        storage=PublicMediaStorage(),   # ✅ B2 public
+        upload_to='artists/',
+        blank=True, null=True
+    )
     is_popular = models.BooleanField(default=False)
 
     def __str__(self):
@@ -43,7 +48,11 @@ class Album(models.Model):
     Music_Category = models.ForeignKey(MusicCategory, on_delete=models.CASCADE, null=True, blank=True)
     is_popular = models.BooleanField(default=False)
     price = models.DecimalField(max_digits=6, decimal_places=2, default=9.99)
-    cover_image = models.ImageField(upload_to='album_covers/', blank=True, null=True)
+    cover_image = models.ImageField(
+        storage=PublicMediaStorage(),   # ✅ B2 public
+        upload_to='album_covers/',
+        blank=True, null=True
+    )
     fichier = models.FileField(
         storage=MediaStorage(),       # ✅ B2
         upload_to='albums/',
@@ -58,21 +67,45 @@ class Album(models.Model):
 
 class Track(models.Model):
     title = models.CharField(max_length=100, db_index=True)
-    album = models.ForeignKey(Album, on_delete=models.CASCADE, related_name='tracks', null=True, blank=True)
-    artist = models.ForeignKey(Artist, on_delete=models.CASCADE, null=True, blank=True, related_name='tracks')
-    Music_Category = models.ForeignKey(MusicCategory, on_delete=models.CASCADE, null=True, blank=True)
+    album = models.ForeignKey('Album', on_delete=models.CASCADE, related_name='tracks', null=True, blank=True)
+    artist = models.ForeignKey('Artist', on_delete=models.CASCADE, null=True, blank=True, related_name='tracks')
+    Music_Category = models.ForeignKey('MusicCategory', on_delete=models.CASCADE, null=True, blank=True)
+
     file = models.FileField(
         storage=MediaStorage(),       # ✅ B2
         upload_to='tracks/'
     )
-    cover_image = models.ImageField(upload_to='track_covers/', blank=True, null=True)
+    cover_image = models.ImageField(
+        storage=PublicMediaStorage(),   # ✅ B2 public
+        upload_to='track_covers/',
+        blank=True, null=True
+    )
 
     theme_color = models.CharField(max_length=7, null=True, blank=True)
-    duration = models.DurationField()
+    duration = models.DurationField(editable=False, null=True, blank=True)  # ✅ auto, non modifiable
     play_count = models.PositiveIntegerField(default=0)
     download_count = models.PositiveIntegerField(default=0)
 
     liked_by = models.ManyToManyField(User, blank=True, related_name='liked_tracks')
+
+    def save(self, *args, **kwargs):
+        # ✅ Calcul automatique de la durée
+        if self.file:
+            try:
+                audio = MutagenFile(self.file)
+                if audio and audio.info:
+                    self.duration = timedelta(seconds=int(audio.info.length))
+            except Exception as e:
+                print(f"⚠️ Impossible de lire la durée du fichier {self.file}: {e}")
+        super().save(*args, **kwargs)
+
+    def get_duration_display(self):
+        """Affiche la durée formatée mm:ss"""
+        if not self.duration:
+            return "0:00"
+        total_seconds = int(self.duration.total_seconds())
+        minutes, seconds = divmod(total_seconds, 60)
+        return f"{minutes}:{seconds:02d}"
 
     def __str__(self):
         return self.title
@@ -119,7 +152,11 @@ class Video(models.Model):
         storage=MediaStorage(),       # ✅ B2
         upload_to='videos/'
     )
-    thumbnail = models.ImageField(upload_to='video_thumbnails/', blank=True, null=True)
+    thumbnail =  models.ImageField(
+        storage=PublicMediaStorage(),   # ✅ B2 public
+        upload_to='video_thumbnails/',
+        blank=True, null=True
+    )
 
     is_popular = models.BooleanField(default=False)
 

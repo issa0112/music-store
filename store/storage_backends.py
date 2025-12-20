@@ -88,3 +88,9 @@ class MediaStorage(S3Boto3Storage):
     default_acl = "private"          # fichiers protégés
     file_overwrite = False
     querystring_auth = True          # URLs signées temporaires
+
+class PublicMediaStorage(S3Boto3Storage):
+    location = "images"
+    default_acl = "public-read"
+    file_overwrite = False
+    querystring_auth = False

@@ -20,6 +20,7 @@ admin.site.register(UserAction)
 @admin.register(Track)
 class TrackAdmin(admin.ModelAdmin):
     list_display = ['title', 'artist', 'album', 'play_count', 'download_count']
+    readonly_fields = ('duration',)
 
 @admin.register(Video)
 class VideoAdmin(admin.ModelAdmin):
@@ -112,3 +113,6 @@ class PlaylistAdmin(admin.ModelAdmin):
         return TemplateResponse(request, 'admin/playlist_merge_confirmation.html', context)
 
     merge_playlists.short_description = "Fusionner les playlists sélectionnées (par utilisateur)"
+
+
+

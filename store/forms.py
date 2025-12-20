@@ -5,7 +5,7 @@ from Utilisateurs.models import Profile
 class TrackUploadForm(forms.ModelForm):
     class Meta:
         model = Track
-        fields = ['title', 'album', 'file', 'duration']
+        fields = ['title', 'album', 'file', 'cover_image', 'Music_Category']
 
 class VideoUploadForm(forms.ModelForm):
     class Meta:

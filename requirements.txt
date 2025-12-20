@@ -59,3 +59,4 @@ vine==5.1.0
 wcwidth==0.2.14
 whitenoise==6.11.0
 yarl==1.20.1
+mutagen==1.47.0
