@@ -95,4 +95,7 @@ class PublicMediaStorage(S3Boto3Storage):
     location = "images"
     default_acl = None
     file_overwrite = False
-    querystring_auth = False   # ✅ URLs directes
+    querystring_auth = False   # ✅ URLs directes 
+
+    access_key = os.getenv("AWS_ACCESS_KEY_ID_IMAGES")
+    secret_key = os.getenv("AWS_SECRET_ACCESS_KEY_IMAGES")
