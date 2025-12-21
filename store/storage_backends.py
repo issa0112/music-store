@@ -79,18 +79,20 @@
 
 # # Alias pour compatibilité
 # MediaStorage = FallbackMediaStorage
-
+import os
 from storages.backends.s3boto3 import S3Boto3Storage
 
 # ✅ Storage pour audio/vidéo (B2)
 class MediaStorage(S3Boto3Storage):
+    bucket_name = os.getenv("AWS_STORAGE_BUCKET_NAME")   
     location = "media"
     default_acl = None          # fichiers protégés
     file_overwrite = False
     querystring_auth = True          # URLs signées temporaires
 
 class PublicMediaStorage(S3Boto3Storage):
+    bucket_name = os.getenv("AWS_STORAGE_BUCKET_NAME_IMAGES")
     location = "images"
     default_acl = None
     file_overwrite = False
-    querystring_auth = False
+    querystring_auth = False   # ✅ URLs directes

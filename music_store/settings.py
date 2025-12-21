@@ -141,25 +141,34 @@ STATICFILES_DIRS = [
 # =========================
 # MEDIA FILES → BACKBLAZE B2
 # =========================
-if DEBUG:
-    DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
-    MEDIA_ROOT = BASE_DIR / "media"
-    MEDIA_URL = "/media/"
-else:
-    DEFAULT_FILE_STORAGE = 'store.storage_backends.FallbackMediaStorage'
-    MEDIA_URL = "/media/"  # Django utilisera storage.url() pour générer les URLs publiques
 
+# Variables AWS
 AWS_ACCESS_KEY_ID = os.getenv("AWS_ACCESS_KEY_ID")
 AWS_SECRET_ACCESS_KEY = os.getenv("AWS_SECRET_ACCESS_KEY")
-AWS_STORAGE_BUCKET_NAME = os.getenv("AWS_STORAGE_BUCKET_NAME")
+AWS_STORAGE_BUCKET_NAME = os.getenv("AWS_STORAGE_BUCKET_NAME")  # bucket privé
+
+AWS_ACCESS_KEY_ID_IMAGES = os.getenv("AWS_ACCESS_KEY_ID_IMAGES")
+AWS_SECRET_ACCESS_KEY_IMAGES = os.getenv("AWS_SECRET_ACCESS_KEY_IMAGES")
+AWS_STORAGE_BUCKET_NAME_IMAGES = os.getenv("AWS_STORAGE_BUCKET_NAME_IMAGES")  # bucket public
+
 AWS_S3_ENDPOINT_URL = os.getenv("AWS_S3_ENDPOINT_URL")
 AWS_S3_REGION_NAME = os.getenv("AWS_S3_REGION_NAME")
 
 AWS_S3_SIGNATURE_VERSION = "s3v4"
 AWS_S3_FILE_OVERWRITE = False
-AWS_DEFAULT_ACL = 'public-read'
-AWS_QUERYSTRING_AUTH = False          # URLs publiques
+AWS_DEFAULT_ACL = None
+AWS_QUERYSTRING_AUTH = False
 AWS_S3_ADDRESSING_STYLE = "virtual"
+
+# Configuration stockage
+if DEBUG:
+    DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
+    MEDIA_ROOT = BASE_DIR / "media"
+    MEDIA_URL = "/media/"
+else:
+    DEFAULT_FILE_STORAGE = 'store.storage_backends.MediaStorage'
+    MEDIA_URL = f"https://f000.backblazeb2.com/file/{AWS_STORAGE_BUCKET_NAME}/"
+
 
 # =========================
 # AUTH / ALLAUTH

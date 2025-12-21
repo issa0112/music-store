@@ -1,10 +1,16 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.core.exceptions import PermissionDenied
-from django.contrib.contenttypes.models import ContentType
+from django.contrib.contenttypes.models import ContentType 
+import magic
+from django.core.exceptions import ValidationError
+import mimetypes
 from django.contrib.contenttypes.fields import GenericForeignKey
 from store.storage_backends import MediaStorage, PublicMediaStorage
 from mutagen import File as MutagenFile
+from datetime import timedelta 
+
+
 
 class MusicCategory(models.Model):
     name = models.CharField(max_length=100)
@@ -25,10 +31,11 @@ class Artist(models.Model):
     bio = models.TextField(blank=True)
     image = models.ImageField(
         storage=PublicMediaStorage(),   # ✅ B2 public
-        upload_to='artists/',
+        upload_to='images/artists/',
         blank=True, null=True
     )
-    is_popular = models.BooleanField(default=False)
+    is_popular = models.BooleanField(default=False, db_index=True)
+
 
     def __str__(self):
         return self.name
@@ -46,16 +53,16 @@ class Album(models.Model):
     artist = models.ForeignKey(Artist, on_delete=models.CASCADE, related_name='albums')
     release_date = models.DateField()
     Music_Category = models.ForeignKey(MusicCategory, on_delete=models.CASCADE, null=True, blank=True)
-    is_popular = models.BooleanField(default=False)
+    is_popular = models.BooleanField(default=False, db_index=True)
     price = models.DecimalField(max_digits=6, decimal_places=2, default=9.99)
     cover_image = models.ImageField(
         storage=PublicMediaStorage(),   # ✅ B2 public
-        upload_to='album_covers/',
+        upload_to='images/albums/',
         blank=True, null=True
     )
     fichier = models.FileField(
         storage=MediaStorage(),       # ✅ B2
-        upload_to='albums/',
+        upload_to='media/albums/',
         blank=True, null=True
     )
 
@@ -65,19 +72,26 @@ class Album(models.Model):
 
 
 
+def validate_audio_file(value):
+    mime = magic.from_buffer(value.read(2048), mime=True)
+    value.seek(0) 
+    if not mime.startswith("audio"):
+        raise ValidationError("Seuls les fichiers audio sont autorisés.")
+
 class Track(models.Model):
     title = models.CharField(max_length=100, db_index=True)
     album = models.ForeignKey('Album', on_delete=models.CASCADE, related_name='tracks', null=True, blank=True)
     artist = models.ForeignKey('Artist', on_delete=models.CASCADE, null=True, blank=True, related_name='tracks')
     Music_Category = models.ForeignKey('MusicCategory', on_delete=models.CASCADE, null=True, blank=True)
-
+    
     file = models.FileField(
         storage=MediaStorage(),       # ✅ B2
-        upload_to='tracks/'
+        upload_to='media/tracks/',
+        validators=[validate_audio_file]
     )
     cover_image = models.ImageField(
         storage=PublicMediaStorage(),   # ✅ B2 public
-        upload_to='track_covers/',
+        upload_to='images/tracks/',
         blank=True, null=True
     )
 
@@ -140,6 +154,12 @@ class UserAction(models.Model):
         unique_together = ('user', 'action_type', 'content_type', 'object_id')
 
 
+def validate_video_file(value):
+    mime = magic.from_buffer(value.read(2048), mime=True)
+    value.seek(0) 
+    if not mime.startswith("video"):
+        raise ValidationError("Seuls les fichiers vidéo sont autorisés.")
+
 class Video(models.Model):
     title = models.CharField(max_length=100, db_index=True)
     artist = models.ForeignKey(Artist, on_delete=models.CASCADE, null=True, blank=True, related_name='videos')
@@ -150,15 +170,16 @@ class Video(models.Model):
     download_count = models.PositiveIntegerField(default=0)
     file =models.FileField(
         storage=MediaStorage(),       # ✅ B2
-        upload_to='videos/'
+        upload_to='media/videos/',
+        validators=[validate_video_file]
     )
     thumbnail =  models.ImageField(
         storage=PublicMediaStorage(),   # ✅ B2 public
-        upload_to='video_thumbnails/',
+        upload_to='images/videos/',
         blank=True, null=True
     )
 
-    is_popular = models.BooleanField(default=False)
+    is_popular = models.BooleanField(default=False, db_index=True)
 
     def __str__(self):
         return self.title
@@ -183,15 +204,26 @@ class ArtistOrSuperuserRequiredMixin:
 
 class Commande(models.Model):
     client = models.ForeignKey(User, on_delete=models.CASCADE)
-    total = models.DecimalField(max_digits=10, decimal_places=2)
+    total = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     etat_paiement = models.CharField(
         max_length=20,
-        default="non_payé"  # valeurs possibles: non_payé, en_attente, payé, échoué
+        default="non_payé"
     )
     date_creation = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"Commande {self.id} - {self.client.username}"
+        return f"Commande {self.id} - {self.client.username} - {self.etat_paiement}"
+
+    @property
+    def total_calculé(self):
+        """Calcule automatiquement le total à partir des CommandeAlbum liés"""
+        return sum(album.sous_total for album in self.albums.all())
+
+    def save(self, *args, **kwargs):
+        # ✅ Met à jour le champ total avant sauvegarde
+        self.total = self.total_calculé
+        super().save(*args, **kwargs)
+
 
 
 class CommandeAlbum(models.Model):
