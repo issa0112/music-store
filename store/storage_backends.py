@@ -92,7 +92,7 @@ class MediaStorage(S3Boto3Storage):
 
 class PublicMediaStorage(S3Boto3Storage):
     bucket_name = os.getenv("AWS_STORAGE_BUCKET_NAME_IMAGES")
-    location = "images"
+    location = ""
     default_acl = None
     file_overwrite = False
     querystring_auth = False   # ✅ URLs directes 
