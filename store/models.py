@@ -14,14 +14,15 @@ from datetime import timedelta
 
 class MusicCategory(models.Model):
     name = models.CharField(max_length=100)
-    cover_image = models.ImageField(upload_to='music_category_covers/', blank=True, null=True)
+    cover_image = models.ImageField(storage=PublicMediaStorage(), upload_to='images/music_category_covers/', blank=True, null=True)
 
     def __str__(self):
         return self.name
 
-class VideoCategory(models.Model):  # ✅ Conservez cette définition
+class VideoCategory(models.Model):
     name = models.CharField(max_length=100)
-    cover_image = models.ImageField(upload_to='video_category_covers/', blank=True, null=True)
+    cover_image = models.ImageField(storage=PublicMediaStorage(), upload_to='images/video_category_covers/', blank=True, null=True)
+
     def __str__(self):
         return self.name
 
