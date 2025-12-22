@@ -449,9 +449,9 @@ input[type="range"].progress-bar {
         <div class="search-bar search-container" >
         
             <div class="search-container">
-                <div class="search-icon" id="search-toggle">
+                {% comment %} <div class="search-icon" id="search-toggle">
                     <i class="bi bi-search"></i>
-                </div>
+                </div> {% endcomment %}
                 <input type="text" id="query" class="inputsearch" placeholder="Que souhaitez-vous regarder ou écouter?" autocomplete="off">
                 <input type="hidden" id="search-url" data-url="{% url 'recherche_globale' %}">
                 <div id="search-results" style="display:none;"></div>
