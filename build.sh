@@ -11,3 +11,5 @@ python manage.py migrate
 
 # Collecter les fichiers statiques
 python manage.py collectstatic --noinput
+
+apt-get update && apt-get install -y ffmpeg

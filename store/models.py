@@ -10,6 +10,7 @@ from store.storage_backends import MediaStorage, PublicMediaStorage
 from mutagen import File as MutagenFile
 from datetime import timedelta 
 
+from django.utils import timezone
 
 
 class MusicCategory(models.Model):
@@ -241,3 +242,51 @@ class CommandeAlbum(models.Model):
 
     def __str__(self):
         return f"{self.title} x {self.quantite}"
+
+
+
+# store/models.py
+
+class MediaFile(models.Model):
+    AUDIO = "audio"
+    VIDEO = "video"
+
+    MEDIA_TYPES = [
+        (AUDIO, "Audio"),
+        (VIDEO, "Video"),
+    ]
+
+    STATUS_PENDING = "pending"
+    STATUS_SUCCESS = "success"
+    STATUS_FAILED = "failed"
+
+    CONVERSION_STATUS = [
+        (STATUS_PENDING, "Pending"),
+        (STATUS_SUCCESS, "Success"),
+        (STATUS_FAILED, "Failed"),
+    ]
+
+    title = models.CharField(max_length=255)
+    file = models.FileField(upload_to="uploads/originals/")
+    media_type = models.CharField(max_length=10, choices=MEDIA_TYPES)
+    created_at = models.DateTimeField(default=timezone.now)
+
+    # Champs pour stocker les versions converties
+    opus_file = models.FileField(upload_to="uploads/converted/audio/", blank=True, null=True)
+    aac_file = models.FileField(upload_to="uploads/converted/audio/", blank=True, null=True)
+    mp4_file = models.FileField(upload_to="uploads/converted/video/", blank=True, null=True)
+    webm_file = models.FileField(upload_to="uploads/converted/video/", blank=True, null=True)
+
+    # Thumbnails (pour vidéo)
+    thumbnail = models.ImageField(upload_to="uploads/thumbnails/", blank=True, null=True)
+
+    # Statut de conversion
+    conversion_status = models.CharField(
+        max_length=20,
+        choices=CONVERSION_STATUS,
+        default=STATUS_PENDING,
+        db_index=True
+    )
+
+    def __str__(self):
+        return f"{self.title} ({self.media_type}) - {self.conversion_status}"

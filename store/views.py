@@ -970,3 +970,25 @@ def unfollow(request, user_id):
 def library_api(request):
     data = {"message": "API OK"}
     return JsonResponse(data)
+
+
+
+from django.core.files.storage import default_storage
+from store.media_converter import convert_audio_to_opus
+import tempfile
+
+def handle_audio_upload(file):
+    with tempfile.NamedTemporaryFile(delete=False) as tmp:
+        for chunk in file.chunks():
+            tmp.write(chunk)
+        tmp_path = tmp.name
+
+    converted = convert_audio_to_opus(tmp_path)
+
+    with open(converted, "rb") as f:
+        path = default_storage.save(
+            f"audio/{converted.name}",
+            f
+        )
+
+    return path
