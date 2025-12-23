@@ -5,9 +5,11 @@ services:
     plan: starter
     buildCommand: |
       apt-get update && apt-get install -y ffmpeg
+      pip install --upgrade pip setuptools wheel
       pip install -r requirements.txt
       python manage.py migrate --noinput
       python manage.py migrate django_celery_results --noinput
+      python manage.py migrate django_celery_beat --noinput
       python manage.py collectstatic --noinput
     startCommand: gunicorn music_store.wsgi:application --workers 1 --threads 2 --log-file -
 
@@ -26,7 +28,7 @@ services:
         sync: false
       - key: CELERY_RESULT_BACKEND
         value: django-db
-      # AWS / Stripe variables idem...
+      # Ajoute ici tes variables AWS / Stripe / Backblaze
 
   - type: worker
     name: music-store-worker
@@ -34,6 +36,7 @@ services:
     plan: starter
     buildCommand: |
       apt-get update && apt-get install -y ffmpeg
+      pip install --upgrade pip setuptools wheel
       pip install -r requirements.txt
     startCommand: celery -A music_store worker -l info --concurrency=1
 
@@ -43,6 +46,7 @@ services:
     plan: starter
     buildCommand: |
       apt-get update && apt-get install -y ffmpeg
+      pip install --upgrade pip setuptools wheel
       pip install -r requirements.txt
     startCommand: celery -A music_store beat -l info
 
