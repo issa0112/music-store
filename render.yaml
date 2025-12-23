@@ -1,15 +1,14 @@
 services:
-  # Service Web Django
   - type: web
     name: music-store
     env: python
-    plan: starter   # ou free si tu veux tester
-
+    plan: starter
     buildCommand: |
       apt-get update && apt-get install -y ffmpeg
       pip install -r requirements.txt
       python manage.py migrate --noinput
-
+      python manage.py migrate django_celery_results --noinput
+      python manage.py collectstatic --noinput
     startCommand: gunicorn music_store.wsgi:application --log-file -
 
     envVars:
@@ -19,26 +18,16 @@ services:
         value: music_store.settings
       - key: DEBUG
         value: "0"
+      - key: SECRET_KEY
+        sync: false
+      - key: ALLOWED_HOSTS
+        sync: false
+      - key: CELERY_BROKER_URL
+        sync: false
+      - key: CELERY_RESULT_BACKEND
+        value: django-db
+      # AWS / Stripe variables idem...
 
-      # Variables AWS / Backblaze B2
-      - key: AWS_STORAGE_BUCKET_NAME
-        sync: false
-      - key: AWS_S3_ENDPOINT_URL
-        sync: false
-      - key: AWS_S3_REGION_NAME
-        sync: false
-      - key: AWS_ACCESS_KEY_ID
-        sync: false
-      - key: AWS_SECRET_ACCESS_KEY
-        sync: false
-
-      # Variables Stripe
-      - key: STRIPE_PUBLIC_KEY
-        sync: false
-      - key: STRIPE_SECRET_KEY
-        sync: false
-
-  # Worker Celery
   - type: worker
     name: music-store-worker
     env: python
@@ -48,7 +37,6 @@ services:
       pip install -r requirements.txt
     startCommand: celery -A music_store worker -l info
 
-  # Beat Celery (planificateur)
   - type: worker
     name: music-store-beat
     env: python
