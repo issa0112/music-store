@@ -109,5 +109,4 @@ def process_media(input_path):
         logger.error(f"❌ Erreur pipeline {input_path}: {e}")
         raise
 
-results = process_media(instance.file.path)
-logger.info(f"Résultats process_media: {results}")
+
