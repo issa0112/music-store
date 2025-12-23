@@ -63,4 +63,4 @@ mutagen==1.47.0
 python-magic-bin; sys_platform == 'win32'
 python-magic; sys_platform != 'win32'
 django-celery-results==2.6.0 
-django-celery-beat==2.6.1  
+django-celery-beat>=2.6.0,<2.9
