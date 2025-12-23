@@ -9,7 +9,7 @@ services:
       python manage.py migrate --noinput
       python manage.py migrate django_celery_results --noinput
       python manage.py collectstatic --noinput
-    startCommand: gunicorn music_store.wsgi:application --log-file -
+    startCommand: gunicorn music_store.wsgi:application --workers 1 --threads 2 --log-file -
 
     envVars:
       - key: PYTHON_VERSION
@@ -35,7 +35,7 @@ services:
     buildCommand: |
       apt-get update && apt-get install -y ffmpeg
       pip install -r requirements.txt
-    startCommand: celery -A music_store worker -l info
+    startCommand: celery -A music_store worker -l info --concurrency=1
 
   - type: worker
     name: music-store-beat
