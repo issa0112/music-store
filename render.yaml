@@ -1,48 +1,62 @@
 services:
+  # Service Web Django
   - type: web
     name: music-store
     env: python
+    plan: starter   # ou free si tu veux tester
 
-    buildCommand: "./build.sh"
-    startCommand: "gunicorn music_store.wsgi:application"
+    buildCommand: |
+      apt-get update && apt-get install -y ffmpeg
+      pip install -r requirements.txt
+      python manage.py migrate --noinput
 
-    plan: starter  # ou free si tu veux tester
+    startCommand: gunicorn music_store.wsgi:application --log-file -
 
     envVars:
       - key: PYTHON_VERSION
         value: 3.12
-
       - key: DJANGO_SETTINGS_MODULE
         value: music_store.settings
-
-      - key: REMOVED
-        sync: false
-
       - key: DEBUG
         value: "0"
 
-      - key: REMOVED
-        sync: false
-      - key: REMOVED
-        sync: false
+      # Variables AWS / Backblaze B2
       - key: AWS_STORAGE_BUCKET_NAME
         sync: false
       - key: AWS_S3_ENDPOINT_URL
         sync: false
       - key: AWS_S3_REGION_NAME
         sync: false
+      - key: AWS_ACCESS_KEY_ID
+        sync: false
+      - key: AWS_SECRET_ACCESS_KEY
+        sync: false
 
+      # Variables Stripe
       - key: STRIPE_PUBLIC_KEY
         sync: false
-      - key: REMOVED
+      - key: STRIPE_SECRET_KEY
         sync: false
 
-      - key: REMOVED
-        sync: false
-      - key: REMOVED
-        sync: false
-      - key: REMOVED
-        sync: false
+  # Worker Celery
+  - type: worker
+    name: music-store-worker
+    env: python
+    plan: starter
+    buildCommand: |
+      apt-get update && apt-get install -y ffmpeg
+      pip install -r requirements.txt
+    startCommand: celery -A music_store worker -l info
+
+  # Beat Celery (planificateur)
+  - type: worker
+    name: music-store-beat
+    env: python
+    plan: starter
+    buildCommand: |
+      apt-get update && apt-get install -y ffmpeg
+      pip install -r requirements.txt
+    startCommand: celery -A music_store beat -l info
 
 databases:
   - name: music_store_db
