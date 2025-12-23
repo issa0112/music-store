@@ -1,52 +1,56 @@
 # store/tasks.py
-import os
-import logging
 from celery import shared_task
 from django.core.files import File
+from pathlib import Path
+import logging
+
 from .models import MediaFile
-from store.media_converter import process_media
+from .media_converter import process_media
 
 logger = logging.getLogger(__name__)
 
-@shared_task
-def convert_media_task(media_id):
+@shared_task(bind=True, autoretry_for=(Exception,), retry_backoff=10, retry_kwargs={"max_retries": 3})
+def convert_media_task(self, media_id):
     try:
-        instance = MediaFile.objects.get(id=media_id)
-    except MediaFile.DoesNotExist:
-        logger.error(f"❌ MediaFile {media_id} introuvable")
-        return "Fichier non trouvé"
+        media = MediaFile.objects.get(id=media_id)
 
-    try:
-        logger.info(f"🚀 Conversion démarrée pour {instance.title} ({instance.id})")
-        results = process_media(instance.file.path)
+        media.conversion_status = "processing"
+        media.save(update_fields=["conversion_status"])
 
+        logger.info(f"🎬 Conversion en cours pour MediaFile {media.id}")
+
+        results = process_media(media.file.path)
+
+        # === AUDIO ===
         if results.get("opus"):
             with open(results["opus"], "rb") as f:
-                instance.opus_file.save(os.path.basename(results["opus"]), File(f), save=False)
+                media.opus_file.save(Path(results["opus"]).name, File(f), save=False)
 
         if results.get("aac"):
             with open(results["aac"], "rb") as f:
-                instance.aac_file.save(os.path.basename(results["aac"]), File(f), save=False)
+                media.aac_file.save(Path(results["aac"]).name, File(f), save=False)
 
+        # === VIDEO ===
         if results.get("mp4"):
             with open(results["mp4"], "rb") as f:
-                instance.mp4_file.save(os.path.basename(results["mp4"]), File(f), save=False)
+                media.mp4_file.save(Path(results["mp4"]).name, File(f), save=False)
 
         if results.get("webm"):
             with open(results["webm"], "rb") as f:
-                instance.webm_file.save(os.path.basename(results["webm"]), File(f), save=False)
+                media.webm_file.save(Path(results["webm"]).name, File(f), save=False)
 
+        # === THUMBNAIL ===
         if results.get("thumbs"):
             with open(results["thumbs"][0], "rb") as f:
-                instance.thumbnail.save(os.path.basename(results["thumbs"][0]), File(f), save=False)
+                media.thumbnail.save(Path(results["thumbs"][0]).name, File(f), save=False)
 
-        instance.conversion_status = "success"
-        instance.save()
-        logger.info(f"✅ Conversion terminée pour {instance.title} ({instance.id})")
-        return "Conversion terminée"
+        media.conversion_status = "done"
+        media.save()
+
+        logger.info(f"✅ Conversion terminée pour MediaFile {media.id}")
 
     except Exception as e:
-        instance.conversion_status = "failed"
-        instance.save()
-        logger.error(f"❌ Erreur conversion {instance.id}: {e}")
-        return f"Erreur conversion: {e}"
+        logger.error(f"❌ Erreur conversion MediaFile {media_id}: {e}")
+        media.conversion_status = "failed"
+        media.save(update_fields=["conversion_status"])
+        raise
