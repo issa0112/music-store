@@ -104,7 +104,10 @@ def process_media(input_path):
             results["webm"] = convert_video_to_webm(input_path)
             results["thumbs"] = generate_thumbnails(input_path)
         logger.info(f"✅ Pipeline terminée pour {input_path}")
-        return {"status": "success", "files": results}
+        return results   # ✅ plus simple pour tasks.py
     except Exception as e:
         logger.error(f"❌ Erreur pipeline {input_path}: {e}")
-        return {"status": "failed", "error": str(e)}
+        raise
+
+results = process_media(instance.file.path)
+logger.info(f"Résultats process_media: {results}")

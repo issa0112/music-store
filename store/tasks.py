@@ -4,7 +4,7 @@ import logging
 from celery import shared_task
 from django.core.files import File
 from .models import MediaFile
-from media_converter import process_media
+from store.media_converter import process_media
 
 logger = logging.getLogger(__name__)
 
