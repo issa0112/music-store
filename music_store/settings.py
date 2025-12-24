@@ -1,4 +1,5 @@
 import os
+from kombu import Connection
 from pathlib import Path
 import dj_database_url
 from dotenv import load_dotenv
@@ -232,3 +233,6 @@ CELERY_RESULT_BACKEND = "django-db"
 
 CELERY_CACHE_BACKEND = "django-cache" # Scheduler pour Celery Beat (stockage en base via django_celery_beat) 
 CELERY_BEAT_SCHEDULER = "django_celery_beat.schedulers:DatabaseScheduler"
+
+broker_use_ssl = { 'ssl_cert_reqs': 'none' # ou 'required' si tu fournis un certificat 
+}
