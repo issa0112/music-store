@@ -64,17 +64,9 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function startVisualizerIfPossible() {
-    if (!visualizerCanvas) return;
+    if (!visualizerCanvas || !audioContext || audioContext.state !== "running") return;
 
     try {
-      if (!audioContext) {
-        audioContext = new (window.AudioContext || window.webkitAudioContext)();
-      }
-
-      if (audioContext.state === "suspended") {
-        audioContext.resume();
-      }
-
       if (!analyser) {
         analyser = audioContext.createAnalyser();
         analyser.fftSize = 256;
@@ -82,18 +74,16 @@ document.addEventListener("DOMContentLoaded", () => {
         dataArray = new Uint8Array(bufferLength);
       }
 
-      // 🔴 PROTECTION CRITIQUE
-      if (!mediaSource && audio instanceof HTMLMediaElement) {
-          mediaSource = audioContext.createMediaElementSource(audio);
-          mediaSource.connect(analyser);
-          analyser.connect(audioContext.destination);
-        }
+      if (!mediaSource) {
+        mediaSource = audioContext.createMediaElementSource(audio);
+        mediaSource.connect(analyser);
+        analyser.connect(audioContext.destination);
+      }
 
       if (!visualizerRaf) {
         const draw = () => {
           analyser.getByteFrequencyData(dataArray);
           visualizerCtx.clearRect(0, 0, visualizerCanvas.width, visualizerCanvas.height);
-
           const barWidth = (visualizerCanvas.width / bufferLength) * 2.5;
           let x = 0;
 
@@ -112,6 +102,7 @@ document.addEventListener("DOMContentLoaded", () => {
       console.error("[player] visualizer error", e);
     }
   }
+
 
 
   function stopVisualizer() {
@@ -271,6 +262,10 @@ document.addEventListener("DOMContentLoaded", () => {
         if (playPromise && typeof playPromise.then === 'function') {
           playPromise.then(() => {
             try { playPauseBtn.innerHTML = '<i class="bi bi-pause-fill"></i>'; } catch (e) {}
+            // Check if audio is muted (browser autoplay policy)
+            if (audio.muted) {
+              showToast("Le son est coupé. Cliquez sur le bouton volume pour activer le son.", "info");
+            }
           }).catch(() => {
             // Autoplay blocked or error -> keep audio paused and show Play icon
             try { playPauseBtn.innerHTML = '<i class="bi bi-play-fill"></i>'; } catch (e) {}
@@ -278,6 +273,10 @@ document.addEventListener("DOMContentLoaded", () => {
         } else {
           // older browsers: assume play succeeded
           try { playPauseBtn.innerHTML = '<i class="bi bi-pause-fill"></i>'; } catch (e) {}
+          // Check if audio is muted (browser autoplay policy)
+          if (audio.muted) {
+            showToast("Le son est coupé. Cliquez sur le bouton volume pour activer le son.", "info");
+          }
         }
       } else {
         try { playPauseBtn.innerHTML = '<i class="bi bi-play-fill"></i>'; } catch (e) {}
@@ -335,6 +334,10 @@ window.playAudioFromSearch = function (track) {
         playPauseBtn.innerHTML = '<i class="bi bi-pause-fill"></i>';
         startVisualizerIfPossible();
         savePlayerState(track.id); // ✅ IMPORTANT
+        // Check if audio is muted (browser autoplay policy)
+        if (audio.muted) {
+          showToast("Le son est coupé. Cliquez sur le bouton volume pour activer le son.", "info");
+        }
       })
       .catch(() => {
         playPauseBtn.innerHTML = '<i class="bi bi-play-fill"></i>';
@@ -397,8 +400,22 @@ prevBtn?.addEventListener("click", () => {
     }
 
     if (audio.paused) {
-      audio.play();
-      playPauseBtn.innerHTML = '<i class="bi bi-pause-fill"></i>';
+      const playPromise = audio.play();
+      if (playPromise?.then) {
+        playPromise
+          .then(() => {
+            playPauseBtn.innerHTML = '<i class="bi bi-pause-fill"></i>';
+            // Check if audio is muted (browser autoplay policy)
+            if (audio.muted) {
+              showToast("Le son est coupé. Cliquez sur le bouton volume pour activer le son.", "info");
+            }
+          })
+          .catch(() => {
+            playPauseBtn.innerHTML = '<i class="bi bi-play-fill"></i>';
+          });
+      } else {
+        playPauseBtn.innerHTML = '<i class="bi bi-pause-fill"></i>';
+      }
     } else {
       audio.pause();
       playPauseBtn.innerHTML = '<i class="bi bi-play-fill"></i>';
@@ -864,11 +881,11 @@ fsClose?.addEventListener("click", () => {
   });
 
   // Visualizer event listeners
-  document.addEventListener("click", () => {
-    if (audioContext && audioContext.state === "suspended") {
-      try { audioContext.resume(); } catch {}
-    }
-  });
+  // document.addEventListener("click", () => {
+  //   if (audioContext && audioContext.state === "suspended") {
+  //     try { audioContext.resume(); } catch {}
+  //   }
+  // });
   audio.addEventListener('play', () => {
     startVisualizerIfPossible();
   });
@@ -902,5 +919,24 @@ fsClose?.addEventListener("click", () => {
       try { restorePlayerState(); } catch (e) {}
     }
   });
+
+    function unlockAudioContextOnce() {
+      if (!audioContext) {
+        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      }
+
+      if (audioContext.state === "suspended") {
+        audioContext.resume();
+      }
+
+      document.removeEventListener("click", unlockAudioContextOnce);
+      document.removeEventListener("touchstart", unlockAudioContextOnce);
+    }
+
+    // 🔑 Déverrouillage réel navigateur
+    document.addEventListener("click", unlockAudioContextOnce, { once: true });
+    document.addEventListener("touchstart", unlockAudioContextOnce, { once: true });
+
+
 
 });
