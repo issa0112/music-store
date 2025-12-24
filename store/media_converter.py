@@ -3,9 +3,6 @@ import logging
 from pathlib import Path
 import magic  # python-magic
 
-# =========================
-# LOGGING
-# =========================
 logger = logging.getLogger(__name__)
 
 # =========================
@@ -23,11 +20,12 @@ def run_ffmpeg(cmd, output_path):
     - limite mémoire
     - évite stdout PIPE (trop gourmand)
     """
+    logger.info(f"▶️ Commande FFmpeg : {' '.join(cmd)}")
     try:
         subprocess.run(
             cmd,
             check=True,
-            stdout=subprocess.DEVNULL,   # ⛔ évite explosion mémoire
+            stdout=subprocess.DEVNULL,
             stderr=subprocess.PIPE
         )
         logger.info(f"✅ Conversion réussie : {output_path}")
@@ -63,15 +61,15 @@ def convert_audio_to_aac(input_path, bitrate="128k"):
     return run_ffmpeg(cmd, output_path)
 
 # =========================
-# VIDEO (SAFE SETTINGS)
+# VIDEO
 # =========================
 def convert_video_to_mp4(input_path, crf="23", preset="veryfast", audio_bitrate="128k"):
     output_path = get_output_path(input_path, ".mp4")
     cmd = [
         "ffmpeg", "-y", "-i", str(input_path),
-        "-threads", "1",                 # ✅ limite CPU
+        "-threads", "1",
         "-c:v", "libx264",
-        "-preset", preset,               # ✅ veryfast
+        "-preset", preset,
         "-crf", str(crf),
         "-pix_fmt", "yuv420p",
         "-movflags", "+faststart",
@@ -80,15 +78,11 @@ def convert_video_to_mp4(input_path, crf="23", preset="veryfast", audio_bitrate=
     ]
     return run_ffmpeg(cmd, output_path)
 
-# ❌ WEBM / VP9 SUPPRIMÉ (trop lourd pour Render)
-# def convert_video_to_webm(...): SUPPRIMÉ
-
 # =========================
-# THUMBNAILS (SAFE)
+# THUMBNAILS
 # =========================
 def generate_thumbnails(input_path, positions=("00:00:01",)):
     thumbs = []
-
     for pos in positions:
         output_path = OUTPUT_DIR / f"{Path(input_path).stem}_{pos.replace(':','-')}.jpg"
         cmd = [
@@ -101,13 +95,15 @@ def generate_thumbnails(input_path, positions=("00:00:01",)):
         result = run_ffmpeg(cmd, output_path)
         if result:
             thumbs.append(result)
-
     return thumbs
 
 # =========================
 # MIME DETECTION
 # =========================
 def detect_mime(input_path):
+    if not Path(input_path).exists():
+        logger.error(f"❌ Fichier introuvable : {input_path}")
+        return None
     with open(input_path, "rb") as f:
         return magic.from_buffer(f.read(2048), mime=True)
 
@@ -122,8 +118,10 @@ def process_media(input_path):
     - mémoire contrôlée
     """
     mime = detect_mime(input_path)
-    results = {}
+    if not mime:
+        return {"error": f"Fichier introuvable : {input_path}"}
 
+    results = {}
     logger.info(f"🎬 Début pipeline pour {input_path} ({mime})")
 
     if mime.startswith("audio"):

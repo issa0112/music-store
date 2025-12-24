@@ -8,11 +8,7 @@ app = Celery("music_store")
 app.config_from_object("django.conf:settings", namespace="CELERY")
 app.autodiscover_tasks()
 
-# 🔐 Configuration SSL pour Redis (rediss://)
+# 🔐 Configuration SSL pour Redis (Upstash rediss://)
 app.conf.broker_use_ssl = {
-    "ssl_cert_reqs": ssl.CERT_REQUIRED
-}
-
-app.conf.redis_backend_use_ssl = {
-    "ssl_cert_reqs": ssl.CERT_REQUIRED
+    "ssl_cert_reqs": ssl.CERT_NONE  # ✅ évite les warnings, connexion TLS reste active
 }

@@ -226,13 +226,15 @@ LOGGING = {
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
+# Celery
 CELERY_BROKER_URL = os.environ.get("CELERY_BROKER_URL", "redis://127.0.0.1:6379/0")
 CELERY_ACCEPT_CONTENT = ["json"]
 CELERY_TASK_SERIALIZER = "json"
 CELERY_RESULT_BACKEND = "django-db"
-
-CELERY_CACHE_BACKEND = "django-cache" # Scheduler pour Celery Beat (stockage en base via django_celery_beat) 
+CELERY_CACHE_BACKEND = "django-cache"
 CELERY_BEAT_SCHEDULER = "django_celery_beat.schedulers:DatabaseScheduler"
 
-broker_use_ssl = { 'ssl_cert_reqs': 'none' # ou 'required' si tu fournis un certificat 
+# Routes pour isoler les conversions
+CELERY_TASK_ROUTES = {
+    "store.tasks.convert_media_task": {"queue": "media"}
 }
