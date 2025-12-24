@@ -1,3 +1,5 @@
+import boto3, tempfile, os
+from django.conf import settings
 from celery import shared_task
 from django.core.files import File
 from pathlib import Path
@@ -8,25 +10,36 @@ from .media_converter import process_media
 
 logger = logging.getLogger(__name__)
 
+# Client S3 (Backblaze B2 via django-storages)
+s3 = boto3.client(
+    "s3",
+    aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
+    aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
+    endpoint_url=settings.AWS_S3_ENDPOINT_URL,
+)
+
+def download_to_tmp(media):
+    """Télécharge le fichier depuis B2 vers /tmp et retourne le chemin local"""
+    tmp_file = tempfile.NamedTemporaryFile(delete=False)
+    s3.download_fileobj(settings.AWS_STORAGE_BUCKET_NAME, media.file.name, tmp_file)
+    tmp_file.flush()
+    return tmp_file.name
+
 @shared_task(bind=True, autoretry_for=(Exception,), retry_backoff=10, retry_kwargs={"max_retries": 3})
 def convert_media_task(self, media_id):
+    local_path = None
     try:
         media = MediaFile.objects.get(id=media_id)
-
         media.conversion_status = "processing"
         media.save(update_fields=["conversion_status"])
 
         logger.info(f"🎬 Conversion en cours pour MediaFile {media.id}")
 
-        # Vérification du fichier
-        if not media.file or not Path(media.file.path).exists():
-            logger.error(f"❌ Fichier introuvable pour MediaFile {media.id}")
-            media.conversion_status = "failed"
-            media.save(update_fields=["conversion_status"])
-            return
+        # ✅ Télécharger le fichier depuis B2
+        local_path = download_to_tmp(media)
 
         # Pipeline média
-        results = process_media(media.file.path)
+        results = process_media(local_path)
 
         # === AUDIO ===
         if results.get("opus"):
@@ -49,7 +62,6 @@ def convert_media_task(self, media_id):
 
         media.conversion_status = "done"
         media.save()
-
         logger.info(f"✅ Conversion terminée pour MediaFile {media.id}")
 
     except FileNotFoundError as e:
@@ -57,7 +69,6 @@ def convert_media_task(self, media_id):
         media = MediaFile.objects.get(id=media_id)
         media.conversion_status = "failed"
         media.save(update_fields=["conversion_status"])
-        # Pas de retry inutile
     except Exception as e:
         logger.error(f"❌ Erreur conversion MediaFile {media_id}: {e}")
         try:
@@ -67,3 +78,8 @@ def convert_media_task(self, media_id):
         except Exception:
             pass
         raise
+    finally:
+        # ✅ Nettoyage du fichier temporaire
+        if local_path and os.path.exists(local_path):
+            os.remove(local_path)
+            logger.info(f"🧹 Fichier temporaire supprimé : {local_path}")
