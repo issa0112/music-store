@@ -11,7 +11,7 @@ services:
       python manage.py migrate django_celery_results --noinput
       python manage.py migrate django_celery_beat --noinput
       python manage.py collectstatic --noinput
-    startCommand: celery -A music_store worker -l info --concurrency=1 --prefetch-multiplier=1 --max-tasks-per-child=1 --pool=solo
+    startCommand: gunicorn music_store.wsgi:application --workers 1 --threads 1 --log-file -
 
     envVars:
       - key: PYTHON_VERSION
@@ -38,7 +38,7 @@ services:
       apt-get update && apt-get install -y ffmpeg
       pip install --upgrade pip setuptools wheel
       pip install -r requirements.txt
-    startCommand: celery -A music_store worker -l info --concurrency=1
+    startCommand: celery -A music_store worker -l info --concurrency=1 --prefetch-multiplier=1 --max-tasks-per-child=1 --pool=solo
 
   - type: worker
     name: music-store-beat
