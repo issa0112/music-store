@@ -76,8 +76,10 @@ class Album(models.Model):
 
 def validate_audio_file(value):
     mime = magic.from_buffer(value.read(2048), mime=True)
-    value.seek(0) 
-    if not mime.startswith("audio"):
+    value.seek(0)
+
+    # ✅ Autoriser tout type de fichier dont le MIME commence par "audio/"
+    if not mime.startswith("audio/"):
         raise ValidationError("Seuls les fichiers audio sont autorisés.")
 
 class Track(models.Model):
@@ -158,9 +160,14 @@ class UserAction(models.Model):
 
 def validate_video_file(value):
     mime = magic.from_buffer(value.read(2048), mime=True)
-    value.seek(0) 
-    if not mime.startswith("video"):
+    value.seek(0)
+
+    allowed_prefix = "video"
+    allowed_mimes = ["application/octet-stream"]  # certains fichiers mal détectés
+
+    if not (mime.startswith(allowed_prefix) or mime in allowed_mimes):
         raise ValidationError("Seuls les fichiers vidéo sont autorisés.")
+
 
 class Video(models.Model):
     title = models.CharField(max_length=100, db_index=True)
