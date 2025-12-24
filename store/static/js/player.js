@@ -49,6 +49,7 @@ document.addEventListener("DOMContentLoaded", () => {
   let dataArray = null;
   let bufferLength = 0;
   let visualizerRaf = null;
+  let mediaSource = null;
   let visualizerCanvas = document.getElementById("player-visualizer");
   let visualizerCtx = visualizerCanvas ? visualizerCanvas.getContext("2d") : null;
 
@@ -64,45 +65,54 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function startVisualizerIfPossible() {
     if (!visualizerCanvas) return;
+
     try {
       if (!audioContext) {
         audioContext = new (window.AudioContext || window.webkitAudioContext)();
       }
-      if (audioContext.state === 'suspended') {
+
+      if (audioContext.state === "suspended") {
         audioContext.resume();
       }
+
       if (!analyser) {
         analyser = audioContext.createAnalyser();
         analyser.fftSize = 256;
         bufferLength = analyser.frequencyBinCount;
         dataArray = new Uint8Array(bufferLength);
-        const source = audioContext.createMediaElementSource(audio);
-        source.connect(analyser);
-        analyser.connect(audioContext.destination);
       }
-      if (!visualizerRaf) {
-        function draw() {
-          if (analyser && dataArray) {
-            analyser.getByteFrequencyData(dataArray);
-            visualizerCtx.clearRect(0, 0, visualizerCanvas.width, visualizerCanvas.height);
-            const barWidth = (visualizerCanvas.width / bufferLength) * 2.5;
-            let barHeight;
-            let x = 0;
-            for (let i = 0; i < bufferLength; i++) {
-              barHeight = (dataArray[i] / 255) * visualizerCanvas.height;
-              visualizerCtx.fillStyle = `rgb(${barHeight + 100}, 50, 50)`;
-              visualizerCtx.fillRect(x, visualizerCanvas.height - barHeight, barWidth, barHeight);
-              x += barWidth + 1;
-            }
-          }
-          visualizerRaf = requestAnimationFrame(draw);
+
+      // 🔴 PROTECTION CRITIQUE
+      if (!mediaSource && audio instanceof HTMLMediaElement) {
+          mediaSource = audioContext.createMediaElementSource(audio);
+          mediaSource.connect(analyser);
+          analyser.connect(audioContext.destination);
         }
+
+      if (!visualizerRaf) {
+        const draw = () => {
+          analyser.getByteFrequencyData(dataArray);
+          visualizerCtx.clearRect(0, 0, visualizerCanvas.width, visualizerCanvas.height);
+
+          const barWidth = (visualizerCanvas.width / bufferLength) * 2.5;
+          let x = 0;
+
+          for (let i = 0; i < bufferLength; i++) {
+            const barHeight = (dataArray[i] / 255) * visualizerCanvas.height;
+            visualizerCtx.fillStyle = `rgb(${barHeight + 100},50,50)`;
+            visualizerCtx.fillRect(x, visualizerCanvas.height - barHeight, barWidth, barHeight);
+            x += barWidth + 1;
+          }
+
+          visualizerRaf = requestAnimationFrame(draw);
+        };
         draw();
       }
     } catch (e) {
-      console.log('[player] visualizer error', e);
+      console.error("[player] visualizer error", e);
     }
   }
+
 
   function stopVisualizer() {
     if (visualizerRaf) {
@@ -287,54 +297,56 @@ document.addEventListener("DOMContentLoaded", () => {
   // ---------------------
   // Lecture depuis recherche
   // ---------------------
-window.playAudioFromSearch = function(track) {
-    // Vérifier que c’est bien un vrai track
-    if (!track || !track.file_url) return;
+window.playAudioFromSearch = function (track) {
+  if (!track || !track.file_url) return;
 
-    const cover = track.cover || "/static/img/trackdefault.png";
+  const cover = track.cover || "/static/img/trackdefault.png";
 
-    // 🔊 Mise à jour du mini-lecteur
-    audio.src = track.file_url;
-    audio.dataset.trackId = track.id;
-    expandBtn.dataset.trackId = track.id;
+  // Stop lecture précédente
+  audio.pause();
 
-    titleEl.textContent = track.title || "Sans titre";
-    artistEl.textContent = track.artist || "Inconnu";
-    coverImg.src = cover;
+  // Reset visual state
+  isLiked = false;
+  likeBtn.innerHTML = '<i class="bi bi-heart"></i>';
 
-    audio.play().catch(console.error);
-    playerContainer.style.display = "flex";
+  // Load new track
+  audio.src = track.file_url;
+  audio.currentTime = 0;
+  audio.muted = false;
 
-    startVisualizerIfPossible();
-    try { sessionStorage.removeItem('playerClosed'); } catch (e) {}
+  if (audio.volume === 0) {
+    audio.volume = volumeControl?.value || 1;
+  }
 
-    playPauseBtn.innerHTML = '<i class="bi bi-pause-fill"></i>';
+  audio.dataset.trackId = track.id;
+  expandBtn.dataset.trackId = track.id;
 
-    // --------------------------------------------
-    // 🎵 Mise à jour du popup si déjà ouvert
-    // --------------------------------------------
-    const fsPlayer = document.getElementById("fullscreen-player");
-    if (fsPlayer && fsPlayer.classList.contains("fs-visible")) {
+  titleEl.textContent = track.title || "Sans titre";
+  artistEl.textContent = track.artist || "Inconnu";
+  coverImg.src = cover;
 
-        const fsCover  = document.getElementById("fs-cover");
-        const fsTitle  = document.getElementById("fs-title");
-        const fsArtist = document.getElementById("fs-artist");
-        const fsBg     = fsPlayer.querySelector(".fs-bg");
+  playerContainer.style.display = "flex";
+  try { sessionStorage.removeItem("playerClosed"); } catch {}
 
-        if (fsCover)  fsCover.src = cover;
-        if (fsTitle)  fsTitle.textContent = track.title || "Sans titre";
-        if (fsArtist) fsArtist.textContent = track.artist || "Inconnu";
-        if (fsBg)     fsBg.style.backgroundImage = `url('${cover}')`;
-    }
+  const playPromise = audio.play();
+  if (playPromise?.then) {
+    playPromise
+      .then(() => {
+        playPauseBtn.innerHTML = '<i class="bi bi-pause-fill"></i>';
+        startVisualizerIfPossible();
+        savePlayerState(track.id); // ✅ IMPORTANT
+      })
+      .catch(() => {
+        playPauseBtn.innerHTML = '<i class="bi bi-play-fill"></i>';
+      });
+  }
 
-    // --------------------------------------------
-    // 🔁 Maintenir compatibilité Next/Prev
-    // --------------------------------------------
-    if (window.currentTrackList && Array.isArray(window.currentTrackList)) {
-        window.currentTrackIndex =
-            window.currentTrackList.findIndex(t => t.id === track.id);
-    }
+  if (Array.isArray(window.currentTrackList)) {
+    window.currentTrackIndex =
+      window.currentTrackList.findIndex(t => t.id === track.id);
+  }
 };
+
 // Next bouton
 nextBtn?.addEventListener("click", () => {
     if (window.location.pathname.includes('/track/play/')) {
@@ -403,6 +415,11 @@ prevBtn?.addEventListener("click", () => {
       currentTimeEl.textContent = formatTime(audio.currentTime);
     }
   });
+  audio.addEventListener("volumechange", () => {
+    if (!volumeControl) return;
+    volumeControl.value = audio.muted ? 0 : audio.volume;
+  });
+
 
   progressBar?.addEventListener("input", () => {
     audio.currentTime = (progressBar.value / 100) * audio.duration;
@@ -465,7 +482,7 @@ prevBtn?.addEventListener("click", () => {
   });
 
 likeBtn?.addEventListener("click", async () => {
-  if (!userIsLoggedIn) { // userIsLoggedIn = true/false depuis Django
+  if (typeof userIsLoggedIn === "undefined" || !userIsLoggedIn) { // userIsLoggedIn = true/false depuis Django
     alert("Veuillez vous connecter pour aimer ce contenu !");
     return;
   }
@@ -503,7 +520,7 @@ likeBtn?.addEventListener("click", async () => {
 
 // --- Gestion du bouton ajouter à la playlist ---
 addToPlaylistBtn?.addEventListener("click", async (e) => {
-  if (!userIsLoggedIn) {
+  if (typeof userIsLoggedIn === "undefined" || !userIsLoggedIn) {
     showToast("Veuillez vous connecter pour ajouter à une playlist !", "error");
     return;
   }
