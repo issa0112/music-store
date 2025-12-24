@@ -11,7 +11,7 @@ services:
       python manage.py migrate django_celery_results --noinput
       python manage.py migrate django_celery_beat --noinput
       python manage.py collectstatic --noinput
-    startCommand: celery -A music_store worker -l info --concurrency=1 --prefetch-multiplier=1 --max-tasks-per-child=1
+    startCommand: celery -A music_store worker -l info --concurrency=1 --prefetch-multiplier=1 --max-tasks-per-child=1 --pool=solo
 
     envVars:
       - key: PYTHON_VERSION
