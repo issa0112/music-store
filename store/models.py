@@ -74,13 +74,16 @@ class Album(models.Model):
 
 
 
+from django.core.validators import FileExtensionValidator
+
 def validate_audio_file(value):
     mime = magic.from_buffer(value.read(2048), mime=True)
     value.seek(0)
 
-    # ✅ Autoriser tout type de fichier dont le MIME commence par "audio/"
-    if not mime.startswith("audio/"):
+    # ✅ Vérifie MIME OU extension
+    if not (mime.startswith("audio") or value.name.lower().endswith((".mp3",".aac",".wav",".ogg",".flac",".m4a"))):
         raise ValidationError("Seuls les fichiers audio sont autorisés.")
+
 
 class Track(models.Model):
     title = models.CharField(max_length=100, db_index=True)
@@ -162,11 +165,15 @@ def validate_video_file(value):
     mime = magic.from_buffer(value.read(2048), mime=True)
     value.seek(0)
 
-    allowed_prefix = "video"
-    allowed_mimes = ["application/octet-stream"]  # certains fichiers mal détectés
+    allowed_extensions = (".mp4", ".mkv", ".webm", ".mov", ".avi")
 
-    if not (mime.startswith(allowed_prefix) or mime in allowed_mimes):
+    if not (
+        mime.startswith("video") 
+        or mime in ["application/octet-stream", "binary/octet-stream"]
+        or value.name.lower().endswith(allowed_extensions)
+    ):
         raise ValidationError("Seuls les fichiers vidéo sont autorisés.")
+
 
 
 class Video(models.Model):
