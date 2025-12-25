@@ -7,6 +7,7 @@ import os
 import shutil
 import multiprocessing
 from django.conf import settings
+import tempfile  # <-- ajoute ça
 
 logger = logging.getLogger(__name__)
 
