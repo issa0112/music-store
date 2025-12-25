@@ -226,15 +226,21 @@ LOGGING = {
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
-# Celery
+# -------------------------
+# CELERY
+# -------------------------
 CELERY_BROKER_URL = os.environ.get("CELERY_BROKER_URL", "redis://127.0.0.1:6379/0")
+CELERY_RESULT_BACKEND = "django-db"   # Pour stocker les résultats dans la DB
+CELERY_CACHE_BACKEND = "django-cache"
 CELERY_ACCEPT_CONTENT = ["json"]
 CELERY_TASK_SERIALIZER = "json"
-CELERY_RESULT_BACKEND = "django-db"
-CELERY_CACHE_BACKEND = "django-cache"
+CELERY_RESULT_SERIALIZER = "json"
+CELERY_TIMEZONE = "UTC"
 CELERY_BEAT_SCHEDULER = "django_celery_beat.schedulers:DatabaseScheduler"
 
-# Routes pour isoler les conversions
+# -------------------------
+# ROUTES et CONCURRENCY
+# -------------------------
 CELERY_TASK_ROUTES = {
     "store.tasks.convert_media_task": {"queue": "media"}
 }
