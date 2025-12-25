@@ -12,7 +12,6 @@ services:
       python manage.py migrate django_celery_beat --noinput
       python manage.py collectstatic --noinput
     startCommand: gunicorn music_store.wsgi:application --workers 1 --threads 1 --log-file -
-
     envVars:
       - key: PYTHON_VERSION
         value: 3.12
@@ -28,7 +27,16 @@ services:
         sync: false
       - key: CELERY_RESULT_BACKEND
         value: django-db
-      # Ajoute ici tes variables AWS / Stripe / Backblaze
+      - key: AWS_ACCESS_KEY_ID
+        sync: false
+      - key: AWS_SECRET_ACCESS_KEY
+        sync: false
+      - key: AWS_STORAGE_BUCKET_NAME
+        sync: false
+      - key: STRIPE_PUBLIC_KEY
+        sync: false
+      - key: STRIPE_SECRET_KEY
+        sync: false
 
   - type: worker
     name: music-store-worker
@@ -38,7 +46,7 @@ services:
       apt-get update && apt-get install -y ffmpeg
       pip install --upgrade pip setuptools wheel
       pip install -r requirements.txt
-    startCommand: celery -A music_store worker -l info --concurrency=1 --prefetch-multiplier=1 --max-tasks-per-child=1 --pool=solo
+    startCommand: celery -A music_store worker -l info -Q media --concurrency=2 --max-tasks-per-child=10
 
   - type: worker
     name: music-store-beat
