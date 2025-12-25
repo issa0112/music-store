@@ -238,3 +238,6 @@ CELERY_BEAT_SCHEDULER = "django_celery_beat.schedulers:DatabaseScheduler"
 CELERY_TASK_ROUTES = {
     "store.tasks.convert_media_task": {"queue": "media"}
 }
+
+CELERYD_MAX_TASKS_PER_CHILD = 10
+CELERYD_CONCURRENCY = 2
