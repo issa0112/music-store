@@ -366,7 +366,7 @@ input[type="range"].progress-bar {
                 <span id="total-time">0:00</span>
             </div>
 
-            <canvas id="player-visualizer"></canvas>
+            {% comment %} <canvas id="player-visualizer"></canvas> {% endcomment %}
 
             <div id="time-display"></div>
             </div>
@@ -383,10 +383,13 @@ input[type="range"].progress-bar {
         <div id="share" class="player-btn" title="Partager"><i class="bi bi-share"></i></div>
         </div>
 
-        <!-- Élément audio -->
+                <!-- Élément audio -->
         <audio id="audio-player">
         <source id="audio-source" src="" type="audio/mpeg">
         </audio>
+
+
+        {% comment %} <canvas id="visualizer" width="800" height="200" style="border:1px solid #ccc;"></canvas> {% endcomment %}
 
     </div>
     </div>
