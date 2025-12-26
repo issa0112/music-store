@@ -643,76 +643,59 @@ footer .button .bloom-container:active .button-container-main .button-inner {
 /* ============================= */
 /* === MOBILE NAV PRO STYLE === */
 /* ============================= */
-
 @media (max-width: 900px) {
 
-  /* ===== CACHE MENU DESKTOP ===== */
-  .main-nav ul,
-  .menu-toggle {
-    display: none !important;
-  }
-
-  /* ===== TOP NAV ===== */
-  .top-nav {
-    display: flex; /* ✅ IMPORTANT */
-    position: fixed;
+  /* ===== MAIN NAV ===== */
+  .main-nav {
+    position: relative; /* changer fixed -> relative */
     top: 0;
     left: 0;
     width: 100%;
     height: 60px;
-
+    padding: 0 12px;
+    gap: 10px;
+    z-index: 10000;
+    background: rgba(0,0,0,0.95);
+    backdrop-filter: blur(12px);
     display: flex;
     align-items: center;
-    justify-content: space-between;
-
-    padding: 0 15px;
-    background: rgba(0,0,0,0.9);
-    backdrop-filter: blur(12px);
-    z-index: 1000;
   }
 
-  .top-nav img {
-    height: 40px;
+  /* cache menu desktop */
+  nav ul,
+  .nav-links {
+    display: none;
   }
 
-  /* ===== SEARCH TOUJOURS VISIBLE ===== */
+  /* recherche prend tout l'espace */
   .search-container {
     flex: 1;
-    margin: 0 12px;
+    position: relative; /* pour que #search-results soit relatif */
   }
 
-  .mobile-search {
-    display: block;
+  .inputsearch {
     width: 100%;
-    padding: 8px 14px;
-
+    height: 38px;
     border-radius: 20px;
     border: 1px solid rgba(255,255,255,0.3);
-
     background: rgba(255,255,255,0.12);
     color: white;
   }
 
-  .mobile-search::placeholder {
+  .inputsearch::placeholder {
     color: rgba(255,255,255,0.6);
   }
 
-  /* ===== PANIER ===== */
-  .cart-icon {
-    font-size: 1.3rem;
-    color: white;
-    position: relative;
-  }
-
-  .cart-count {
-    position: absolute;
-    top: -6px;
-    right: -8px;
-    font-size: 10px;
-    padding: 2px 6px;
-    border-radius: 50%;
-    background: red;
-    color: white;
+  #search-results {
+    position: absolute;  /* collé au champ */
+    top: 46px;           /* hauteur du champ + 8px */
+    left: 0;
+    width: 100%;         /* même largeur que le champ */
+    max-height: 70vh;
+    overflow-y: auto;
+    background: rgba(0,0,0,0.95);
+    z-index: 10001;
+    border-radius: 0 0 12px 12px;
   }
 
   /* ===== BOTTOM NAV (TikTok style) ===== */
@@ -723,13 +706,13 @@ footer .button .bloom-container:active .button-container-main .button-inner {
     top: auto !important;     /* unset top to allow bottom */
     bottom: 0 !important;     /* en bas */
     left: 0 !important;
-    width: 100% !important;
-    height: 65px !important;
+    width: 100%;
+    height: 65px;
 
-    justify-content: space-around !important;
-    align-items: center !important;
+    justify-content: space-around;
+    align-items: center;
 
-    background: rgba(0,0,0,0.95) !important;
+    background: rgba(0,0,0,0.95) ;
     backdrop-filter: blur(12px) !important;
     border-top: 1px solid rgba(255,255,255,0.1);
 
@@ -762,5 +745,11 @@ footer .button .bloom-container:active .button-container-main .button-inner {
   body {
     padding-top: 70px;
     padding-bottom: 75px;
+  }
+
+  /* Hide user buttons on mobile nav */
+  .user-avatar-btn,
+  .open-form-button {
+    display: none;
   }
 }

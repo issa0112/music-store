@@ -109,7 +109,7 @@
   
 </nav>
 
-<nav class="top-nav">
+{% comment %} <nav class="top-nav">
   <div class="nav-logo">
     <a href="{% url 'homepage' %}">
       <img src="{% static 'img/logotramo.png' %}" alt="Inova Music" />
@@ -131,7 +131,7 @@
     <span class="cart-count">{{ panier_count }}</span>
     {% endif %}
   </a>
-</nav>
+</nav> {% endcomment %}
 <nav class="bottom-nav">
   <a href="{% url 'homepage' %}">
         <ion-icon name="home-outline"></ion-icon>
