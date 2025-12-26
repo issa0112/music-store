@@ -1,0 +1,120 @@
+{% load static %}
+
+<!-- ================= DESKTOP NAV ================= -->
+<nav class="main-nav">
+    <div class="nav-logo">
+        <a href="{% url 'homepage' %}">
+            <img src="{% static 'img/logotramo.png' %}" alt="Inova Music">
+        </a>
+    </div>
+
+    <ul>
+        <li>
+            <a href="{% url 'homepage' %}" class="{% if request.path == '/' %}active{% endif %}">
+                <ion-icon name="home-outline"></ion-icon>
+                <span class="text">Accueil</span>
+            </a>
+        </li>
+
+        <li class="deroulant">
+            <a href="{% url 'album_list' %}">
+                <ion-icon name="albums-outline"></ion-icon>
+                <span class="text">Musique</span>
+            </a>
+            <ul class="sous">
+                <li><a href="#">Albums</a></li>
+                <li><a href="#">Pistes</a></li>
+            </ul>
+        </li>
+
+        <li class="deroulant">
+            <a href="{% url 'video_list' %}">
+                <ion-icon name="videocam-outline"></ion-icon>
+                <span class="text">Vidéos</span>
+            </a>
+            <ul class="sous">
+                <li><a href="#">Clip</a></li>
+                <li><a href="#">Cinéma</a></li>
+                <li><a href="#">Sketch</a></li>
+            </ul>
+        </li>
+    </ul>
+
+    <!-- Recherche desktop -->
+    <div class="search-container">
+        <input type="text"
+               class="inputsearch"
+               placeholder="Que souhaitez-vous regarder ou écouter?"
+               autocomplete="off">
+    </div>
+
+    <a href="{% url 'panier' %}" class="cart-icon">
+        <i class="bi-journal-album"></i>
+        {% if panier_count %}
+            <span class="cart-count">{{ panier_count }}</span>
+        {% endif %}
+    </a>
+
+    {% if user.is_authenticated %}
+        <button class="user-avatar-btn">
+            {{ user.username|first|upper }}
+        </button>
+    {% else %}
+        <button class="open-form-button">
+            Connexion
+        </button>
+    {% endif %}
+</nav>
+
+<!-- ================= MOBILE TOP NAV ================= -->
+<nav class="top-nav">
+    <div class="nav-logo">
+        <a href="{% url 'homepage' %}">
+            <img src="{% static 'img/logotramo.png' %}" alt="Inova Music">
+        </a>
+    </div>
+
+    <div class="search-container">
+        <input type="text"
+               class="inputsearch mobile-search"
+               placeholder="Rechercher musique ou vidéo..."
+               autocomplete="off">
+    </div>
+
+    <a href="{% url 'panier' %}" class="cart-icon">
+        <i class="bi-journal-album"></i>
+        {% if panier_count %}
+            <span class="cart-count">{{ panier_count }}</span>
+        {% endif %}
+    </a>
+</nav>
+
+<!-- ================= MOBILE BOTTOM NAV ================= -->
+<nav class="bottom-nav">
+    <a href="{% url 'homepage' %}">
+        <ion-icon name="home-outline"></ion-icon>
+        <span>Accueil</span>
+    </a>
+
+    <a href="{% url 'album_list' %}">
+        <ion-icon name="albums-outline"></ion-icon>
+        <span>Albums</span>
+    </a>
+
+    <a href="{% url 'video_list' %}">
+        <ion-icon name="videocam-outline"></ion-icon>
+        <span>Vidéos</span>
+    </a>
+
+    {% if user.is_authenticated %}
+        <a href="#">
+            <ion-icon name="person-outline"></ion-icon>
+            <span>Profil</span>
+        </a>
+    {% else %}
+        <a href="#">
+            <ion-icon name="log-in-outline"></ion-icon>
+            <span>Connexion</span>
+        </a>
+    {% endif %}
+</nav>

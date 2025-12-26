@@ -254,11 +254,11 @@
 /* === Responsive === */
 @media (max-width: 900px) {
   #library-sidebar {
-    top: 80px;
+    top: 60px;
     height: calc(100vh - 0px);
   }
   .library-toggle-btn {
-    top: 80px;
+    top: 60px;
     font-size: 0; /* cache le texte */
   }
   #open-library-btn {
