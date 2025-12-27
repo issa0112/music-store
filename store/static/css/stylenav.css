@@ -647,7 +647,7 @@ footer .button .bloom-container:active .button-container-main .button-inner {
 
   /* ===== MAIN NAV ===== */
   .main-nav {
-    position: relative; /* changer fixed -> relative */
+    position: fixed; /* fixed on mobile */
     top: 0;
     left: 0;
     width: 100%;
