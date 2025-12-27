@@ -17,7 +17,7 @@ import stripe
 import json
 from django.db.models import Sum
 from django.views.decorators.http import require_POST
-
+from .utils.b2 import get_signed_url
 
 
 class AlbumListView(ListView):
@@ -210,6 +210,30 @@ def upload_video(request: HttpRequest):
     else:
         form = VideoUploadForm()
     return render(request, 'upload_video.html', {'form': form})
+
+
+
+@login_required
+@login_required
+def download_album(request, album_id):
+    album = get_object_or_404(Album, id=album_id)
+
+    if not album.fichier:
+        raise Http404("Fichier non disponible pour cet album.")
+
+    try:
+        signed_url = get_signed_url(
+            bucket_name="music-store0112",
+            filename=album.fichier.name,  # ex: "media/albums/monalbum.zip"
+            duration=3600
+        )
+        return redirect(signed_url)
+    except Exception as e:
+        import traceback
+        print("Erreur B2:", e)
+        traceback.print_exc()
+        return JsonResponse({"error": "Impossible de générer l’URL signée"}, status=500)
+
 
 @login_required
 def purchase_item(request: HttpRequest, item_type: str, item_id: int):

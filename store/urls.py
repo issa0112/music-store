@@ -62,7 +62,7 @@ urlpatterns = [
     path('profile/artist/<int:artist_id>/', artist_profile, name='artist_profile'),
     path('api/library/', library_api, name='library_api'),
 
-
+    path("album/<int:album_id>/download/", download_album, name="download_album"),
 
 
 
