@@ -57,8 +57,8 @@
     <div class="album-container">
       {% for album in popular_albums|slice:":10" %}
       <div class="album-card">
-        <a href="#">
-          <img src="{{ album.cover_image.url }}" alt="{{ album.title }}" />
+        <a href="{% url 'album_detail' album.pk %}">
+          <img src="{{ album.cover_url }}" alt="{{ album.title }}">
           <h3>{{ album.title }}</h3>
           <p>Artiste : {{ album.artist.name }}</p>
         </a>
@@ -70,6 +70,7 @@
     <a href="{% url 'album_list' %}" class="btn">Voir plus d'albums</a>
   </div>
 </section>
+
 
 <!-- Section Vidéo Populaire -->
 <section id="popular-videos" class="section fade-in-scroll">

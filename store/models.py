@@ -9,7 +9,7 @@ from django.contrib.contenttypes.fields import GenericForeignKey
 from store.storage_backends import MediaStorage, PublicMediaStorage
 from mutagen import File as MutagenFile
 from datetime import timedelta 
-
+from django.templatetags.static import static
 from django.utils import timezone
 
 
@@ -50,28 +50,55 @@ class Follow(models.Model):
         unique_together = ('follower', 'artist')
 
 
+
+
 class Album(models.Model):
     title = models.CharField(max_length=100, db_index=True)
-    artist = models.ForeignKey(Artist, on_delete=models.CASCADE, related_name='albums')
+    artist = models.ForeignKey(
+        "Artist",
+        on_delete=models.CASCADE,
+        related_name="albums"
+    )
     release_date = models.DateField()
-    Music_Category = models.ForeignKey(MusicCategory, on_delete=models.CASCADE, null=True, blank=True)
+    Music_Category = models.ForeignKey(
+        "MusicCategory",
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True
+    )
     is_popular = models.BooleanField(default=False, db_index=True)
     price = models.DecimalField(max_digits=6, decimal_places=2, default=9.99)
+
+    # ✅ Cover image → bucket public
     cover_image = models.ImageField(
-        storage=PublicMediaStorage(),   # ✅ B2 public
-        upload_to='images/albums/',
-        blank=True, null=True
-    )
-    fichier = models.FileField(
-        storage=MediaStorage(),       # ✅ B2
-        upload_to='media/albums/',
-        blank=True, null=True
+        storage=PublicMediaStorage(),
+        upload_to="images/albums/",
+        blank=True,
+        null=True
     )
 
+    # ✅ Fichier audio/vidéo → bucket privé (signed URLs)
+    fichier = models.FileField(
+        storage=MediaStorage(),
+        upload_to="media/albums/",
+        blank=True,
+        null=True
+    )
 
     def __str__(self):
         return self.title
 
+    # ✅ Helper pour éviter ValueError si cover_image est vide
+    def cover_url(self):
+        if self.cover_image:
+            return self.cover_image.url
+        return static("img/trackdefault.png")
+
+    # ✅ Helper pour générer une URL signée si fichier existe
+    def fichier_url(self):
+        if self.fichier:
+            return self.fichier.storage.url(self.fichier.name)
+        return None
 
 
 from django.core.validators import FileExtensionValidator
@@ -130,6 +157,16 @@ class Track(models.Model):
 
     def __str__(self):
         return self.title
+    
+    def cover_url(self):
+        if self.cover_image:
+            return self.cover_image.url
+        return static("img/trackdefault.png")
+
+    def file_url(self):
+        if self.file:
+            return self.file.storage.url(self.file.name)
+        return None
 
 
 class Playlist(models.Model):
@@ -200,6 +237,15 @@ class Video(models.Model):
     def __str__(self):
         return self.title
 
+    def cover_url(self):
+        if self.thumbnail:
+            return self.thumbnail.url
+        return static("img/trackdefault.png")
+
+    def file_url(self):
+        if self.file:
+            return self.file.storage.url(self.file.name)
+        return None
 
 class Purchase(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)

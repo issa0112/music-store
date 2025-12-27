@@ -5,219 +5,35 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Détail des albums</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Helvetica', sans-serif;
-        }
-
-        body {
-            background-color: #121212;
-            color: #ffffff;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-        }
-
-        .main {
-            width: 90%;
-            max-width: 1200px;
-            background-color: #1a1a1a;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-        }
-
-        .list {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            text-align: center;
-        }
-
-        h1 {
-            font-size: 3rem;
-            margin-bottom: 10px;
-            font-weight: 700;
-        }
-
-        p {
-            font-size: 1.2rem;
-            margin-bottom: 20px;
-            color: #b3b3b3;
-        }
-
-        img {
-            width: 250px;
-            height: 250px;
-            border-radius: 10px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
-            margin-bottom: 30px;
-        }
-
-        h3 {
-            font-size: 2rem;
-            margin-bottom: 20px;
-            font-weight: 600;
-        }
-
-        ul {
-            list-style-type: none;
-            width: 100%;
-            max-width: 800px;
-        }
-
-        ul li {
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            background-color: #2a2a2a;
-            padding: 15px;
-            margin-bottom: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-            transition: transform 0.3s ease-in-out;
-        }
-
-        ul li:hover {
-            transform: translateY(-5px);
-        }
-
-        ul li p {
-            font-size: 1rem;
-            color: #808080;
-            margin-top: 10px;
-        }
-
-        audio {
-            width: 100%;
-            margin: 10px 0;
-            border-radius: 8px;
-        }
-
-        a {
-            color: #1db954;
-            text-decoration: none;
-            font-weight: bold;
-            margin-top: 10px;
-            transition: color 0.2s ease-in-out;
-        }
-
-        a:hover {
-            color: #1ed760;
-        }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Helvetica', sans-serif; }
+        body { background-color: #121212; color: #ffffff; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+        .main { width: 90%; max-width: 1200px; background-color: #1a1a1a; padding: 20px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
+        .list { display: flex; flex-direction: column; align-items: center; text-align: center; }
+        h1 { font-size: 3rem; margin-bottom: 10px; font-weight: 700; }
+        p { font-size: 1.2rem; margin-bottom: 20px; color: #b3b3b3; }
+        img { width: 250px; height: 250px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.4); margin-bottom: 30px; }
+        h3 { font-size: 2rem; margin-bottom: 20px; font-weight: 600; }
+        ul { list-style-type: none; width: 100%; max-width: 800px; }
+        ul li { display: flex; flex-direction: column; justify-content: space-between; background-color: #2a2a2a; padding: 15px; margin-bottom: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.2); transition: transform 0.3s ease-in-out; }
+        ul li:hover { transform: translateY(-5px); }
+        ul li p { font-size: 1rem; color: #808080; margin-top: 10px; }
+        audio { width: 100%; margin: 10px 0; border-radius: 8px; }
+        a { color: #1db954; text-decoration: none; font-weight: bold; margin-top: 10px; transition: color 0.2s ease-in-out; }
+        a:hover { color: #1ed760; }
         @media (max-width: 768px) {
-            h1 {
-                font-size: 2.5rem;
-            }
-
-            h3 {
-                font-size: 1.5rem;
-            }
-
-            img {
-                width: 200px;
-                height: 200px;
-            }
-
-            ul li {
-                padding: 10px;
-            }
+            h1 { font-size: 2.5rem; }
+            h3 { font-size: 1.5rem; }
+            img { width: 200px; height: 200px; }
+            ul li { padding: 10px; }
         }
-        .audio-player-fixed {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            background-color: #282828;
-            color: white;
-            padding: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.5);
-            z-index: 1000;
-            visibility: hidden;
-        }
-
-        .audio-player-fixed.active {
-            visibility: visible;
-        }
-
-        .audio-player-fixed audio {
-            flex-grow: 1;
-            margin-right: 10px;
-        }
-
-        .audio-player-fixed .track-info {
-            margin-right: 20px;
-        }
-
-        .audio-player-fixed button {
-            background-color: transparent;
-            border: none;
-            color: white;
-            cursor: pointer;
-        }
-        .audio-player-fixed {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    background-color: #282828;
-    color: white;
-    padding: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.5);
-    z-index: 1000;
-    visibility: hidden;
-    opacity: 0;
-    transform: translateY(100%);
-    transition: all 0.5s ease;
-}
-
-.audio-player-fixed.active {
-    visibility: visible;
-    opacity: 1;
-    transform: translateY(0);
-}
-
-.audio-player-fixed audio {
-    flex-grow: 1;
-    margin-right: 10px;
-}
-
-.audio-player-fixed .track-info {
-    margin-right: 20px;
-}
-
-.audio-player-fixed button {
-    background-color: transparent;
-    border: none;
-    color: white;
-    cursor: pointer;
-}
-
-.list audio {
-    transition: all 0.5s ease;
-}
-
-.list audio.shrink {
-    transform: scale(0);
-}
-
-.list audio.expand {
-    transform: scale(1);
-}
-
-
+        .audio-player-fixed { position: fixed; bottom: 0; left: 0; width: 100%; background-color: #282828; color: white; padding: 10px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 -2px 10px rgba(0,0,0,0.5); z-index: 1000; visibility: hidden; opacity: 0; transform: translateY(100%); transition: all 0.5s ease; }
+        .audio-player-fixed.active { visibility: visible; opacity: 1; transform: translateY(0); }
+        .audio-player-fixed audio { flex-grow: 1; margin-right: 10px; }
+        .audio-player-fixed .track-info { margin-right: 20px; }
+        .audio-player-fixed button { background-color: transparent; border: none; color: white; cursor: pointer; }
+        .list audio { transition: all 0.5s ease; }
+        .list audio.shrink { transform: scale(0); }
+        .list audio.expand { transform: scale(1); }
     </style>
 </head>
 <body>
@@ -225,21 +41,26 @@
         <div class="list">
             <h1>{{ album.title }}</h1>
             <p>Artiste : {{ album.artist.name }}</p>
-            <img src="{{ album.cover_image.url }}" alt="{{ album.title }}">
+            <img src="{{ album.cover_url }}" alt="{{ album.title }}">
 
             <h3>Pistes</h3>
             <ul>
                 {% for track in album.tracks.all %}
                     <li>
                         {{ track.title }} - {{ track.duration }}
-                        <p>Nombre de lectures: {{ track.play_count }} | Téléchargements: {{ track.download_count }}</p>
-                        <audio id="audio-{{ track.id }}" controls class="expand">
-                            <source src="{{ track.file.url }}" type="audio/mpeg">
-                            Votre navigateur ne supporte pas la lecture audio.
-                        </audio>
-                        <a href="{% url 'download_track' track.id %}">Télécharger le morceau</a>
-                        <br>
-                        <button onclick="trackPlay({{ track.id }}, '{{ track.title }}', '{{ track.file.url }}')">Lire dans la barre fixe</button>
+                        <p>Lectures: {{ track.play_count }} | Téléchargements: {{ track.download_count }}</p>
+
+                        {% if track.file_url %}
+                            <audio id="audio-{{ track.id }}" controls class="expand">
+                                <source src="{{ track.file_url }}" type="audio/mpeg">
+                                Votre navigateur ne supporte pas la lecture audio.
+                            </audio>
+                            <a href="{% url 'download_track' track.id %}">Télécharger le morceau</a>
+                            <br>
+                            <button onclick="trackPlay({{ track.id }}, '{{ track.title }}', '{{ track.file_url }}')">Lire dans la barre fixe</button>
+                        {% else %}
+                            <span>Pas de fichier disponible</span>
+                        {% endif %}
                     </li>
                 {% endfor %}
             </ul>
@@ -255,76 +76,48 @@
         </audio>
         <button onclick="closeAudioPlayer()">X</button>
     </div>
-    
-
 
     <script>
-        let currentAudioInList = null; // Garde une référence au lecteur actuel dans la liste
+        let currentAudioInList = null;
 
-// Fonction pour jouer une piste et afficher le lecteur audio fixe
-function trackPlay(track_id, track_title, track_url) {
-    // Met à jour le compteur de lecture
-    fetch(`/store/track/play/${track_id}/`)
-        .then(response => response.json())
-        .then(data => {
-            console.log('Track play count updated:', data.play_count);
-        })
-        .catch(error => {
-            console.error('Erreur lors de la mise à jour du compteur de lecture :', error);
-        });
+        function trackPlay(track_id, track_title, track_url) {
+            fetch(`/store/track/play/${track_id}/`)
+                .then(response => response.json())
+                .then(data => console.log('Track play count updated:', data.play_count))
+                .catch(error => console.error('Erreur compteur lecture :', error));
 
-    // Récupère le lecteur audio de la liste
-    const audioInList = document.getElementById(`audio-${track_id}`);
+            const audioInList = document.getElementById(`audio-${track_id}`);
+            if (currentAudioInList && currentAudioInList !== audioInList) {
+                currentAudioInList.classList.remove('expand');
+                currentAudioInList.classList.add('shrink');
+                currentAudioInList.pause();
+            }
+            currentAudioInList = audioInList;
+            audioInList.classList.add('shrink');
+            audioInList.pause();
 
-    // Si un autre audio est en lecture, le réduire
-    if (currentAudioInList && currentAudioInList !== audioInList) {
-        currentAudioInList.classList.remove('expand');
-        currentAudioInList.classList.add('shrink');
-        currentAudioInList.pause();
-    }
+            const audioPlayerFixed = document.getElementById('audio-player-fixed');
+            const audioSource = document.getElementById('audio-source');
+            const trackInfo = document.getElementById('track-title');
+            const fixedAudioPlayer = document.getElementById('fixed-audio-player');
 
-    // Marque ce lecteur comme celui actuellement joué
-    currentAudioInList = audioInList;
+            trackInfo.textContent = track_title;
+            audioSource.src = track_url;
+            fixedAudioPlayer.load();
+            fixedAudioPlayer.play();
+            audioPlayerFixed.classList.add('active');
+        }
 
-    // Démarre la transition pour masquer l'audio dans la liste
-    audioInList.classList.add('shrink');
-    audioInList.pause(); // Met en pause l'audio de la liste
-
-    // Affiche la barre de lecture en bas et joue la piste
-    const audioPlayerFixed = document.getElementById('audio-player-fixed');
-    const audioSource = document.getElementById('audio-source');
-    const trackInfo = document.getElementById('track-title');
-    const fixedAudioPlayer = document.getElementById('fixed-audio-player');
-
-    // Mettre à jour les informations de la piste
-    trackInfo.textContent = track_title;
-    audioSource.src = track_url;
-    fixedAudioPlayer.load(); // Recharge l'élément audio avec le nouveau fichier
-    fixedAudioPlayer.play(); // Lance la lecture
-
-    // Activer la transition d'apparition du lecteur popup
-    audioPlayerFixed.classList.add('active');
-}
-
-// Fonction pour fermer le lecteur audio pop-up
-function closeAudioPlayer() {
-    const audioPlayerFixed = document.getElementById('audio-player-fixed');
-    const fixedAudioPlayer = document.getElementById('fixed-audio-player');
-    
-    // Met en pause l'audio du lecteur pop-up
-    fixedAudioPlayer.pause(); 
-    
-    // Cache le lecteur pop-up
-    audioPlayerFixed.classList.remove('active');
-
-    // Revenir à l'état initial dans la liste
-    if (currentAudioInList) {
-        currentAudioInList.classList.remove('shrink');
-        currentAudioInList.classList.add('expand');
-    }
-}
-
-
+        function closeAudioPlayer() {
+            const audioPlayerFixed = document.getElementById('audio-player-fixed');
+            const fixedAudioPlayer = document.getElementById('fixed-audio-player');
+            fixedAudioPlayer.pause();
+            audioPlayerFixed.classList.remove('active');
+            if (currentAudioInList) {
+                currentAudioInList.classList.remove('shrink');
+                currentAudioInList.classList.add('expand');
+            }
+        }
     </script>
 </body>
 </html>

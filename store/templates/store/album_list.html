@@ -7,7 +7,7 @@
     <div class="list-item">
       <div class="crd">
         <a href="{% url 'album_detail' album.pk %}">
-          <img src="{{ album.cover_image.url }}" alt="{{ album.title }}" />
+          <img src="{{ album.cover_url }}" alt="{{ album.title }}">
           <div class="crd-contenta">
             <h2 class="crd-titlea">{{ album.title }}</h2>
             <p>Artiste: {{ album.artist.name }}</p>
