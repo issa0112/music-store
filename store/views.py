@@ -214,7 +214,6 @@ def upload_video(request: HttpRequest):
 
 
 @login_required
-@login_required
 def download_album(request, album_id):
     album = get_object_or_404(Album, id=album_id)
 
@@ -222,11 +221,10 @@ def download_album(request, album_id):
         raise Http404("Fichier non disponible pour cet album.")
 
     try:
-        signed_url = get_signed_url(
-            bucket_name="music-store0112",
-            filename=album.fichier.name,  # ex: "media/albums/monalbum.zip"
-            duration=3600
-        )
+        # Utilise le storage configuré pour ce FileField
+        storage = album.fichier.storage
+        signed_url = storage.url(album.fichier.name)  # génère une URL signée automatiquement
+
         return redirect(signed_url)
     except Exception as e:
         import traceback
