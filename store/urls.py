@@ -1,9 +1,60 @@
 from django.urls import path
-from django.contrib.auth import views as auth_views
-from django.contrib.auth.views import LogoutView
 from django.conf import settings
 from django.conf.urls.static import static
-from .views import *
+from django.contrib.auth import views as auth_views
+from django.contrib.auth.views import LogoutView
+from .views import (
+    AlbumListView,
+    AlbumDetailView,
+    VideoListView,
+    VideoDetailView,
+    video_list_ajax,
+    play_track,
+    play_video,
+    purchase_item,
+    download_track,
+    download_video,
+    register,
+    upload_track,
+    upload_video,
+    not_authorized,
+    homepage,
+    track_list,
+    recherche_globale,
+    CinemaVideoListView,
+    LongMetrageListView,
+    SerieListView,
+    popular_videos,
+    liste_categories_musique,
+    liste_categories_videos,
+    artist_detail,
+    recherche_resultat,
+    user_playlists,
+    create_playlist,
+    add_track_to_playlist,
+    toggle_like_follow,
+    user_playlists_or_suggestions,
+    library_data,
+    profile,
+    panier,
+    ajouter_au_panier,
+    retirer_du_panier,
+    vider_panier,
+    acheter,
+    telecharger_album,
+    create_payment_intent,
+    paiement_stripe,
+    paiement_paypal,
+    paiement_mobile,
+    callback_mobile,
+    panier_count,
+    play_video_increment,
+    user_profile,
+    artist_profile,
+    library_api,
+    download_album,
+)
+
 
 urlpatterns = [
     path('album/', AlbumListView.as_view(), name='album_list'),

@@ -38,6 +38,15 @@ class Artist(models.Model):
     )
     is_popular = models.BooleanField(default=False, db_index=True)
 
+    @property
+    def image_url(self):
+        """
+        Retourne l'URL publique de l'image si elle existe,
+        sinon une image par défaut.
+        """
+        if self.image and self.image.name:
+            return self.image.url
+        return "/static/img/artistedefault.png"
 
     def __str__(self):
         return self.name
@@ -51,6 +60,8 @@ class Follow(models.Model):
 
 
 
+
+from django.templatetags.static import static
 
 class Album(models.Model):
     title = models.CharField(max_length=100, db_index=True)
@@ -88,17 +99,24 @@ class Album(models.Model):
     def __str__(self):
         return self.title
 
-    # ✅ Helper pour éviter ValueError si cover_image est vide
+    @property
     def cover_url(self):
-        if self.cover_image:
+        """Retourne l'URL publique de la cover ou une image par défaut."""
+        if self.cover_image and self.cover_image.name:
             return self.cover_image.url
-        return static("img/trackdefault.png")
+        return static("img/default-album.png")
 
-    # ✅ Helper pour générer une URL signée si fichier existe
+    @property
     def fichier_url(self):
-        if self.fichier:
+        """Retourne une URL signée pour le fichier ou None."""
+        if self.fichier and self.fichier.name:
             return self.fichier.storage.url(self.fichier.name)
         return None
+
+    # ⚡ Compatibilité rétroactive
+    @property
+    def url(self):
+        return self.cover_url
 
 
 from django.core.validators import FileExtensionValidator
@@ -119,7 +137,7 @@ class Track(models.Model):
     Music_Category = models.ForeignKey('MusicCategory', on_delete=models.CASCADE, null=True, blank=True)
     
     file = models.FileField(
-        storage=MediaStorage(),       # ✅ B2
+        storage=MediaStorage(),       # ✅ B2 privé
         upload_to='media/tracks/',
         validators=[validate_audio_file]
     )
@@ -158,15 +176,24 @@ class Track(models.Model):
     def __str__(self):
         return self.title
     
+    @property
     def cover_url(self):
-        if self.cover_image:
+        """Retourne l'URL publique de la cover ou une image par défaut."""
+        if self.cover_image and self.cover_image.name:
             return self.cover_image.url
         return static("img/trackdefault.png")
 
+    @property
     def file_url(self):
-        if self.file:
+        """Retourne une URL signée pour le fichier ou None."""
+        if self.file and self.file.name:
             return self.file.storage.url(self.file.name)
         return None
+
+    # ⚡ Compatibilité rétroactive
+    @property
+    def url(self):
+        return self.file_url
 
 
 class Playlist(models.Model):
@@ -198,6 +225,7 @@ class UserAction(models.Model):
         unique_together = ('user', 'action_type', 'content_type', 'object_id')
 
 
+
 def validate_video_file(value):
     mime = magic.from_buffer(value.read(2048), mime=True)
     value.seek(0)
@@ -212,23 +240,23 @@ def validate_video_file(value):
         raise ValidationError("Seuls les fichiers vidéo sont autorisés.")
 
 
-
 class Video(models.Model):
     title = models.CharField(max_length=100, db_index=True)
-    artist = models.ForeignKey(Artist, on_delete=models.CASCADE, null=True, blank=True, related_name='videos')
-    Video_Category = models.ForeignKey(VideoCategory, on_delete=models.CASCADE, null=True, blank=True)
+    artist = models.ForeignKey("Artist", on_delete=models.CASCADE, null=True, blank=True, related_name="videos")
+    Video_Category = models.ForeignKey("VideoCategory", on_delete=models.CASCADE, null=True, blank=True)
     description = models.TextField(blank=True, db_index=True)
     play_count = models.PositiveIntegerField(default=0)
     like_count = models.PositiveIntegerField(default=0)
     download_count = models.PositiveIntegerField(default=0)
-    file =models.FileField(
-        storage=MediaStorage(),       # ✅ B2
-        upload_to='media/videos/',
+
+    file = models.FileField(
+        storage=MediaStorage(),       # ✅ B2 privé
+        upload_to="media/videos/",
         validators=[validate_video_file]
     )
-    thumbnail =  models.ImageField(
+    thumbnail = models.ImageField(
         storage=PublicMediaStorage(),   # ✅ B2 public
-        upload_to='images/videos/',
+        upload_to="images/videos/",
         blank=True, null=True
     )
 
@@ -237,15 +265,24 @@ class Video(models.Model):
     def __str__(self):
         return self.title
 
+    @property
     def cover_url(self):
-        if self.thumbnail:
+        """Retourne l'URL publique de la miniature ou une image par défaut."""
+        if self.thumbnail and self.thumbnail.name:
             return self.thumbnail.url
-        return static("img/trackdefault.png")
+        return static("img/videodefault.png")
 
+    @property
     def file_url(self):
-        if self.file:
+        """Retourne une URL signée pour le fichier ou None."""
+        if self.file and self.file.name:
             return self.file.storage.url(self.file.name)
         return None
+
+    # ⚡ Compatibilité rétroactive
+    @property
+    def url(self):
+        return self.file_url
 
 class Purchase(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
