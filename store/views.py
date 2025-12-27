@@ -302,45 +302,49 @@ def create_artist(request):
 
 
 
-
 @require_GET
 def recherche_globale(request):
     query = request.GET.get("q", "").strip()
     data = {"tracks": [], "videos": [], "artists": [], "albums": []}
 
-    if not query:
+    if not query:  # si aucun caractère
         return JsonResponse(data)
 
+    # Tracks
     tracks = Track.objects.filter(
         Q(title__icontains=query) |
         Q(artist__name__icontains=query) |
         Q(album__title__icontains=query)
     ).select_related("artist", "album")[:20]
 
+    # Videos
     videos = Video.objects.filter(
         Q(title__icontains=query) |
         Q(artist__name__icontains=query) |
         Q(description__icontains=query)
     ).select_related("artist")[:20]
 
+    # Artists
     artists = Artist.objects.filter(
         Q(name__icontains=query) |
         Q(bio__icontains=query)
     )[:20]
 
+    # Albums
     albums = Album.objects.filter(
         Q(title__icontains=query) |
         Q(artist__name__icontains=query)
     ).select_related("artist")[:20]
 
+    # Format JSON
     data["tracks"] = [
         {
             "id": t.id,
             "title": t.title,
             "artist": getattr(t.artist, "name", "Inconnu"),
             "album": getattr(t.album, "title", ""),
-            "audio_url": t.file_url,        # ✅ helper
-            "cover_image": t.cover_url,     # ✅ helper
+            "audio_url": t.file_url or "",  # ✅ helper → URL signée ou vide
+            "cover_image": t.cover_url or static("img/trackdefault.png"),  # ✅ fallback
         }
         for t in tracks
     ]
@@ -350,8 +354,9 @@ def recherche_globale(request):
             "id": v.id,
             "title": v.title,
             "artist": getattr(v.artist, "name", "Inconnu"),
-            "url": reverse("video_detail", args=[v.id]),  # ✅ reverse
-            "thumbnail": v.thumbnail_url,                 # ✅ helper
+            "url": reverse("video_detail", args=[v.id]),  # ✅ lien robuste
+            "thumbnail": v.cover_url or static("img/videodefault.png"),
+            "file_url": v.file_url or "",  # ✅ URL signée ou vide
         }
         for v in videos
     ]
@@ -361,7 +366,7 @@ def recherche_globale(request):
             "id": a.id,
             "name": a.name,
             "url": reverse("artist_detail", args=[a.id]),
-            "image": a.image.url if a.image and a.image.name else "/static/img/artistedefault.png",
+            "image": a.image_url or static("img/artistedefault.png"),
         }
         for a in artists
     ]
@@ -372,12 +377,15 @@ def recherche_globale(request):
             "title": alb.title,
             "artist": getattr(alb.artist, "name", "Inconnu"),
             "url": reverse("album_detail", args=[alb.id]),
-            "cover_image": alb.cover_url,  # ✅ helper
+            "cover_image": alb.cover_url or static("img/default-album.png"),
+            "fichier_url": alb.fichier_url or "",  # ✅ URL signée ou vide
         }
         for alb in albums
     ]
 
     return JsonResponse(data)
+
+
 
 
 def artist_detail(request, pk):
