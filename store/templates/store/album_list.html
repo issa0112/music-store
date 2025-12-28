@@ -2,14 +2,24 @@
 {% block Albums %}
 <!-- Section principale -->
 <div class="main">
+  <!-- Barre recherche + catégories -->
+    <div class="main-toolbar">
+        <!-- Recherche dynamique -->
+        <input
+            type="text"
+            id="searchInput"
+            placeholder="Rechercher un album..."
+            autocomplete="off"
+        >
+    </div>
   <div class="list">
     {% for album in object_list %}
     <div class="list-item">
       <div class="crd">
         <a href="{% url 'album_detail' album.pk %}">
-          <img src="{{ album.cover_url }}" alt="{{ album.title }}">
-          <div class="crd-contenta">
-            <h2 class="crd-titlea">{{ album.title }}</h2>
+          <img src="{{ album.cover_image.url }}" alt="{{ album.title }}" />
+          <div class="crd-content">
+            <h2 class="crd-title">{{ album.title }}</h2>
             <p>Artiste: {{ album.artist.name }}</p>
           </div>
         </a>
@@ -27,5 +37,23 @@
     {% endfor %}
   </div>
 </div>
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const searchInput = document.getElementById("searchInput");
+    const albumList = document.getElementById("album-list");
+
+    searchInput.addEventListener("input", () => {
+        const query = searchInput.value.trim().toLowerCase();
+        const albums = albumList.querySelectorAll(".list-item");
+
+        albums.forEach(album => {
+            const title = album.dataset.title || "";
+            album.style.display = title.includes(query) ? "block" : "none";
+        });
+    });
+});
+</script>
+{% endblock extra_js %}
 
 {% endblock Albums %}

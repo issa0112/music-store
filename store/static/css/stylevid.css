@@ -45,6 +45,7 @@ a:hover {
     color: #fff;
     /* padding: 50px 10%; */
     margin: 20px;
+    margin-top: 60px;
     margin-bottom: 30px;
     background: transparent; /* removed translucent white */
     padding: 20px;
@@ -365,3 +366,96 @@ a:hover {
     margin: 5px; /* Réduire la marge autour de chaque album */
 }
 
+/* ✅ Responsive mobile */
+@media (max-width: 768px) {
+    body {
+        margin: 20px 0 0 0;   /* moins de marge en haut */
+        font-size: 14px;      /* texte plus petit */
+    }
+
+    header h1 {
+        font-size: 1.4em;     /* titre réduit */
+    }
+
+    .main {
+        margin: 10px;
+        padding: 15px;
+        border-radius: 12px;
+    }
+
+    .main-player {
+        width: 100% !important;
+        display: flex;
+        flex-direction: column;
+        align-items: center;   /* ✅ centre la vidéo */
+        justify-content: center;
+    }
+   
+    
+    .main-player video {
+        width: 100%;
+        max-width: 100%;      /* sécurité */
+        display: block;
+        margin: 0 auto;       /* ✅ centre horizontalement */
+    }
+
+    .main-player h3 {
+        font-size: 16px;
+    }
+
+    .video-stats {
+        gap: 20px;              /* moins d’espace entre icônes */
+        font-size: 16px;
+        flex-wrap: wrap;        /* passe à la ligne si besoin */
+    }
+
+    .video-stats i {
+        font-size: 22px;
+    }
+
+    .card {
+        width: 100%;            /* carte prend toute la largeur */
+        margin-bottom: 15px;
+    }
+
+    .card img,
+    .card video {
+        height: 150px;          /* hauteur réduite */
+    }
+
+    .card-title {
+        font-size: 1em;
+    }
+
+    .card-description {
+        font-size: 0.8em;
+    }
+
+    .list {
+        flex-direction: column; /* ✅ une seule colonne en mobile */
+        gap: 15px;
+    }
+
+    .list-item {
+        flex: 1 1 100%;         /* chaque item prend toute la largeur */
+        margin: 0;
+    }
+
+    .carousel-container {
+        margin-top: 15px;
+    }
+
+    .carousel-button {
+        display: none;          /* ✅ cache les flèches en mobile, on garde le scroll tactile */
+    }
+
+    .carousel-track {
+        overflow-x: auto;
+        gap: 10px;
+        scroll-behavior: smooth;
+    }
+
+    .carousel-track::-webkit-scrollbar {
+        display: none;          /* cache la scrollbar */
+    }
+}

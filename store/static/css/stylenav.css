@@ -31,7 +31,7 @@ nav button{
   background-position: left 10px center;
   border: 1px solid rgb(255, 255, 255);
   text-align:justify;
-  border-radius: 50%;
+  border-radius: 12px 0 0 12px;
   transition: 0.2s;
   cursor: pointer;
   box-shadow: inset 4px 4px 6px -1px rgba(0,0,0,0.2),

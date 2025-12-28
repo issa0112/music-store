@@ -1,0 +1,103 @@
+/* =========================
+   CARTE ALBUM / VIDÉO
+========================= */
+.crd {
+    background: rgba(255, 255, 255, 0.267);
+    border-radius: 8px;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.416);
+    overflow: hidden;
+    margin: 10px auto; /* centré et espacement réduit */
+    max-width: 200px;
+    text-align: center;
+    
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px); /* Safari */
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Hover effet */
+.crd:hover {
+    box-shadow: inset 4px 4px 6px -1px rgba(0,0,0,0.2),
+                inset -4px -4px 6px -1px rgba(255,255,255,0.7),
+                -0.5px -0.5px 0px rgba(255,255,255,1),
+                0.5px 0.5px 0px rgba(0,0,0,0.15),
+                0px 12px 10px -10px rgba(0,0,0,0.05);
+    border: 1px solid rgba(0,0,0,0.1);
+    transform: translateY(-0.3em); /* plus subtil en prod */
+}
+
+/* SVG à l'intérieur de boutons */
+.bt svg {
+    transition: transform 0.5s, fill 0.3s;
+}
+
+.crd:hover svg {
+    transform: scale(0.9);
+    fill: #333;
+}
+
+/* Images */
+.crd img {
+    width: 100%;
+    height: auto;
+    max-height: 150px;
+    object-fit: cover; /* pour que l'image ne déforme pas */
+}
+
+/* Contenu texte */
+.crd-content {
+    padding: 10px;
+    background-color: rgba(255, 255, 255, 0) transparent;
+    backdrop-filter: blur(10px);
+}
+
+.crd-title {
+    font-size: 1.2em;
+    margin: 0;
+    color: #333;
+    line-height: 1.3;
+}
+
+.crd-description {
+    color: #666666;
+    font-size: 0.9em;
+    margin-top: 10px;
+}
+
+/* Responsive mini-carte */
+@media (max-width: 768px) {
+    .crd {
+        max-width: 100%;
+        margin: 8px auto;
+    }
+
+    .crd-title {
+        font-size: 1em;
+    }
+
+    .crd-description {
+        font-size: 0.8em;
+    }
+}
+
+@media (max-width: 768px) {
+    #searchInput {
+        max-width: 100%;
+        font-size: 14px;
+        padding: 10px;
+    }
+
+    .crd {
+        max-width: 100%;
+        margin-top: 20;   /* carte pleine largeur */
+        margin: 40px;
+    }
+
+    .crd-title {
+        font-size: 1em;
+    }
+
+    .crd-description {
+        font-size: 0.8em;
+    }
+}

@@ -5,13 +5,36 @@
 
 {% block videos %}
 <div class="main">
+
+    <!-- 🔍 Recherche + Onglets (DANS main) -->
+    <div class="main-toolbar">
+
+        <!-- Recherche -->
+        <input
+            type="text"
+            id="searchInput"
+            placeholder="Rechercher une vidéo..."
+            autocomplete="off"
+        >
+
+        <!-- Catégories -->
+        <div class="tabs">
+            <button class="tab active" data-category="all">Tout</button>
+            <button class="tab" data-category="clips">Clips</button>
+            <button class="tab" data-category="cinema">Cinéma</button>
+            <button class="tab" data-category="sketch">Sketch</button>
+        </div>
+
+    </div>
+
+    <!-- 📹 Liste des vidéos -->
     <div id="video-list" class="list">
-        <!-- Premiers éléments chargés côté serveur -->
         {% include "store/components/video_items.html" with videos=object_list %}
     </div>
 
-    <!-- Trigger invisible pour l'Infinite Scroll -->
+    <!-- Trigger Infinite Scroll -->
     <div id="load-more-trigger" style="height: 50px;"></div>
+
 </div>
 {% endblock videos %}
 
@@ -22,30 +45,68 @@ let loading = false;
 let hasNext = true;
 
 const videoList = document.getElementById("video-list");
+const searchInput = document.getElementById("searchInput");
+const tabs = document.querySelectorAll(".tab");
 
+let activeCategory = "all";
+
+/* =========================
+   🔍 FILTRAGE
+========================= */
+function filterVideos() {
+    const query = searchInput.value.trim().toLowerCase();
+    const cards = videoList.querySelectorAll(".list-item");
+
+    cards.forEach(card => {
+        const title = card.dataset.title || "";
+        const category = card.dataset.category || "";
+
+        const matchSearch = title.includes(query);
+        const matchCategory =
+            activeCategory === "all" || category === activeCategory;
+
+        card.style.display =
+            (matchSearch && matchCategory) ? "block" : "none";
+    });
+}
+
+searchInput.addEventListener("input", filterVideos);
+
+/* 📂 Onglets */
+tabs.forEach(tab => {
+    tab.addEventListener("click", () => {
+        tabs.forEach(t => t.classList.remove("active"));
+        tab.classList.add("active");
+
+        activeCategory = tab.dataset.category;
+        filterVideos(); // 🔁 refiltrage immédiat
+    });
+});
+/* =========================
+   ♾️ INFINITE SCROLL
+========================= */
 const observer = new IntersectionObserver(async (entries) => {
-    if (entries[0].isIntersecting && hasNext && !loading) {
-        loading = true;
+    if (!entries[0].isIntersecting || loading || !hasNext) return;
 
-        try {
-            const response = await fetch(`/videos/ajax/?page=${page}`);
-            const data = await response.json();
+    loading = true;
 
-            // Injecte les nouveaux items
-            videoList.insertAdjacentHTML("beforeend", data.html);
+    try {
+        const response = await fetch(`/videos/ajax/?page=${page}`);
+        const data = await response.json();
 
-            // Optionnel : initialise lazy loading sur nouvelles miniatures ou vidéos
-            const newVideos = videoList.querySelectorAll("video[loading='lazy']");
-            newVideos.forEach(v => v.load());
+        videoList.insertAdjacentHTML("beforeend", data.html);
 
-            hasNext = data.has_next;
-            page++;
-        } catch (error) {
-            console.error(error);
-        }
+        /* ⚠️ IMPORTANT : refiltrer après ajout */
+        filterVideos();
 
-        loading = false;
+        hasNext = data.has_next;
+        page++;
+
+    } catch (error) {
+        console.error(error);
     }
+
+    loading = false;
 });
 
 observer.observe(document.getElementById("load-more-trigger"));

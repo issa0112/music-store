@@ -1,4 +1,4 @@
-/* Global Styles */
+/* Global Styles
 body {
     font-family: Arial, sans-serif;
     background-color: #f9f9f9;
@@ -14,7 +14,7 @@ h2 {
 }
 
 /* Video List Layout */
-ul {
+/* ul {
     display: flex;
     flex-wrap: wrap;
     padding: 0;
@@ -40,19 +40,19 @@ li:hover {
 }
 
 /* Video Player */
-video {
+/* video {
     width: 100%;
     border-radius: 8px;
-}
+} */
 
 /* Description */
-p {
+/* p {
     color: #666;
     font-size: 14px;
-}
+} */
 
 /* Download Button */
-a {
+/* a {
     display: inline-block;
     margin-top: 10px;
     padding: 10px 15px;
@@ -66,13 +66,115 @@ a {
 
 a:hover {
     background-color: #cc0000;
-}
+} */
 
 /* Play Count and Download Count */
-.stats {
+/* .stats {
     display: flex;
     justify-content: space-between;
     margin-top: 10px;
     font-size: 20px;
     color: #888;
+} */ 
+
+.main-toolbar {
+    display: flex;
+    justify-content: space-between; /* gauche / droite */
+    align-items: center;
+    margin-bottom: 20px;
+    padding: 10px 15px;
+    gap: 12px;
+}
+
+#searchInput {
+    width: 260px;
+    margin-top: 30px;
+    padding: 10px 16px;
+    border-radius: 25px;
+    border: 1px solid rgb(71, 145, 139);
+    outline: none;
+    font-size: 14px;
+    color: #222;
+    background: rgba(255, 255, 255, 0.65);
+    backdrop-filter: blur(8px);
+    transition: all 0.25s ease;
+}
+
+#searchInput::placeholder {
+    color: #55555500 transparent;
+}
+/* Focus + saisie dynamique */
+#searchInput:focus {
+    background: white;
+    box-shadow: 0 0 0 3px rgba(71, 145, 139, 0.25);
+    border-color: rgb(71, 145, 139);
+}
+
+   /* ONGLETS CATÉGORIES
+========================= */ 
+.tabs {
+    display: flex;
+    gap: 10px;
+}
+
+.tab {
+    padding: 9px 18px;
+    border-radius: 25px;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+    color: #222;
+    background: rgba(255, 255, 255, 0.25);
+    backdrop-filter: blur(8px);
+    transition: all 0.25s ease;
+}
+
+/* Hover */
+.tab:hover {
+    background: rgb(71, 145, 139);
+    color: white;
+    transform: translateY(-1px);
+}
+
+/* Actif */
+.tab.active {
+    background: rgb(71, 145, 139);
+    color: white;
+    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.25);
+}
+
+/* =========================
+   LISTE VIDÉOS (filtrage)
+========================= */
+.list-item {
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+/* Cache proprement */
+.list-item[style*="none"] {
+    opacity: 0;
+    transform: scale(0.95);
+}
+
+@media (max-width: 768px) {
+
+    .main-toolbar {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 14px;
+    }
+
+    #searchInput {
+        width: 100%;
+    }
+
+    .tabs {
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    .tab {
+        flex: 1 1 auto;
+        text-align: center;
+    }
 }
