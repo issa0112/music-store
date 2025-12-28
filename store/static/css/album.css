@@ -1,3 +1,86 @@
+
+.main-toolbar {
+    display: flex;
+    justify-content: space-between; /* gauche / droite */
+    align-items: center;
+    margin-bottom: 20px;
+    padding: 10px 15px;
+    gap: 12px;
+}
+
+#searchInput {
+    width: 260px;
+    margin-top: 30px;
+    padding: 10px 16px;
+    border-radius: 25px;
+    border: 1px solid rgb(71, 145, 139);
+    outline: none;
+    font-size: 14px;
+    color: #222;
+    background: rgba(255, 255, 255, 0.65);
+    backdrop-filter: blur(8px);
+    transition: all 0.25s ease;
+}
+
+#searchInput::placeholder {
+    color: #55555500 transparent;
+}
+/* Focus + saisie dynamique */
+#searchInput:focus {
+    background: white;
+    box-shadow: 0 0 0 3px rgba(71, 145, 139, 0.25);
+    border-color: rgb(71, 145, 139);
+}
+
+/* ONGLETS CATÉGORIES
+========================= */ 
+.tabs {
+    display: flex;
+    gap: 10px;
+}
+
+.tab {
+    padding: 9px 18px;
+    border-radius: 25px;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+    color: #222;
+    background: rgba(255, 255, 255, 0.25);
+    backdrop-filter: blur(8px);
+    transition: all 0.25s ease;
+}
+
+/* Hover */
+.tab:hover {
+    background: rgb(71, 145, 139);
+    color: white;
+    transform: translateY(-1px);
+}
+
+/* Actif */
+.tab.active {
+    background: rgb(71, 145, 139);
+    color: white;
+    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.25);
+}
+
+/* =========================
+LISTE VIDÉOS (filtrage)
+========================= */
+.list-item {
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+/* Cache proprement */
+.list-item[style*="none"] {
+    opacity: 0;
+    transform: scale(0.95);
+}
+
+
+
+
 /* =========================
    CARTE ALBUM / VIDÉO
 ========================= */
@@ -101,3 +184,105 @@
         font-size: 0.8em;
     }
 }
+
+
+@media (max-width: 768px) {
+
+    .main-toolbar {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 14px;
+    }
+
+    #searchInput {
+        width: 100%;
+    }
+
+    .tabs {
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    .tab {
+        flex: 1 1 auto;
+        text-align: center;
+    }
+}
+
+@media (max-width: 768px) {
+
+    /* Conteneur direct des cartes */
+    .list {
+        display: flex;
+        flex-direction: column;      /* une seule colonne */
+        gap: 12px;                   /* espacement vertical entre cartes */
+        padding: 0 10px;             /* padding horizontal pour éviter débordement */
+        box-sizing: border-box;       /* inclut padding et border dans la largeur */
+    }
+
+    /* Chaque élément de liste */
+    .list-item {
+        flex: 1 1 100%;             /* prend toute la largeur disponible */
+        margin: 0;                  /* supprime marges horizontales */
+        box-sizing: border-box;     /* sécurité */
+    }
+
+    /* Cartes vidéo */
+    .card {
+        width: 100%;                /* carte pleine largeur du list-item */
+        max-width: 100%;            /* sécurité pour pas dépasser */
+        margin: 0;                  /* supprime toute marge */
+        border-radius: 12px;        /* coins arrondis mobile */
+        box-shadow: 0 6px 12px rgba(0,0,0,0.2); /* ombre adaptée mobile */
+        overflow: hidden;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    /* Images et vidéos */
+    .card img,
+    .card video {
+        width: 100%;                /* plein largeur carte */
+        height: auto;
+        max-height: 150px;          /* hauteur réduite pour mobile */
+        object-fit: cover;          /* pas de déformation */
+        display: block;             /* supprime marges inline par défaut */
+    }
+
+    /* Stats (play, download, like) */
+    .card .stats {
+        font-size: 18px;            /* taille réduite */
+        gap: 16px;                  /* espace entre icônes */
+        padding: 4px 0;             /* padding vertical léger */
+    }
+
+    /* Play icon au centre */
+    .play-icon {
+        padding: 16px;              /* cercle légèrement plus petit */
+        font-size: 20px;
+    }
+
+    /* Effet hover minimal sur mobile (optionnel) */
+    .card:hover {
+        transform: translateY(0);   /* désactiver translateY pour mobile si tu veux */
+        box-shadow: 0 6px 12px rgba(0,0,0,0.2);
+    }
+}
+
+    .card video {
+        width: 100%;          /* occupe toute la largeur */
+        height: auto;         /* ajuste automatiquement */
+        max-height: 200px;    /* ✅ limite la hauteur en mobile */
+        object-fit: cover;    /* garde le ratio sans déformation */
+        border-radius: 8px;
+        display: block;
+    }
+
+    .card img {
+        width: 100%;
+        height: auto;
+        max-height: 200px;    /* ✅ même limite pour les images */
+        object-fit: cover;
+        border-radius: 8px;
+        display: block;
+    }
+
