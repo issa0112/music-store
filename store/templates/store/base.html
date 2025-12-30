@@ -838,11 +838,12 @@ document.addEventListener("DOMContentLoaded", () => {
 <script src="{% static 'js/auth.js' %}" defer></script>
 <script src="{% static 'js/conn.js' %}" defer></script>
 <script src="{% static 'js/profil.js' %}" defer></script>
-
+<script src="{% static 'js/panier.js' %}" defer></script>
 <script src="{% static 'js/player.js' %}" defer></script>
 <script src="{% static 'js/search.js' %}" defer></script>
 <script src="{% static 'js/scroll.js' %}" defer></script>
-
+<script src="https://js.stripe.com/v3/"></script>
+<script src="https://www.paypal.com/sdk/js?client-id=TON_CLIENT_ID"></script>
 <script>
   const libraryDataUrl = "{% url 'library_data' %}";
 </script>

@@ -383,9 +383,21 @@ a:hover {
         border-radius: 12px;
     }
 
+    .video-main-page {
+        margin-top: 40px !important;
+        margin: 0;
+        padding: 0;
+        width: 100vw;
+        margin-left: calc(-50vw + 50%);
+        border-radius: 0;
+        border: none;
+        box-shadow: none;
+    }
+
     .main-player {
         width: 100% !important;
         display: flex;
+        margin-top: 20px !important;
         flex-direction: column;
         align-items: center;   /* ✅ centre la vidéo */
         justify-content: center;
@@ -420,7 +432,7 @@ a:hover {
 
     .card img,
     .card video {
-        height: 150px;          /* hauteur réduite */
+        height: 200px;          /* hauteur réduite */
     }
 
     .card-title {
@@ -439,6 +451,12 @@ a:hover {
     .list-item {
         flex: 1 1 100%;         /* chaque item prend toute la largeur */
         margin: 0;
+    }
+
+    .video-list-page {
+        width: 100vw;
+        margin-left: calc(-50vw + 50%);
+        margin-right: calc(-50vw + 50%);
     }
 
     .carousel-container {
