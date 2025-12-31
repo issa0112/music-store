@@ -80,6 +80,11 @@ body {
   overflow-x: auto;
   scroll-behavior: smooth;
 }
+.artist-link {
+  text-decoration: none;
+  color: inherit;
+  display: block;
+}
 
 .artist-card {
     position: relative;

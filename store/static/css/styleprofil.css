@@ -10,7 +10,7 @@ body {
 }
 
 a {
-    color: #1DB954;
+    color: rgb(71, 145, 139);
     text-decoration: none;
 }
 
@@ -35,7 +35,7 @@ a:hover {
     flex-direction: column;
     justify-content: flex-end;
     overflow: hidden;
-    margin-top: 82px; /* espace sous la nav principale */
+    margin-top: 0px; /* espace sous la nav principale */
 }
 
 .profile-cover {
@@ -70,7 +70,7 @@ a:hover {
     width: 120px;
     height: 120px;
     border-radius: 50%;
-    border: 3px solid #1DB954;
+    border: 3px solid rgb(71, 145, 139);
     object-fit: cover;
     transition: transform 0.3s ease;
 }
@@ -82,7 +82,7 @@ a:hover {
 .camera-btn {
     position: absolute;
     bottom: 5px; right: 5px;
-    background: #1DB954;
+    background: rgb(71, 145, 139);
     color: #fff;
     border-radius: 50%;
     padding: 8px;
@@ -91,7 +91,7 @@ a:hover {
 }
 
 .camera-btn:hover {
-    background: #1ed760;
+    background: #47918b;
 }
 
 /* ====== TEXT ====== */
@@ -102,7 +102,7 @@ a:hover {
 
 .artist-badge {
     display: inline-block;
-    background: #1DB954;
+    background: #47918b;
     color: #fff;
     font-size: 12px;
     padding: 4px 8px;
@@ -142,7 +142,7 @@ a:hover {
 .profile-nav li.active,
 .profile-nav li:hover {
     color: #fff;
-    border-bottom: 2px solid #1DB954;
+    border-bottom: 2px solid rgb(71, 145, 139);
 }
 
 /* ====== CONTENT ====== */
@@ -171,7 +171,7 @@ a:hover {
 }
 
 /* ====== MEDIA ITEMS ====== */
-.media-item, .album-item, .playlist-item {
+.album-item, .playlist-item {
     background: #181818;
     border-radius: 8px;
     overflow: hidden;
@@ -179,7 +179,53 @@ a:hover {
     transition: transform 0.3s ease, background 0.3s ease;
     cursor: pointer;
 }
+.album-item{
+    background: rgba(255, 255, 255, 0.991);
+    color: #121212;
+    border-radius: 8px;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.416);
+    overflow: hidden;
+    margin: 10px auto; /* centré et espacement réduit */
+    max-width: 150px;
+    height: 220px;
+    text-align: center;
+    
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px); /* Safari */
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.media-item {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 10px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
 
+.media-item:hover {
+    background: rgba(255, 255, 255, 0.08);
+}
+
+
+.media-thumb {
+    position: relative;
+    width: 60px;
+    height: 60px;
+    flex-shrink: 0;
+}
+
+.media-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 6px;
+}
+
+.album-item:hover{
+    color: #fff;
+}
 .media-item:hover,
 .album-item:hover,
 .playlist-item:hover {
@@ -211,17 +257,38 @@ a:hover {
 }
 
 .play-btn {
-    background: #1DB954;
-    border: none;
+    position: absolute;
+    bottom: 6px;
+    right: 6px;
+
+    width: 28px;
+    height: 28px;
+   
+    background:#0000007d;          /* TRANSPARENT */
+    border: 2px solid rgb(71, 145, 139);         /* BORDURE VERTE */
     border-radius: 50%;
-    padding: 10px;
-    margin-top: 10px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    color: rgb(71, 145, 139);
+    font-size: 12px;
+
+    opacity: 0;
+    transform: scale(0.8);
+    transition: all 0.2s ease;
     cursor: pointer;
-    transition: background 0.3s ease;
 }
 
+.media-item:hover .play-btn {
+    opacity: 1;
+    transform: scale(1);
+}
+
+
 .play-btn:hover {
-    background: #1ed760;
+    background: #47918b;
 }
 
 .play-btn i {
@@ -230,7 +297,7 @@ a:hover {
 }
 
 .btn-follow {
-    background: #1DB954;
+    background: #47918b;
     color: #fff;
     border: none;
     padding: 8px 16px;
@@ -248,3 +315,15 @@ a:hover {
     color: #b3b3b3;
 }
 
+@media (max-width: 768px) {
+    .profile-header {
+        margin-top: 0;   /* ⬅️ SUPPRESSION DE L’ESPACE */
+        height: 240px;   /* optionnel : cover plus petite */
+    }
+    
+
+    .profile-nav {
+        margin-top: 0;
+        padding-top: 0;
+    }
+}

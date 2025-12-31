@@ -15,22 +15,23 @@
 <!-- Section Artiste Populaire -->
 <section id="popular-artists" class="section fade-in-scroll popular-artists">
   <div class="section-inner">
-    <h2>Artistes Populaires</h2>
+    <h2>Artistes Populaires </h2>
 
     <div class="swiper popular-swiper">
       <div class="swiper-wrapper">
         {% for artist in popular_artists %}
         <div class="swiper-slide">
           {% if artist.user and artist.user.id %}
-          <div
+          <a
             href="{% url 'artist_profile' artist.user.id %}"
             class="artist-card"
-          >
+            class="artist-link"
+            >
             <img src="{{ artist.image.url }}" alt="{{ artist.name }}" />
             <div class="artist-info">
               <span>{{ artist.name }}</span>
             </div>
-          </div>
+          </a>
           {% else %}
           <div class="artist-card">
             <img src="{{ artist.image.url }}" alt="{{ artist.name }}" />

@@ -1,98 +1,69 @@
+// =====================================================
+// FONCTIONS GLOBALES
+// =====================================================
+
+// Affiche la section Stripe ou Orange Money
+function showSection(type) {
+  const stripeSection = document.getElementById("section-stripe");
+  const orangeSection = document.getElementById("section-orange");
+
+  if (stripeSection) stripeSection.style.display = type === "stripe" ? "block" : "none";
+  if (orangeSection) orangeSection.style.display = type === "orange" ? "block" : "none";
+}
+
+// Paiement mobile (Orange Money)
+function payMobileMoney(operateur) {
+  const input = document.querySelector(`#section-${operateur} input[name="${operateur}_numero"]`);
+  if (!input || !input.value) {
+    alert("Veuillez entrer votre numéro de téléphone");
+    return;
+  }
+  window.location.href = `/paiement_mobile/${operateur}/?numero=` + encodeURIComponent(input.value);
+}
+
+// =====================================================
+// DOMContentLoaded
+// =====================================================
 document.addEventListener("DOMContentLoaded", () => {
-  // =====================================================
-  // CONFIG DJANGO (optionnelle selon la page)
-  // =====================================================
   const config = window.PAYMENT_CONFIG || null;
 
-  // =====================================================
-  // MENU MOBILE (safe pour toutes les pages)
-  // =====================================================
+  // ===== Menu mobile =====
   const toggle = document.querySelector(".menu-toggle");
   const menu = document.querySelector(".nav-menu");
-
   if (toggle && menu) {
-    toggle.addEventListener("click", () => {
-      menu.classList.toggle("active");
-    });
+    toggle.addEventListener("click", () => menu.classList.toggle("active"));
   }
 
-  // =====================================================
-  // AFFICHAGE DES SECTIONS (utilisé par onclick HTML)
-  // =====================================================
-  window.showSection = function (type) {
-    const carte = document.getElementById("section-carte");
-    const mobile = document.getElementById("section-mobile");
+  // ===== Boutons Stripe / Orange =====
+  const stripeBtn = document.getElementById("btn-stripe");
+  const orangeBtn = document.getElementById("btn-orange");
+  stripeBtn?.addEventListener("click", () => showSection("stripe"));
+  orangeBtn?.addEventListener("click", () => showSection("orange"));
 
-    if (carte) carte.style.display = type === "carte" ? "block" : "none";
-    if (mobile) mobile.style.display = type === "mobile" ? "block" : "none";
-  };
+  const payOrangeBtn = document.getElementById("pay-orange");
+  payOrangeBtn?.addEventListener("click", () => payMobileMoney("orange"));
 
-  window.showMoneyForm = function (type) {
-    ["orange", "moov", "wave"].forEach((t) => {
-      const form = document.getElementById("form-" + t);
-      if (form) {
-        form.style.display = t === type ? "block" : "none";
-      }
-    });
-  };
-
-  window.payMobileMoney = function (operateur) {
-    const input = document.querySelector(`input[name="${operateur}_numero"]`);
-    if (!input || !input.value) {
-      alert("Veuillez entrer votre numéro de téléphone");
-      return;
-    }
-
-    window.location.href =
-      `/paiement_mobile/${operateur}/?numero=` +
-      encodeURIComponent(input.value);
-  };
-
-  // =====================================================
-  // STRIPE (uniquement si présent sur la page)
-  // =====================================================
+  // ===== Stripe =====
   if (config && window.Stripe) {
     const stripe = Stripe(config.stripePublicKey);
     let cardElement;
 
-    const stripeButton = document.getElementById("stripe-button");
     const stripeForm = document.getElementById("stripe-payment-form");
     const submitPayment = document.getElementById("submit-payment");
     const cardErrors = document.getElementById("card-errors");
 
-    stripeButton?.addEventListener("click", () => {
-      if (!stripeForm) return;
+    if (stripeForm) {
+      const elements = stripe.elements();
+      cardElement = elements.create("card");
+      cardElement.mount("#card-element");
 
-      stripeForm.style.display = "block";
-
-      if (!cardElement) {
-        const elements = stripe.elements();
-        cardElement = elements.create("card");
-        cardElement.mount("#card-element");
-
-        cardElement.on("change", (event) => {
-          if (cardErrors) {
-            cardErrors.textContent = event.error ? event.error.message : "";
-          }
-        });
-      }
-    });
-
-    document.addEventListener("click", (event) => {
-      if (
-        stripeForm &&
-        stripeButton &&
-        stripeForm.style.display === "block" &&
-        !stripeForm.contains(event.target) &&
-        !stripeButton.contains(event.target)
-      ) {
-        stripeForm.style.display = "none";
-      }
-    });
+      cardElement.on("change", (event) => {
+        if (cardErrors) cardErrors.textContent = event.error ? event.error.message : "";
+      });
+    }
 
     submitPayment?.addEventListener("click", async (e) => {
       e.preventDefault();
-
       if (!cardElement) return;
 
       const { error, paymentMethod } = await stripe.createPaymentMethod({
@@ -112,7 +83,6 @@ document.addEventListener("DOMContentLoaded", () => {
       });
 
       const data = await response.json();
-
       if (data.error) {
         if (cardErrors) cardErrors.textContent = data.error;
         return;
@@ -131,63 +101,46 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // =====================================================
-  // PAYPAL (safe)
-  // =====================================================
+  // ===== PayPal =====
   if (config && window.paypal) {
     const container = document.getElementById("paypal-button-container");
     if (container) {
-      paypal
-        .Buttons({
-          createOrder: (data, actions) => {
-            return actions.order.create({
-              purchase_units: [
-                { amount: { value: config.totalGeneral } },
-              ],
-            });
-          },
-          onApprove: (data, actions) => {
-            return actions.order.capture().then(() => {
-              window.location.reload();
-            });
-          },
-        })
-        .render("#paypal-button-container");
+      paypal.Buttons({
+        createOrder: (data, actions) => actions.order.create({
+          purchase_units: [{ amount: { value: config.totalGeneral } }],
+        }),
+        onApprove: (data, actions) => actions.order.capture().then(() => window.location.reload()),
+      }).render("#paypal-button-container");
     }
   }
 
-  // =====================================================
-  // PANIER - RETIRER UN ALBUM (AJAX)
-  // =====================================================
+  // ===== Retirer un album du panier =====
   const csrftoken = getCookie("csrftoken");
-
   document.querySelectorAll(".retirer-btn").forEach((btn) => {
     btn.addEventListener("click", async (e) => {
       e.preventDefault();
-      if (!confirm("Retirer cet album du panier ?")) return;
-
       const albumId = btn.dataset.id;
+      if (!albumId || !confirm("Retirer cet album du panier ?")) return;
+      btn.disabled = true;
 
       try {
         const response = await fetch(`/panier/retirer/${albumId}/`, {
           method: "POST",
-          headers: { "X-CSRFToken": csrftoken },
+          credentials: "same-origin",
+          headers: { "X-CSRFToken": csrftoken, "Accept": "application/json" },
         });
 
+        if (!response.ok) throw new Error("Erreur serveur " + response.status);
         const data = await response.json();
 
         if (data.success) {
           btn.closest("tr")?.remove();
-
+          const totalEl = document.querySelector(".total-panier h3");
+          if (totalEl) totalEl.textContent = data.total ? `Total général : ${data.total}` : totalEl.innerHTML;
           const tbody = document.querySelector(".table-panier tbody");
-          if (!tbody || tbody.children.length === 0) {
-            document.getElementById("cart-content")?.style.setProperty("display", "none");
-            document.getElementById("empty-cart")?.style.setProperty("display", "block");
-          } else {
-            const total = document.querySelector(".total-panier h3");
-            if (total) total.textContent = `Total général : ${data.total}`;
-          }
-
+          const hasRows = tbody && tbody.querySelectorAll("tr").length > 0;
+          document.getElementById("cart-content")?.style.setProperty("display", hasRows ? "block" : "none");
+          document.getElementById("empty-cart")?.style.setProperty("display", hasRows ? "none" : "block");
           window.updateCartCount?.();
         } else {
           alert(data.error || "Erreur lors de la suppression");
@@ -195,22 +148,19 @@ document.addEventListener("DOMContentLoaded", () => {
       } catch (err) {
         console.error(err);
         alert("Erreur réseau");
+      } finally {
+        btn.disabled = false;
       }
     });
   });
 
-  // =====================================================
-  // CSRF
-  // =====================================================
+  // ===== CSRF =====
   function getCookie(name) {
     let cookieValue = null;
     document.cookie.split(";").forEach((cookie) => {
       cookie = cookie.trim();
-      if (cookie.startsWith(name + "=")) {
-        cookieValue = decodeURIComponent(cookie.slice(name.length + 1));
-      }
+      if (cookie.startsWith(name + "=")) cookieValue = decodeURIComponent(cookie.slice(name.length + 1));
     });
     return cookieValue;
   }
 });
-

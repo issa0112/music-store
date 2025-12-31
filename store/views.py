@@ -20,6 +20,8 @@ from django.views.decorators.http import require_POST
 from .utils.b2 import get_signed_url
 
 
+
+
 class AlbumListView(ListView):
     model = Album
     template_name = 'store/album_list.html'
@@ -713,27 +715,29 @@ def ajouter_au_panier(request, pk):
 
 
 
-
-
-@csrf_exempt  # pour test, on enlèvera après
+@require_POST
 def retirer_du_panier(request, album_id):
-    if request.method == "POST":
-        panier = request.session.get('panier', {})
-        album_id_str = str(album_id)
+    panier = request.session.get('panier', {})
+    album_id_str = str(album_id)
 
-        if album_id_str in panier:
-            del panier[album_id_str]
-            request.session['panier'] = panier
+    if album_id_str not in panier:
+        return JsonResponse({"success": False, "error": "Album non trouvé dans le panier."}, status=404)
 
-            # Recalculer le total
-            total_general = sum(item['prix'] * item['quantite'] for item in panier.values())
-            total_count = sum(item['quantite'] for item in panier.values())
+    # Retirer l'album
+    del panier[album_id_str]
+    request.session['panier'] = panier
+    request.session.modified = True  # important
 
-            return JsonResponse({"success": True, "total": f"{total_general:.2f} €", "count": total_count})
-        else:
-            return JsonResponse({"success": False, "error": "Album non trouvé dans le panier."})
+    # Recalculer le total
+    total_general = sum(item['prix'] * item['quantite'] for item in panier.values())
+    total_count = sum(item['quantite'] for item in panier.values())
 
-    return JsonResponse({"success": False, "error": "Méthode non autorisée."})
+    return JsonResponse({
+        "success": True,
+        "total": f"{total_general:.2f} €",  # formaté pour affichage
+        "total_raw": total_general,        # brut pour calcul JS
+        "count": total_count
+    })
 
 
 
