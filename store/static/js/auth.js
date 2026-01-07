@@ -1,41 +1,48 @@
+// ==============================
+// AUTH (SIGNUP AJAX)
+// ==============================
 
-document.addEventListener("DOMContentLoaded", function () {
-    const signupForm = document.getElementById("signupForm");
-    const signupMessages = document.getElementById("signupMessages");
-    const signupFields = document.getElementById("signupFields");
+let authInitialized = false;
 
-    signupForm.addEventListener("submit", function (e) {
-        e.preventDefault();
+function initAuth() {
+  if (authInitialized) return;
+  authInitialized = true;
 
-        const formData = new FormData(signupForm);
+  document.addEventListener("submit", e => {
+    const form = e.target.closest("#signupForm");
+    if (!form) return;
 
-        fetch(signupForm.action, {
-        method: "POST",
-        body: formData,
-        credentials: "same-origin", // important pour CSRF
-        headers: {
-            "X-Requested-With": "XMLHttpRequest"
-        }
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-            signupMessages.innerHTML = `<p class='success-message'>${data.message}</p>`;
-            signupFields.style.display = "none";
+    e.preventDefault();
 
-            // Après inscription, afficher le login
-            setTimeout(() => {
-                document.getElementById("popupSignupForm").style.display = "none";
-                document.getElementById("popupLoginForm").style.display = "block";
-            }, 1500);
-            } else {
-            signupMessages.innerHTML = `<p class='error-message'>${data.message}</p>`;
-            }
-        })
-        .catch(error => {
-            console.error("Erreur : ", error);
-            signupMessages.innerHTML = `<p class='error-message'>Erreur technique. Veuillez réessayer.</p>`;
-        });
+    const messages = document.getElementById("signupMessages");
+    const fields = document.getElementById("signupFields");
+
+    const formData = new FormData(form);
+
+    fetch(form.action, {
+      method: "POST",
+      body: formData,
+      credentials: "same-origin",
+      headers: {
+        "X-Requested-With": "XMLHttpRequest"
+      }
+    })
+    .then(r => r.json())
+    .then(data => {
+      if (data.success) {
+        messages.innerHTML = `<p class="success-message">${data.message}</p>`;
+        fields.style.display = "none";
+
+        setTimeout(() => {
+          document.getElementById("popupSignupForm")?.classList.remove("show");
+          document.getElementById("popupLoginForm")?.classList.add("show");
+        }, 1200);
+      } else {
+        messages.innerHTML = `<p class="error-message">${data.message}</p>`;
+      }
+    })
+    .catch(() => {
+      messages.innerHTML = `<p class="error-message">Erreur technique.</p>`;
     });
-
-});
+  });
+}

@@ -740,31 +740,30 @@ def retirer_du_panier(request, album_id):
     })
 
 
-
 # ✅ Vider le panier
 def vider_panier(request):
     request.session['panier'] = {}
+    request.session.modified = True  # assure que la session est sauvegardée
     return redirect('panier')
 
 
 # ✅ Afficher le panier
 def panier(request):
-    # Récupérer le panier depuis la session (ou créer vide)
     panier = request.session.get('panier', {})
     produits = []
     total_general = 0
 
     for pk, item in panier.items():
-        # Récupérer le produit réel depuis la base pour s'assurer des données
+        album = None
         try:
             album = Album.objects.get(pk=pk)
             image_url = album.cover_image.url if album.cover_image else '/static/img/trackdefault.png'
         except Album.DoesNotExist:
             image_url = '/static/img/trackdefault.png'
 
-        # Sécuriser les clés pour les anciens items
-        prix = item.get('prix', float(album.price if 'album' in locals() else 0))
-        titre = item.get('titre', album.title if 'album' in locals() else 'Inconnu')
+        # Récupérer les infos avec fallback
+        prix = item.get('prix', float(album.price) if album else 0)
+        titre = item.get('titre', album.title if album else 'Inconnu')
         quantite = item.get('quantite', 1)
 
         total = prix * quantite
@@ -777,14 +776,13 @@ def panier(request):
             'quantite': quantite,
             'total': total,
             'image': image_url
-
         })
 
-    return render(request, 'store/panier.html', {
+    context = {
         'produits': produits,
         'total_general': total_general
-    })
-
+    }
+    return render(request, 'store/panier.html', context)
 
 # ✅ Acheter et permettre le téléchargement
 def acheter(request):

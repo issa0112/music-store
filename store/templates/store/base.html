@@ -554,34 +554,12 @@ input[type="range"].progress-bar {
     <div id="overlay" class="overlay"></div>
 
     <!-- Pied de page -->
-    <footer>
-        <p>&copy; 2024 Inova-Music</p>
-    </footer>
+<footer>
+  <p>&copy; 2024 Tramo</p>
+</footer>
     
     <!-- JS pour afficher/masquer les formulaires -->
  
-
-    {% comment %} <div id="global-audio-player" style="display: none; position: fixed; bottom: 0; left: 0; width: 100%; background: #222; color: white; z-index: 1000; padding: 10px; box-shadow: 0 -2px 10px rgba(0,0,0,0.5);"> {% endcomment %}
-    <!-- <audio id="audio-player" controls style="width: 100%;">
-        <source id="audio-source" src="" type="audio/mpeg">
-        Votre navigateur ne supporte pas l'audio HTML5.
-    </audio>
-    <div id="audio-title" style="margin-top: 5px; text-align: center;"></div>
-    </div> --> 
-    {% comment %} <div id="track-info">
-        🎵 <strong id="current-title">Aucune musique</strong>
-    </div>
-
-    <audio id="audio" style="width: 100%;" controls>
-        <source src="" id="audio-source" type="audio/mpeg">
-        Votre navigateur ne supporte pas l'audio HTML5.
-    </audio>
-
-    <div style="text-align: center; margin-top: 8px;">
-        <button onclick="prevTrack()">⏮️</button>
-        <button onclick="togglePlayPause()">▶️/⏸️</button>
-        <button onclick="nextTrack()">⏭️</button>
-    </div> {% endcomment %}
 <script>
   const userIsLoggedIn = {{ user.is_authenticated|yesno:"true,false" }};
 </script>
@@ -833,29 +811,63 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
 </script>
-    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+<!-- ============================= -->
+<!-- 1️⃣ Librairies externes (CDN) -->
+<!-- ============================= -->
+<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/color-thief/2.3.2/color-thief.umd.js"></script>
+<script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+<script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
 
+
+<script src="{% static 'js/ajax.js' %}" defer></script>
+<script src="{% static 'js/main.js' %}" defer></script>
+
+
+<script>
+document.addEventListener("click", e => {
+  const link = e.target.closest("a.ajax-link");
+  console.log("Clique AJAX sur:", link?.href);
+  if (!link) return;
+  e.preventDefault();
+  loadPage(link.href);
+});
+</script>
+
+<!-- ============================= -->
+<!-- 2️⃣ Modules persistants (toujours chargés) -->
+<!-- ============================= -->
 <script src="{% static 'js/menu.js' %}" defer></script>
+<script src="{% static 'js/player.js' %}" defer></script>
 <script src="{% static 'js/auth.js' %}" defer></script>
 <script src="{% static 'js/conn.js' %}" defer></script>
 <script src="{% static 'js/profil.js' %}" defer></script>
+<script src="{% static 'js/video.js' %}" defer></script>
+
+<!-- ============================= -->
+<!-- 3️⃣ Modules dynamiques (page spécifique / interactions) -->
+<!-- ============================= -->
 <script src="{% static 'js/panier.js' %}" defer></script>
-<script src="{% static 'js/player.js' %}" defer></script>
 <script src="{% static 'js/search.js' %}" defer></script>
 <script src="{% static 'js/scroll.js' %}" defer></script>
-<script src="https://js.stripe.com/v3/"></script>
-<script src="https://www.paypal.com/sdk/js?client-id=TON_CLIENT_ID"></script>
+{% comment %}
+<script src="{% static 'js/popup.js' %}" defer></script>
+{% endcomment %}
+<script src="{% static 'js/library.js' %}" defer></script>
+
+<!-- ============================= -->
+<!-- 4️⃣ Main orchestrateur -->
+<!-- ============================= -->
 <script>
+  // Variable globale pour library.js / main.js
   const libraryDataUrl = "{% url 'library_data' %}";
 </script>
 
-<script src="{% static 'js/library.js' %}" defer></script>
 
 
-    
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/color-thief/2.3.2/color-thief.umd.js"></script>
-    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
-    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+
+
+
     
 </body>
 

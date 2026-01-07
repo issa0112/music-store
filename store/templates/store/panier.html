@@ -1,8 +1,9 @@
 {% extends "store/base.html" %}
 {% load static %}
-{% block panier %}
 
+{% block panier %}
 <div class="container-panier">
+
   <h1>
     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-journal-album" viewBox="0 0 16 16">
       <path d="M5.5 4a.5.5 0 0 0-.5.5v5a.5.5 0 0 0 .5.5h5a.5.5 0 0 0 .5-.5v-5a.5.5 0 0 0-.5-.5zm1 7a.5.5 0 0 0 0 1h3a.5.5 0 0 0 0-1z"/>
@@ -12,6 +13,7 @@
     {% if produits|length > 1 %} Vos Albums {% else %} Votre Album {% endif %}
   </h1>
 
+  <!-- === Panier avec produits === -->
   <div id="cart-content" {% if produits|length == 0 %}style="display: none;"{% endif %}>
     <table class="table-panier">
       <thead>
@@ -76,28 +78,26 @@
         </div>
 
 
-    <!-- Section Orange Money -->
-        <div id="section-orange" class="payment-section" style="display:none;">
-            <h3>Paiement Orange Money</h3>
-            <div id="orange-form">
-                <input class="form-control" type="text" name="orange_numero" placeholder="77xxxxxxx"/>
-                <button type="button" id="pay-orange">Payer Orange</button>
-            </div>
-        </div>
-        <div class="info-panier">
-          <p>
-            Vos informations de paiement sont sécurisées et ne seront pas partagées.
-          </p>    
+      <!-- Section Orange Money -->
+      <div id="section-orange" class="payment-section" style="display:none;">
+        <h3>Paiement Orange Money</h3>
+        <div id="orange-form">
+          <input class="form-control" type="text" name="orange_numero" placeholder="77xxxxxxx"/>
+          <button type="button" id="pay-orange">Payer Orange</button>
         </div>
       </div>
 
+      <div class="info-panier">
+        <p>Vos informations de paiement sont sécurisées et ne seront pas partagées.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- === Panier vide === -->
   <div id="empty-cart" {% if produits|length > 0 %}style="display: none;"{% endif %}>
     <p>Votre panier est vide.</p>
   </div>
 </div>
-
-<!-- === Stripe JS === -->
-{% comment %} <script src="https://js.stripe.com/v3/"></script> {% endcomment %}
 
 <script>
   window.PAYMENT_CONFIG = {
@@ -107,6 +107,4 @@
     redirectSuccessUrl: "/albums/mes-albums/"
   };
 </script>
-<script src="{% static 'store/js/panier.js' %}"></script>
-
 {% endblock panier %}

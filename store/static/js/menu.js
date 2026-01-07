@@ -1,148 +1,112 @@
-document.addEventListener('DOMContentLoaded', function () {
+// ==============================
+// MENU / AUTH / SEARCH UI
+// ==============================
 
-    // --- RÉFÉRENCES AUX ÉLÉMENTS ---
-    const openLoginFormButton = document.getElementById('openLoginFormButton');
-    const openLoginProfilButton = document.getElementById('openLoginProfilButton');
-    const popupLoginForm = document.getElementById('popupLoginForm');
-    const popupLoginProfil = document.getElementById('popupLoginProfil');
-    const popupSignupForm = document.getElementById('popupSignupForm');
-    const openSignupFormLink = document.getElementById('openSignupFormLink');
-    const openLoginFormLink = document.getElementById('openLoginFormLink');
-    const overlay = document.getElementById('overlay');
+function initMenu() {
+  if (window._menuInitialized) return;
+  window._menuInitialized = true;
 
-    // --- GESTION DES POPUPS ---
-    function openForm(form) {
-        form.classList.add('show');
-        overlay.classList.add('show');
+  // ==========================
+  // POPUPS AUTH
+  // ==========================
+  const overlay = document.getElementById("overlay");
+  const popupLoginForm = document.getElementById("popupLoginForm");
+  const popupSignupForm = document.getElementById("popupSignupForm");
+  const popupLoginProfil = document.getElementById("popupLoginProfil");
+
+  function openForm(form) {
+    if (!form) return;
+    form.classList.add("show");
+    overlay?.classList.add("show");
+  }
+
+  function closeForms() {
+    popupLoginForm?.classList.remove("show");
+    popupSignupForm?.classList.remove("show");
+    popupLoginProfil?.classList.remove("show");
+    overlay?.classList.remove("show");
+  }
+
+  document.addEventListener("click", e => {
+    const btnLogin = e.target.closest("#openLoginFormButton");
+    const btnProfil = e.target.closest("#openLoginProfilButton");
+    const btnSignup = e.target.closest("#openSignupFormLink");
+    const btnLoginLink = e.target.closest("#openLoginFormLink");
+
+    if (btnLogin) {
+      e.preventDefault();
+      closeForms();
+      openForm(popupLoginForm);
     }
 
-    function closeForms() {
-        popupLoginForm?.classList.remove('show');
-        popupSignupForm?.classList.remove('show');
-        popupLoginProfil?.classList.remove('show');
-        overlay?.classList.remove('show');
+    if (btnProfil) {
+      e.preventDefault();
+      closeForms();
+      openForm(popupLoginProfil);
     }
 
-    if (openLoginFormButton) {
-        openLoginFormButton.addEventListener('click', function () {
-            closeForms();
-            openForm(popupLoginForm);
-        });
+    if (btnSignup) {
+      e.preventDefault();
+      closeForms();
+      openForm(popupSignupForm);
     }
 
-    if (openLoginProfilButton) {
-        openLoginProfilButton.addEventListener('click', function () {
-            closeForms();
-            openForm(popupLoginProfil);
-        });
+    if (btnLoginLink) {
+      e.preventDefault();
+      closeForms();
+      openForm(popupLoginForm);
     }
+  });
 
-    if (openSignupFormLink) {
-        openSignupFormLink.addEventListener('click', function (event) {
-            event.preventDefault();
-            closeForms();
-            openForm(popupSignupForm);
-        });
-    }
+  overlay?.addEventListener("click", closeForms);
 
-    if (openLoginFormLink) {
-        openLoginFormLink.addEventListener('click', function (event) {
-            event.preventDefault();
-            closeForms();
-            openForm(popupLoginForm);
-        });
-    }
+  // ==========================
+  // SEARCH OPTIONS
+  // ==========================
+  document.addEventListener("click", e => {
+    const option = e.target.closest(".search-option");
+    if (!option) return;
 
-    overlay?.addEventListener('click', closeForms);
+    document.querySelectorAll(".search-option")
+      .forEach(btn => btn.classList.remove("active"));
 
-    // --- BARRE DE RECHERCHE ---
-    document.querySelectorAll('.search-option').forEach(function (button) {
-        button.addEventListener('click', function () {
-            document.querySelectorAll('.search-option').forEach(btn => btn.classList.remove('active'));
-            this.classList.add('active');
-            document.getElementById('search-type').value = this.getAttribute('data-type');
-        });
-    });
+    option.classList.add("active");
+    document.getElementById("search-type").value = option.dataset.type;
+  });
 
-    // --- TOGGLE SEARCH INPUT ON MOBILE ---
-    const searchToggle = document.getElementById('search-toggle');
-    const searchInput = document.getElementById('query');
-    if (searchToggle && searchInput) {
-        searchToggle.addEventListener('click', function () {
-            searchInput.classList.toggle('show');
-            searchInput.focus(); // Focus on the input when shown
-        });
-    }
-    if (searchInput) {
-        searchInput.addEventListener('keydown', function (event) {
-            if (event.key === 'Enter') {
-                const query = this.value;
-                const searchUrl = document.getElementById('search-url').getAttribute('data-url');
-                const searchType = document.getElementById('search-type').value;
+  // ==========================
+  // SEARCH INPUT (AJAX)
+  // ==========================
+  const searchInput = document.getElementById("query");
+  const searchToggle = document.getElementById("search-toggle");
+  const searchUrlEl = document.getElementById("search-url");
 
-                if (query) {
-                    window.location.href = `${searchUrl}?q=${encodeURIComponent(query)}&type=${encodeURIComponent(searchType)}`;
-                }
-            }
-        });
-    }
+  searchToggle?.addEventListener("click", () => {
+    searchInput?.classList.toggle("show");
+    searchInput?.focus();
+  });
 
-    // --- DÉFILEMENT HORIZONTAL DES ARTISTES ---
-    const artistContainer = document.getElementById('artistContainer');
-    const scrollAmount = 300;
+  searchInput?.addEventListener("keydown", e => {
+    if (e.key !== "Enter") return;
 
-    window.scrollLeft = function () {
-        artistContainer?.scrollBy({ top: 0, left: -scrollAmount, behavior: 'smooth' });
-    };
+    const query = searchInput.value.trim();
+    if (!query) return;
 
-    window.scrollRight = function () {
-        artistContainer?.scrollBy({ top: 0, left: scrollAmount, behavior: 'smooth' });
-    };
+    const url = `${searchUrlEl.dataset.url}?q=${encodeURIComponent(query)}&type=${encodeURIComponent(
+      document.getElementById("search-type").value
+    )}`;
 
-    // --- MISE À JOUR DU COMPTEUR DE VIDÉO ---
-    window.videoPlay = function (video_id) {
-        fetch(`/store/video/play/${video_id}/`)
-            .then(response => response.json())
-            .then(data => {
-                console.log('Compteur de lecture mis à jour :', data.play_count);
-            })
-            .catch(error => {
-                console.error('Erreur lors de la mise à jour du compteur de lecture:', error);
-            });
-    };
+    // 👉 navigation AJAX
+    loadPage(url);
+  });
 
-    // --- SUPPRESSION DES CLASSES SKELETON ---
-    window.removeSkeleton = function (videoElement) {
-        videoElement.classList.remove('skeleton');
-    };
+  // ==========================
+  // MENU MOBILE
+  // ==========================
+  document.addEventListener("click", e => {
+    const toggleBtn = e.target.closest(".menu-toggle");
+    if (!toggleBtn) return;
 
-});
-
-
-document.addEventListener('DOMContentLoaded', function() {
-    const popularSwiper = new Swiper(".popular-swiper", {
-        slidesPerView: 4,        // 4 artistes visibles
-        spaceBetween: 30,        // espace entre chaque artiste
-        navigation: {
-            nextEl: ".popular-artists .swiper-button-next",
-            prevEl: ".popular-artists .swiper-button-prev",
-        },
-        loop: false,             // boucle infinie désactivée
-        freeMode: true,          // <<< active la glissade libre
-        grabCursor: true,        // change le curseur pour indiquer qu'on peut glisser
-        breakpoints: {
-            0:   { slidesPerView: 1, spaceBetween: 15 },
-            480: { slidesPerView: 1, spaceBetween: 20 },
-            768: { slidesPerView: 3, spaceBetween: 25 },
-            992: { slidesPerView: 4, spaceBetween: 30 }
-        }
-    });
-});
-
-
-const toggleBtn = document.querySelector(".menu-toggle");
-const navMenu  = document.querySelector(".nav-menu");
-
-toggleBtn.addEventListener("click", () => {
-    navMenu.classList.toggle("active");
-});
+    document.querySelector(".nav-menu")?.classList.toggle("active");
+  });
+}

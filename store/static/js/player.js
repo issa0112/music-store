@@ -1,4 +1,4 @@
-document.addEventListener("DOMContentLoaded", () => {
+function initPlayer() {
   
   // Si la page n'a pas le lecteur global (par ex. page "play_track" qui a son propre lecteur),
   // on quitte proprement pour éviter erreurs sur des éléments absents.
@@ -849,25 +849,25 @@ fsClose?.addEventListener("click", () => {
   // ---------------------
   // Navigation AJAX
   // ---------------------
-  links.forEach(link => {
-    link.addEventListener("click", async e => {
-      if (e.ctrlKey || e.metaKey || e.button === 1) return;
-      e.preventDefault();
-      try {
-        const res = await fetch(link.href);
-        const text = await res.text();
-        const doc = new DOMParser().parseFromString(text, "text/html");
-        const newContent = doc.querySelector("#main-content");
-        if (newContent) {
-          mainContent.innerHTML = newContent.innerHTML;
-          history.pushState(null, "", link.href);
-          window.scrollTo(0, 0);
-        }
-      } catch {
-        window.location.href = link.href;
-      }
-    });
-  });
+  // links.forEach(link => {
+  //   link.addEventListener("click", async e => {
+  //     if (e.ctrlKey || e.metaKey || e.button === 1) return;
+  //     e.preventDefault();
+  //     try {
+  //       const res = await fetch(link.href);
+  //       const text = await res.text();
+  //       const doc = new DOMParser().parseFromString(text, "text/html");
+  //       const newContent = doc.querySelector("#main-content");
+  //       if (newContent) {
+  //         mainContent.innerHTML = newContent.innerHTML;
+  //         history.pushState(null, "", link.href);
+  //         window.scrollTo(0, 0);
+  //       }
+  //     } catch {
+  //       window.location.href = link.href;
+  //     }
+  //   });
+  // });
 
   window.addEventListener("popstate", async () => {
     const res = await fetch(location.href);
@@ -939,4 +939,4 @@ fsClose?.addEventListener("click", () => {
 
 
 
-});
+};

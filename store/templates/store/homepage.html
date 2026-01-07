@@ -1,32 +1,21 @@
-{% extends 'store/base.html' %} {% block title %}Page principale{% endblock %}
-{% block homepage %} {% comment %}
-<div class="search-options">
-  <button type="button" class="search-option" data-type="musique">
-    Musique
-  </button>
-  <button type="button" class="search-option" data-type="video">Vidéo</button>
-  <button type="button" class="search-option" data-type="artiste">
-    Artiste
-  </button>
-  <button type="button" class="search-option" data-type="all">Tous</button>
-</div>
-{% endcomment %}
+{% extends 'store/base.html' %} 
+{% load static %}
+{% block title %}Page principale{% endblock %}
+{% block homepage %} 
+
 <div class="spacer"></div>
 <!-- Section Artiste Populaire -->
 <section id="popular-artists" class="section fade-in-scroll popular-artists">
   <div class="section-inner">
-    <h2>Artistes Populaires </h2>
+    <h2>Artistes Populaires</h2>
 
     <div class="swiper popular-swiper">
       <div class="swiper-wrapper">
         {% for artist in popular_artists %}
         <div class="swiper-slide">
           {% if artist.user and artist.user.id %}
-          <a
-            href="{% url 'artist_profile' artist.user.id %}"
-            class="artist-card"
-            class="artist-link"
-            >
+          <a href="{% url 'artist_profile' artist.user.id %}" 
+             class="artist-card artist-link ajax-link">
             <img src="{{ artist.image.url }}" alt="{{ artist.name }}" />
             <div class="artist-info">
               <span>{{ artist.name }}</span>
@@ -43,13 +32,15 @@
         </div>
         {% endfor %}
       </div>
-
-      <!-- Flèches -->
-      <div class="swiper-button-next"></div>
-      <div class="swiper-button-prev"></div>
     </div>
+
+    <!-- 🔥 BOUTONS EN DEHORS -->
+    <div class="swiper-button-prev"></div>
+    <div class="swiper-button-next"></div>
+
   </div>
 </section>
+
 
 <!-- Section Album Populaire -->
 <section id="popular-albums" class="section fade-in-scroll">
@@ -137,5 +128,7 @@
     >
   </div>
 </section>
+<script src="{% static 'js/scroll.js' %}" defer></script>
+<script src="{% static 'js/menu.js' %}" defer></script>
 
 {% endblock homepage %}

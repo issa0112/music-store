@@ -1,35 +1,67 @@
+// =====================================================
+// SCROLL / ANIMATIONS — compatible AJAX
+// =====================================================
+window.initScroll = function () {
+  console.log("🟢 initScroll");
 
-document.addEventListener('DOMContentLoaded', function () {
-  // === SLIDER ARTISTES ===
-  const artistContainer = document.getElementById('artistContainer');
-  const scrollAmount = 300;
+  // ===============================
+  // FADE-IN AU SCROLL
+  // ===============================
+  document.querySelectorAll(".fade-in-scroll").forEach(el => {
+    // Évite double observer
+    if (el.dataset.fadeInit) return;
+    el.dataset.fadeInit = "true";
 
-  window.scrollLeft = function () {
-    artistContainer?.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
-  };
+    el.classList.remove("visible");
 
-  window.scrollRight = function () {
-    artistContainer?.scrollBy({ left: scrollAmount, behavior: 'smooth' });
-  };
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("visible");
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.1 });
 
-  // === FADE-IN AU SCROLL ===
-  const faders = document.querySelectorAll('.fade-in-scroll');
-
-  const appearOptions = {
-    threshold: 0.1,
-    rootMargin: "0px 0px -50px 0px"
-  };
-
-  const appearOnScroll = new IntersectionObserver(function(entries, observer) {
-    entries.forEach(entry => {
-      if (!entry.isIntersecting) return;
-      entry.target.classList.add('visible');
-      observer.unobserve(entry.target);
-    });
-  }, appearOptions);
-
-  faders.forEach(fader => {
-    appearOnScroll.observe(fader);
+    observer.observe(el);
   });
-});
 
+  // ===============================
+  // SWIPER (popular artists)
+  // ===============================
+  if (typeof Swiper === "undefined") {
+    console.error("❌ Swiper non chargé");
+    return;
+  }
+
+  const swiperEl = document.querySelector(".popular-swiper");
+  if (!swiperEl) {
+    console.warn("⚠️ .popular-swiper introuvable");
+    return;
+  }
+
+  // Détruire proprement si déjà initialisé
+  if (swiperEl.swiper) {
+    swiperEl.swiper.destroy(true, true);
+    swiperEl.swiper = null;
+    console.log("🔁 Swiper détruit");
+  }
+
+  // Initialisation
+  swiperEl.swiper = new Swiper(swiperEl, {
+    slidesPerView: 4,
+    spaceBetween: 30,
+    grabCursor: true,
+    navigation: {
+      nextEl: ".popular-artists .swiper-button-next",
+      prevEl: ".popular-artists .swiper-button-prev",
+    },
+    breakpoints: {
+      0:   { slidesPerView: 1 },
+      768: { slidesPerView: 3 },
+      992: { slidesPerView: 4 },
+    },
+  });
+
+  console.log("✅ Swiper initialisé");
+};
