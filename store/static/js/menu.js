@@ -28,15 +28,19 @@ function initMenu() {
   }
 
   document.addEventListener("click", e => {
-    const btnLogin = e.target.closest("#openLoginFormButton");
+    // const btnLogin = e.target.closest("#openLoginFormButton");
+    const btnLogin = e.target.closest("#openLoginFormButton, #openLoginFormButtonMobile");
     const btnProfil = e.target.closest("#openLoginProfilButton");
     const btnSignup = e.target.closest("#openSignupFormLink");
     const btnLoginLink = e.target.closest("#openLoginFormLink");
-
+    
     if (btnLogin) {
       e.preventDefault();
+      e.stopPropagation();
+      e.stopImmediatePropagation(); // 🔥 IMPORTANT
       closeForms();
       openForm(popupLoginForm);
+      return false;
     }
 
     if (btnProfil) {

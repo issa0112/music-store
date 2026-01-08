@@ -117,9 +117,10 @@
     <span>Profil</span>
   </a>
   {% else %}
-  <a href="{% url 'login' %}" class="ajax-link {% if request.path == '/login/' %}active{% endif %}">
+  <a id="openLoginFormButtonMobile" class="open-form-button bottom-login-btn no-ajax">
     <ion-icon name="log-in-outline"></ion-icon>
     <span>Connexion</span>
   </a>
+
   {% endif %}
 </nav>
