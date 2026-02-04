@@ -18,7 +18,12 @@ document.addEventListener("DOMContentLoaded", () => {
         if (data.playlists.length) {
           data.playlists.forEach(p => {
             const li = document.createElement("li");
-            li.innerHTML = `<a href="/playlist/${p.id}/">${p.name}</a>`;
+            li.className = "library-playlist-item";
+            li.dataset.playlistId = p.id;
+            li.innerHTML = `
+              <a href="#" data-playlist-id="${p.id}">${p.name}</a>
+              <div class="playlist-tracks" data-playlist-id="${p.id}" style="display:none;"></div>
+            `;
             playlistsUl.appendChild(li);
           });
         } else {
@@ -40,7 +45,7 @@ document.addEventListener("DOMContentLoaded", () => {
             artistsUl.appendChild(li);
           });
         } else {
-          artistsUl.innerHTML = "<li><em>Aucun artiste populaire.</em></li>";
+          artistsUl.innerHTML = "<li><em>Aucun artiste suivi.</em></li>";
         }
 
         // Albums
@@ -58,14 +63,61 @@ document.addEventListener("DOMContentLoaded", () => {
             albumsUl.appendChild(li);
           });
         } else {
-          albumsUl.innerHTML = "<li><em>Aucun album trouvé.</em></li>";
+          albumsUl.innerHTML = "<li><em>Aucun album acheté.</em></li>";
         }
       })
       .catch(err => console.error("Erreur bibliothèque :", err));
   }
 
+  function renderPlaylistTracks(container, tracks) {
+    if (!container) return;
+    if (!tracks || !tracks.length) {
+      container.innerHTML = "<div><em>Aucun titre dans cette playlist.</em></div>";
+      return;
+    }
+
+    const items = tracks.map(t => {
+      const cover = t.cover || "/static/img/trackdefault.png";
+      const duration = t.duration ? ` <small>${t.duration}</small>` : "";
+      return `
+        <div class="playlist-track-item" data-track-id="${t.id}">
+          <img src="${cover}" width="32" height="32" style="border-radius:6px; margin-right:8px;">
+          <span>${t.title} - <small>${t.artist}</small>${duration}</span>
+        </div>
+      `;
+    }).join("");
+
+    container.innerHTML = items;
+  }
+
   // Charger au départ
   loadLibrary();
+
+  // === Clic playlist: afficher contenu juste en dessous ===
+  document.addEventListener("click", e => {
+    const link = e.target.closest("#lib-playlists a[data-playlist-id]");
+    if (!link) return;
+    e.preventDefault();
+
+    const playlistId = link.dataset.playlistId;
+    const container = document.querySelector(`.playlist-tracks[data-playlist-id="${playlistId}"]`);
+    if (!container) return;
+
+    if (container.style.display === "block") {
+      container.style.display = "none";
+      return;
+    }
+
+    container.style.display = "block";
+    container.innerHTML = "<div><em>Chargement...</em></div>";
+
+    fetch(`/playlists/${playlistId}/tracks/`)
+      .then(res => res.json())
+      .then(data => renderPlaylistTracks(container, data.tracks))
+      .catch(() => {
+        container.innerHTML = "<div><em>Erreur de chargement.</em></div>";
+      });
+  });
 
   // === Ouvrir la sidebar ===
   openBtn.addEventListener("click", () => {
@@ -78,19 +130,19 @@ document.addEventListener("DOMContentLoaded", () => {
     console.log("Sidebar ouverte");
   });
 
-// === Fermer la sidebar ===
-closeBtn.addEventListener("click", () => {
-  sidebar.classList.remove("library-open", "library-expanded");
-  sidebar.classList.add("library-collapsed");
-  mainContent.classList.remove("main-shifted", "main-expanded");
+  // === Fermer la sidebar ===
+  closeBtn.addEventListener("click", () => {
+    sidebar.classList.remove("library-open", "library-expanded");
+    sidebar.classList.add("library-collapsed");
+    mainContent.classList.remove("main-shifted", "main-expanded");
 
-  openBtn.classList.remove("moved");
-  openBtn.innerHTML = '<i class="bi bi-collection"></i> Bibliothèque';
-  isExpanded = false;
+    openBtn.classList.remove("moved");
+    openBtn.innerHTML = '<i class="bi bi-collection"></i> Bibliothèque';
+    isExpanded = false;
 
-  // >>> Correction : reset la position du bouton <<<
-  openBtn.style.left = "";
-});
+    // reset la position du bouton
+    openBtn.style.left = "";
+  });
 
   // === Agrandir / Réduire la sidebar ===
   expandBtn.addEventListener("click", () => {

@@ -99,6 +99,15 @@
   </div>
 </div>
 
+<div
+  id="payment-config"
+  data-stripe-public-key="pk_test_XXXX"
+  data-create-payment-intent-url="{% url 'create_payment_intent' %}"
+  data-total-general="{{ total_general }}"
+  data-redirect-success-url="/albums/mes-albums/"
+  style="display:none;"
+></div>
+
 <script>
   window.PAYMENT_CONFIG = {
     stripePublicKey: "pk_test_XXXX",

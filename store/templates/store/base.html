@@ -433,6 +433,7 @@ input[type="range"].progress-bar {
         {% block panier %}{% endblock panier %}
         {% block playtrack %}{% endblock playtrack %}
         {% block profil %}{% endblock profil %}
+        {% block profile %}{% endblock profile %}
     </div>
 
 
@@ -442,10 +443,12 @@ input[type="range"].progress-bar {
           <form id="logoutForm" method="POST" action="{% url 'logout' %}">
             {% csrf_token %}
             <div class="form-group">
-              <a href="#">Profil</a>
-              <a href="#">Contactez nous</a>
-              <a href="#">Preference</a>
+                <a href="{% url 'profile' %}">Profil</a>
+
+                <a href="#">Contactez-nous</a>
+                <a href="#">Préférences</a>
             </div>
+            
             {% comment %} <div id="user-playlists" class="form-group">
               <!-- Les playlists seront chargées ici -->
               <p>Chargement de vos playlists...</p>
@@ -467,7 +470,7 @@ input[type="range"].progress-bar {
 
 <div id="popupLoginForm" class="popup-form">
     <div class="container">
-        <form id="loginForm" method="POST" data-url="{% url 'connexion' %}">
+        <form id="loginForm" method="POST" action="{% url 'connexion' %}">
             {% csrf_token %}
             
             <p>Connexion</p>
@@ -478,8 +481,9 @@ input[type="range"].progress-bar {
                 <input type="text" name="username" id="loginUsername" placeholder="Nom d'utilisateur" required><br>
                 <input type="password" name="password" id="loginPassword" placeholder="Mot de passe" required><br>
                 <input type="submit" value="Connexion"><br>
+                <a href="#" id="openForgotPasswordLink" role="button">Mot de passe oublié ?</a>
 
-                <a href="#" id="openSignupFormLink">Pas de compte ? S'inscrire</a>
+                <a href="#" id="openSignupFormLink" role="button">Pas de compte ? S'inscrire</a>
             </div>
               <!-- Boutons de connexion sociale -->
               <h3>Ou connectez-vous avec :</h3>
@@ -497,6 +501,22 @@ input[type="range"].progress-bar {
               </div>
         </form>
 
+    </div>
+</div>
+
+<div id="popupForgotPassword" class="popup-form">
+    <div class="container">
+        <form method="POST" action="{% url 'password_reset' %}">
+            {% csrf_token %}
+
+            <p>Mot de passe oublié</p>
+
+            <input type="email" name="email" placeholder="Votre email" required><br>
+
+            <input type="submit" value="Envoyer le lien"><br>
+
+            <a href="#" id="openLoginFormLink">Retour à la connexion</a>
+        </form>
     </div>
 </div>
 

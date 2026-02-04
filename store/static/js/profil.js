@@ -3,6 +3,7 @@
 // ==============================
 
 let profileInitialized = false;
+let trackClickInitialized = false;
 
 function initProfile() {
   if (profileInitialized) return;
@@ -22,7 +23,9 @@ function initProfile() {
     contents.forEach(c => c.classList.remove("active"));
 
     tab.classList.add("active");
-    document.getElementById(tab.dataset.tab)?.classList.add("active");
+
+    const content = document.getElementById(tab.dataset.tab);
+    if (content) content.classList.add("active");
   });
 
   // ==========================
@@ -50,24 +53,14 @@ function initProfile() {
         btn.classList.toggle("followed");
         btn.textContent = isFollowed ? "Suivre" : "Suivi";
       }
-    });
+    })
+    .catch(err => console.error("Follow error:", err));
   });
 
   // ==========================
   // MEDIA CLICK → GLOBAL PLAYER
   // ==========================
-  document.addEventListener("click", e => {
-    const item = e.target.closest(".media-item");
-    if (!item) return;
-
-    playMediaGlobal({
-      type: item.dataset.type,
-      url: item.dataset.url,
-      cover: item.dataset.cover,
-      title: item.dataset.title,
-      artist: item.dataset.artist
-    });
-  });
+  initTrackClick();
 
   // ==========================
   // HORIZONTAL DRAG SCROLL
@@ -103,47 +96,95 @@ function initProfile() {
 }
 
 // ==============================
-// GLOBAL PLAYER (1 seule fois)
+// GLOBAL PLAYER
 // ==============================
+function playMediaGlobal({ type, url, cover, title, artist, id }) {
+  const audioPlayer = document.getElementById("audio-player");
+  const audioSource = document.getElementById("audio-source");
+  const playerCover = document.getElementById("player-cover");
+  const audioTitle = document.getElementById("audio-title");
+  const audioArtist = document.getElementById("audio-artist");
+  const playPauseBtn = document.getElementById("play-pause");
 
-function playMediaGlobal({ type, url, cover, title, artist }) {
-  const miniPlayer = document.getElementById("mini-player");
-  const audio = document.getElementById("mini-audio");
-  const video = document.getElementById("mini-video");
+  if (type === "audio") {
+    audioSource.src = url;
+    audioPlayer.load();
+    audioPlayer.play().catch(() => {});
 
-  if (!miniPlayer) return;
+    playerCover.src = cover || "/static/img/trackdefault.png";
+    audioTitle.textContent = title;
+    audioArtist.textContent = artist;
 
-  audio?.pause();
-  video?.pause();
-
-  document.getElementById("mini-title").textContent = title;
-  document.getElementById("mini-artist").textContent = artist;
-  document.getElementById("mini-cover").src = cover || "/static/img/trackdefault.png";
-
-  if (type === "audio" && audio) {
-    audio.src = url;
-    audio.style.display = "block";
-    video.style.display = "none";
-    audio.play().catch(()=>{});
+    playPauseBtn.innerHTML = '<i class="bi bi-pause-fill"></i>';
   }
-
-  if (type === "video" && video) {
-    video.src = url;
-    video.style.display = "block";
-    audio.style.display = "none";
-    video.play().catch(()=>{});
-  }
-
-  miniPlayer.style.display = "flex";
 }
+
+// ==============================
+// TRACK CLICK + PLAYLIST
+// ==============================
+function initTrackClick() {
+  const tracks = document.querySelectorAll(".media-item");
+
+  // Construire / rafraîchir la playlist globale
+  window.currentTrackList = Array.from(tracks).map(t => ({
+    id: t.dataset.id,
+    title: t.dataset.title,
+    artist: t.dataset.artist,
+    cover: t.dataset.cover,
+    file_url: t.dataset.url,
+    type: t.dataset.type
+  }));
+  window.currentTrackIndex = -1;
+
+  if (trackClickInitialized) return;
+  trackClickInitialized = true;
+
+  // Délégation pour supporter le contenu injecté via AJAX
+  document.addEventListener("click", e => {
+    const track = e.target.closest(".media-item");
+    if (!track) return;
+
+    const tracksNow = document.querySelectorAll(".media-item");
+    window.currentTrackList = Array.from(tracksNow).map(t => ({
+      id: t.dataset.id,
+      title: t.dataset.title,
+      artist: t.dataset.artist,
+      cover: t.dataset.cover,
+      file_url: t.dataset.url,
+      type: t.dataset.type
+    }));
+    const index = Array.from(tracksNow).indexOf(track);
+    window.currentTrackIndex = index;
+
+    // ✅ Utiliser la fonction centrale qui gère le mini-player
+    window.playAudioFromSearch({
+      file_url: track.dataset.url,
+      title: track.dataset.title,
+      artist: track.dataset.artist,
+      cover: track.dataset.cover,
+      id: track.dataset.id
+    });
+  });
+}
+
 
 // ==============================
 // UTIL
 // ==============================
-
 function getCookie(name) {
   return document.cookie
     .split("; ")
     .find(row => row.startsWith(name + "="))
     ?.split("=")[1];
 }
+
+// ==============================
+// INIT
+// ==============================
+document.addEventListener("DOMContentLoaded", initProfile);
+
+// Exposé à main.js (AJAX navigation)
+window.initProfil = function () {
+  initProfile();
+  initTrackClick();
+};

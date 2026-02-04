@@ -206,9 +206,6 @@ class Playlist(models.Model):
         return f"{self.user.username} - {self.name}"
 
 
-
-
-
 class UserAction(models.Model):
     ACTION_CHOICES = [
         ('like', 'Like'),
@@ -387,3 +384,5 @@ class MediaFile(models.Model):
 
     def __str__(self):
         return f"{self.title} ({self.media_type}) - {self.conversion_status}"
+
+

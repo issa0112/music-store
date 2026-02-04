@@ -15,7 +15,8 @@ class VideoUploadForm(forms.ModelForm):
 class ProfileForm(forms.ModelForm):
     class Meta:
         model = Profile
-        fields = ['profile_picture', 'bio', 'location', 'website']
+        fields = ['avatar', 'cover']
+
 
 class ArtistProfileForm(forms.ModelForm):
     class Meta:

@@ -1,13 +1,19 @@
 document.addEventListener("DOMContentLoaded", function () {
+    // Si le handler AJAX principal (menu.js) est deja initialise, on ne duplique pas.
+    if (window._menuInitialized) return;
+
     const loginForm = document.getElementById("loginForm");
     const loginMessagesDiv = document.getElementById("loginMessages");
     const loginFields = document.getElementById("loginFields");
 
-    // Récupération de l'URL via l'attribut data-url défini dans le HTML
-    const actionUrl = loginForm.dataset.url;
+    if (!loginForm) return;
+
+    // Utiliser l'action du form (pas de data-url requis)
+    const actionUrl = loginForm.getAttribute("action");
+    if (!actionUrl) return;
 
     loginForm.addEventListener("submit", function (e) {
-        e.preventDefault();  // Empêche la soumission normale
+        e.preventDefault();
 
         const formData = new FormData(loginForm);
 
@@ -15,24 +21,37 @@ document.addEventListener("DOMContentLoaded", function () {
             method: "POST",
             body: formData,
             credentials: "same-origin",
+            redirect: "manual",
             headers: {
-                'X-Requested-With': 'XMLHttpRequest'
+                "X-Requested-With": "XMLHttpRequest"
             }
         })
-        .then(response => response.json())
-        .then(data => {
+        .then(async response => {
+            // Si redirection, on recharge
+            if (response.redirected || response.type === "opaqueredirect") {
+                location.reload();
+                return;
+            }
+
+            let data = {};
+            try {
+                data = await response.json();
+            } catch {
+                // Reponse non JSON -> rien a afficher
+            }
+
             if (data.success) {
                 loginMessagesDiv.innerHTML = `<p class="success-message">${data.message}</p>`;
-                loginFields.style.display = "none";
+                if (loginFields) loginFields.style.display = "none";
                 setTimeout(() => {
-                    location.reload();  // Recharge la page après connexion réussie
+                    location.reload();
                 }, 1000);
-            } else {
+            } else if (data.message) {
                 loginMessagesDiv.innerHTML = `<p class="error-message">${data.message}</p>`;
             }
         })
         .catch(error => {
-            loginMessagesDiv.innerHTML = `<p class="error-message">Erreur réseau ou serveur.</p>`;
+            loginMessagesDiv.innerHTML = `<p class="error-message">Erreur reseau ou serveur.</p>`;
             console.error("Erreur :", error);
         });
     });

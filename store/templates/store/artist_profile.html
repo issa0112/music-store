@@ -43,11 +43,12 @@
                 {% endif %}
 
                 <p class="followers">
-                    {{ profile_user.followers.count }}
-                    {% if profile_user.followers.count <= 1 %}
-                        abonné
+                    {% if profile_user.followers.count == 0 %}
+                        Pas d'abonné
+                    {% elif profile_user.followers.count == 1 %}
+                        1 abonné
                     {% else %}
-                        abonnés
+                        {{ profile_user.followers.count }} abonnés
                     {% endif %}
                 </p>
 
@@ -55,19 +56,19 @@
                 {% if request.user.is_authenticated %}
                     {% if request.user != profile_user %}
                         {% if request.user in profile_user.followers.all %}
-                            <form method="POST" action="{% url 'unfollow' profile_user.id %}">
+                            <div method="POST" action="{% url 'unfollow' profile_user.id %}">
                                 {% csrf_token %}
                                 <button type="submit" class="btn-follow followed">Suivi</button>
-                            </form>
+                            </div>
                         {% else %}
-                            <form method="POST" action="{% url 'follow' profile_user.id %}">
+                            <div method="POST" action="{% url 'follow' profile_user.id %}">
                                 {% csrf_token %}
-                                <button type="submit" class="btn-follow">Suivre</button>
-                            </form>
+                                <div type="submit" class="btn-follow">Suivre</div>
+                            </div>
                         {% endif %}
                     {% endif %}
                 {% else %}
-                    {% comment %} <a href="{% url 'login' %}" class="btn-follow">Se connecter pour suivre</a> {% endcomment %}
+                    <a href="{% url 'login' %}" class="btn-follow">Se connecter pour suivre</a>
                 {% endif %}
 
             </div>
@@ -84,7 +85,7 @@
             <li data-tab="albums">Albums</li>
             <li data-tab="videos">Vidéos</li>
             {% endif %}
-            <li data-tab="playlists">Playlists</li>
+            {% comment %} <li data-tab="playlists">Playlists</li> {% endcomment %}
         </ul>
     </div>
 
@@ -93,35 +94,36 @@
 
         <!-- TITRES -->
         <div id="tracks" class="tab-content active">
-            {% for track in tracks %}
-            <div class="media-item"
-                data-type="audio"
-                data-url="{{ track.file.url }}"
-                data-cover="{{ track.cover_image.url }}"
-                data-title="{{ track.title }}"
-                data-artist="{{ profile_user.username }}">
+        {% for track in tracks %}
+        <div class="media-item"
+            data-id="{{ track.id }}"
+            data-type="audio"
+            data-url="{{ track.file.url }}"
+            data-cover="{{ track.cover_image.url|default:'/static/img/trackdefault.png' }}"
+            data-title="{{ track.title }}"
+            data-artist="{{ profile_user.username }}">
 
-                <!-- MINIATURE -->
-                <div class="media-thumb">
-                    <img src="{{ track.cover_image.url|default:'/static/img/trackdefault.png' }}"
-                        alt="{{ track.title }}">
-
-                    <button class="play-btn">
-                        <i class="fa fa-play"></i>
-                    </button>
-                </div>
-
-                <!-- INFOS -->
-                <div class="media-info">
-                    <h3>{{ track.title }}</h3>
-                    <p>{{ profile_user.username }} • {{ track.duration }}</p>
-                </div>
-
+            <!-- MINIATURE -->
+            <div class="media-thumb">
+            <img src="{{ track.cover_image.url|default:'/static/img/trackdefault.png' }}"
+                alt="{{ track.title }}">
+            <button class="play-btn">
+                <i class="fa fa-play"></i>
+            </button>
             </div>
-            {% empty %}
-            <p>Aucun titre disponible.</p>
-            {% endfor %}
+
+            <!-- INFOS -->
+            <div class="media-info">
+            <h3>{{ track.title }}</h3>
+            <p>{{ profile_user.username }} • {{ track.duration }}</p>
+            </div>
+
         </div>
+        {% empty %}
+        <p>Aucun titre disponible.</p>
+        {% endfor %}
+        </div>
+
 
 
         <!-- ALBUMS -->
@@ -157,7 +159,7 @@
             {% endfor %}
         </div>
 
-        <!-- PLAYLISTS -->
+        {% comment %} <!-- PLAYLISTS -->
         <div id="playlists" class="tab-content">
             {% for playlist in playlists %}
             <div class="playlist-item">
@@ -167,7 +169,7 @@
             {% empty %}
             <p>Aucune playlist disponible.</p>
             {% endfor %}
-        </div>
+        </div> {% endcomment %}
 
     </div>
 </div>

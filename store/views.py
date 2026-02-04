@@ -591,8 +591,11 @@ def user_playlists_or_suggestions(request):
 @login_required
 def user_library(request):
     playlists = Playlist.objects.filter(user=request.user)
-    artists = Artist.objects.filter(is_popular=True)[:10]
-    albums = Album.objects.filter(is_popular=True)[:10]
+    artists = Artist.objects.filter(followers__follower=request.user).distinct()
+    albums = Album.objects.filter(
+        commandealbum__commande__client=request.user,
+        commandealbum__commande__etat_paiement__in=["payé", "paye", "payÃ©", "paid"],
+    ).distinct()
     
     return render(request, 'store/library_sidebar.html', {
         'playlists': playlists,
@@ -603,15 +606,44 @@ def user_library(request):
 
 @login_required
 def library_data(request):
-    playlists = Playlist.objects.filter(user=request.user).values("id", "name")
-    artists = Artist.objects.filter(is_popular=True).values("id", "name", "image")
-    albums = Album.objects.filter(is_popular=True).values("id", "title", "artist__name", "cover_image")
+    playlists = Playlist.objects.filter(user=request.user)
+    artists = Artist.objects.filter(followers__follower=request.user).distinct()
+    albums = Album.objects.filter(
+        commandealbum__commande__client=request.user,
+        commandealbum__commande__etat_paiement__in=["payé", "paye", "payÃ©", "paid"],
+    ).distinct()
 
     return JsonResponse({
-        "playlists": list(playlists),
-        "artists": list(artists),
-        "albums": list(albums),
+        "playlists": [{"id": p.id, "name": p.name} for p in playlists],
+        "artists": [{"id": a.id, "name": a.name, "image": a.image_url} for a in artists],
+        "albums": [
+            {
+                "id": alb.id,
+                "title": alb.title,
+                "artist__name": getattr(alb.artist, "name", "Inconnu"),
+                "cover_image": alb.cover_url,
+            }
+            for alb in albums
+        ],
     })
+
+@login_required
+def playlist_tracks(request, playlist_id):
+    playlist = get_object_or_404(Playlist, id=playlist_id, user=request.user)
+    tracks = playlist.tracks.select_related("artist").all()
+
+    data = [
+        {
+            "id": t.id,
+            "title": t.title,
+            "artist": getattr(t.artist, "name", "Inconnu"),
+            "duration": t.get_duration_display() if hasattr(t, "get_duration_display") else "",
+            "cover": t.cover_url,
+            "file_url": t.file_url or "",
+        }
+        for t in tracks
+    ]
+    return JsonResponse({"playlist_id": playlist.id, "tracks": data})
 
 @login_required
 def profile(request):
@@ -972,13 +1004,29 @@ def user_profile(request, user_id):
     }
     return render(request, "store/user_profile.html", context)
 
+from django.shortcuts import render, get_object_or_404
+from django.contrib.auth.models import User
+
 def profile_view(request, user_id):
     profile_user = get_object_or_404(User, id=user_id)
-    is_following = request.user.is_authenticated and request.user.is_following(profile_user)
-    return render(request, 'store/profile.html', {
+
+    is_following = (
+        request.user.is_authenticated
+        and request.user.is_following(profile_user)
+    )
+
+    playlists = profile_user.playlists.all()
+    liked_tracks = profile_user.liked_tracks.all()
+    following = profile_user.following.all()
+
+    return render(request, 'Utilisateur/profile.html', {
         'profile_user': profile_user,
         'is_following': is_following,
+        'playlists': playlists,
+        'liked_tracks': liked_tracks,
+        'following': following,
     })
+
 
 @login_required
 def follow(request, user_id):

@@ -65,6 +65,18 @@ a:hover {
     position: relative;
     margin-right: 20px;
 }
+.avatar-form {
+    position: absolute;
+    bottom: 5px;
+    right: 5px;
+
+    margin: 0;
+    padding: 0;
+    width: auto;
+    height: auto;
+}
+
+
 
 .profile-avatar {
     width: 120px;
@@ -82,16 +94,22 @@ a:hover {
 .camera-btn {
     position: absolute;
     bottom: 5px; right: 5px;
-    background: rgb(71, 145, 139);
+    background: rgba(45, 58, 57, 0.781);
     color: #fff;
     border-radius: 50%;
     padding: 8px;
     cursor: pointer;
     transition: background 0.3s ease;
+    border: 3px solid rgb(71, 145, 139);
+    
+    
 }
 
 .camera-btn:hover {
-    background: #47918b;
+    /* background: #47918b; */
+    transition: transform 0.3s ease;
+    border: 3px solid rgb(71, 145, 139);
+    /* background: rgba(71, 145, 139, 0); */
 }
 
 /* ====== TEXT ====== */
@@ -314,6 +332,25 @@ a:hover {
     background: #282828;
     color: #b3b3b3;
 }
+
+.playlist-cover-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: repeat(2, 1fr);
+    gap: 2px;
+    width: 20px;
+    height: 20px;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+
+.playlist-cover-grid img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
 
 @media (max-width: 768px) {
     .profile-header {

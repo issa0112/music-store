@@ -23,25 +23,43 @@ def deconnecter_compte(request):
 
 
 
-from django.views.decorators.csrf import csrf_protect
+
+from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login
 from django.http import JsonResponse
-import json
+from django.views.decorators.csrf import csrf_protect
+
+from django.shortcuts import render, redirect
+from django.contrib.auth import authenticate, login
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_protect
 
 @csrf_protect
 def connexion(request):
+    # POST = login via AJAX
     if request.method == "POST":
         username = request.POST.get("username")
         password = request.POST.get("password")
 
+        if not username or not password:
+            return JsonResponse({"success": False, "message": "Tous les champs sont requis"}, status=400)
+
         user = authenticate(request, username=username, password=password)
-        if user:
+        if user is not None:
             login(request, user)
-            return JsonResponse({"success": True, "message": "Connexion réussie."})
+            return JsonResponse({"success": True})
         else:
-            return JsonResponse({"success": False, "message": "Nom d'utilisateur ou mot de passe incorrect."}, status=400)
-    
-    return JsonResponse({"message": "Méthode non autorisée."}, status=405)
+            return JsonResponse({"success": False, "message": "Identifiants incorrects"}, status=400)
+
+    # GET = formulaire classique
+    next_url = request.GET.get("next", "")
+    # Si AJAX GET → renvoyer JSON vide, sinon afficher le formulaire HTML
+    if request.headers.get("X-Requested-With") == "XMLHttpRequest":
+        return JsonResponse({"success": False, "message": "Méthode GET non autorisée"}, status=405)
+
+    return render(request, "login.html", {"next": next_url})
+
+
 
 
 
@@ -74,11 +92,24 @@ def inscription(request):
 
 # views.py
 
-from django.contrib.auth.decorators import login_required
-from django.shortcuts import redirect
+def profile_view(request, user_id=None):
+    # Si tu veux afficher le profil d’un autre utilisateur
+    if user_id:
+        profile_user = User.objects.get(id=user_id)
+    else:
+        profile_user = request.user
 
-@login_required
-def profile_view(request):
-    # Rediriger vers la vue de profil dans store
-    return redirect('store:profile')
+    profile = profile_user.profile
+
+    playlists = getattr(profile_user, 'playlists', []).all() if hasattr(profile_user, 'playlists') else []
+    liked_tracks = profile.liked_tracks.all()
+    following = profile.following.all()
+
+    return render(request, 'store/profile.html', {
+        'profile_user': profile_user,
+        'profile': profile,
+        'playlists': playlists,
+        'liked_tracks': liked_tracks,
+        'following': following,
+    })
 

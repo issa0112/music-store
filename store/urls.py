@@ -35,6 +35,7 @@ from .views import (
     toggle_like_follow,
     user_playlists_or_suggestions,
     library_data,
+    playlist_tracks,
     profile,
     panier,
     ajouter_au_panier,
@@ -53,6 +54,9 @@ from .views import (
     artist_profile,
     library_api,
     download_album,
+    follow,
+    unfollow,
+    profile_view,
 )
 
 
@@ -93,7 +97,8 @@ urlpatterns = [
     path('action/<str:model_name>/<int:object_id>/', toggle_like_follow, name='toggle_like_follow'),
     path("playlists/popup_content/", user_playlists_or_suggestions, name="popup_content"),
     path('library/data/', library_data, name='library_data'),
-    path('profile/', profile, name='profile'),
+    path('playlists/<int:playlist_id>/tracks/', playlist_tracks, name='playlist_tracks'),
+    # path('profil/<int:user_id>/', profile_view, name='profile'),
     # path('album/<int:pk>/acheter/', acheter_album, name='acheter_album'),
     path('panier/', panier, name='panier'),
     path('panier/ajouter/<int:pk>/', ajouter_au_panier, name='ajouter_au_panier'),
@@ -114,7 +119,12 @@ urlpatterns = [
     path('api/library/', library_api, name='library_api'),
 
     path("album/<int:album_id>/download/", download_album, name="download_album"),
-
+    path('password-reset/', auth_views.PasswordResetView.as_view(), name='password_reset'),
+    path('password-reset/done/', auth_views.PasswordResetDoneView.as_view(), name='password_reset_done'),
+    path('reset/<uidb64>/<token>/', auth_views.PasswordResetConfirmView.as_view(), name='password_reset_confirm'),
+    path('reset/done/', auth_views.PasswordResetCompleteView.as_view(), name='password_reset_complete'),
+    path("user/<int:user_id>/follow/", follow, name="follow"), 
+    path("user/<int:user_id>/unfollow/", unfollow, name="unfollow"),
 
 
 

@@ -4,7 +4,18 @@
 window.initCart = function () {
   console.log("🛒 initCart");
 
-  const config = window.PAYMENT_CONFIG || null;
+  let config = window.PAYMENT_CONFIG || null;
+  if (!config) {
+    const cfgEl = document.getElementById("payment-config");
+    if (cfgEl) {
+      config = {
+        stripePublicKey: cfgEl.dataset.stripePublicKey,
+        createPaymentIntentUrl: cfgEl.dataset.createPaymentIntentUrl,
+        totalGeneral: cfgEl.dataset.totalGeneral,
+        redirectSuccessUrl: cfgEl.dataset.redirectSuccessUrl,
+      };
+    }
+  }
 
   // ===============================
   // UTILITAIRES

@@ -23,10 +23,11 @@
   <div class="library-content">
     <!-- Playlists -->
     <div id="tab-playlists" class="tab-content active">
-      <ul>
+      <ul id="lib-playlists">
         {% if playlists %} {% for playlist in playlists %}
-        <li>
-          <a href="#">{{ playlist.name }}</a>
+        <li data-playlist-id="{{ playlist.id }}" class="library-playlist-item">
+          <a href="#" data-playlist-id="{{ playlist.id }}">{{ playlist.name }}</a>
+          <div class="playlist-tracks" data-playlist-id="{{ playlist.id }}" style="display:none;"></div>
         </li>
         {% endfor %} {% else %}
         <li><em>Aucune playlist trouvée.</em></li>
@@ -36,7 +37,7 @@
 
     <!-- Artistes -->
     <div id="tab-artists" class="tab-content">
-      <ul>
+      <ul id="lib-artists">
         {% if artists %} {% for artist in artists %}
         <li>
           <a href="{% url 'artist_detail' artist.id %}">
@@ -59,7 +60,7 @@
 
     <!-- Albums -->
     <div id="tab-albums" class="tab-content">
-      <ul>
+      <ul id="lib-albums">
         {% if albums %} {% for album in albums %}
         <li>
           <a href="{% url 'album_detail' album.id %}">
